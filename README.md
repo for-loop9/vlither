@@ -2,7 +2,7 @@
 # Vlither
 ## A Desktop Client for Slither.io
 
-Vlither is a client for Slither.io which can run outside the browser. It is written in C and uses Vulkan for rendering all the graphics, thus providing better CPU/GPU utilization and faster rendering. A lot of the game-play code is a word-for-word C translation of the original JavaScript client (protocol version 14). It has only been tested on Windows (AMD and Intel) and Ubuntu (Intel).
+Vlither is a client for [Slither.io](http://slither.com/io) which can run outside the browser. It is written in C and uses Vulkan for rendering all the graphics, thus providing better CPU/GPU utilization and faster rendering. A lot of the game-play code is a word-for-word C translation of the original JavaScript client (protocol version 14). It has only been tested on Windows (AMD and Intel) and Ubuntu (Intel).
 
 ### Running Instructions
 No dependencies are required to run the program. If your GPU supports at least Vulkan 1.0, you're good to go.
