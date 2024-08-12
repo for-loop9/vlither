@@ -35,6 +35,9 @@ make config=debug # or config=release for release mode
 cd ../..
 build/bin/app
 ```
+You may also work on the cloned project with VS Code by opening the workspace file. All the build tasks and launch configurations have been set. Make sure you have the required extensions installed:
+- [C/C++ tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
+- [Makefile tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.makefile-tools)
 
 ## Features
 
