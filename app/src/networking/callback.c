@@ -232,7 +232,7 @@ void client_callback(struct mg_connection* c, int ev, void* ev_data) {
 				}
 				p += anl;
 				int skl = packet[p]; p++;
-				if (skl > 0) {
+				if (skl > 8) {
 					cusk = 1;
 					skin_data_len = 0;
 					for (int j = 8; j < skl; j += 2) {
