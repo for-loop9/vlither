@@ -2,6 +2,7 @@
 #define SNAKE_H
 
 #include <ignite.h>
+#include <stdbool.h>
 
 #define LFC 128
 #define RFC 43
@@ -30,11 +31,11 @@ typedef struct body_part {
 typedef struct snake {
 	int id;
 	int sct;
-	int iiv;
+	bool iiv;
 
 	int skin_data_len;
 	uint8_t* skin_data;
-	int cusk;
+	bool cusk;
 
 	float ang;
 	float dir;
@@ -79,7 +80,7 @@ typedef struct snake {
 	int ftg;
 	char nk[25];
 
-	int dead;
+	bool dead;
 	float dead_amt;
 	float alive_amt;
 } snake;

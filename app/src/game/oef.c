@@ -416,6 +416,7 @@ void oef(game* g, struct mg_connection* c, const input_data* input_data) {
 		if (fo->eaten) {
 			fo->eaten_fr += g->config.vfr / 41.0f;
 			snake* o = fo->eaten_by == -1 ? NULL : snake_map_get(&g->os, fo->eaten_by);
+
 			if (fo->eaten_fr >= 1 || !o) {
 				ig_darray_remove(g->foods, i);
 			}

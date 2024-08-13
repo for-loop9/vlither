@@ -222,7 +222,7 @@ void client_callback(struct mg_connection* c, int ev, void* ev_data) {
 				float snx = (packet[p] << 16 | packet[p + 1] << 8 | packet[p + 2]) / 5.0f; p += 3;
 				float sny = (packet[p] << 16 | packet[p + 1] << 8 | packet[p + 2]) / 5.0f; p += 3;
 				uint8_t nl, anl; nl = anl = packet[p]; p++; if (nl > 24) nl = 24;
-				char nk[24] = {};
+				char nk[25] = {};
 				int skin_data_len = g->config.default_skins[cv][0];
 				uint8_t* skin_data = g->config.default_skins[cv] + 1;
 				int cusk = 0;
@@ -363,7 +363,7 @@ void client_callback(struct mg_connection* c, int ev, void* ev_data) {
 				int snakes_len = snake_map_get_total(&g->os);
 				for (int i = snakes_len - 1; i >= 0; i--) {
 					if (g->os.snakes[i].id == id) {
-						g->os.snakes[i].id = -1234;
+						// g->os.snakes[i].id = -1234;
 						if (is_kill) {
 							g->os.snakes[i].dead = 1;
 							g->os.snakes[i].dead_amt = 0;

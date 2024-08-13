@@ -80,6 +80,7 @@
 			"game.h": "c",
 			"internal.h": "c"
 		},
+		"makefile.configureOnOpen": true,
 	},
 	"tasks": {
 		"version": "2.0.0",
