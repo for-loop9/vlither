@@ -115,6 +115,7 @@ void reset_game(game* g) {
 	g->config.fvy = 0;
 	g->config.lag_mult = 1;
 	g->network_done = 0;
+	g->config.my_pos = 0;
 
 	snake_map_clear(&g->os);
 	ig_darray_clear(g->foods);
