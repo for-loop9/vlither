@@ -56,6 +56,7 @@ You may also work on the project with VS Code by opening the `.code-workspace` f
 - Better skin rendering
 - Light theme
 - Multisampling
+- Android
 
 ## Tools Used
 
