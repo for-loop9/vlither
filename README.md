@@ -15,7 +15,7 @@ Prerequisites
 - [Vulkan SDK](https://www.lunarg.com/vulkan-sdk)
 - [Python 3](https://www.python.org/downloads) (for automated shader compilation)
 - GCC (mingw-w64 on Windows)
-- GDB (mingw-w64 on Windows)
+- GDB (mingw-w64 on Windows) if you plan to debug
 - Make (mingw-w64 on Windows)
 - X11 dependencies (only for Linux, [see here](https://www.glfw.org/docs/latest/compile.html))
 
