@@ -52,6 +52,7 @@ You may also work on the project with VS Code by opening the `.code-workspace` f
 
 ## Planned
 - Antennas
+- Accessories
 - Better skin rendering
 - Light theme
 
