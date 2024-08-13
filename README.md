@@ -2,7 +2,7 @@
 # Vlither
 ## A Desktop Client for Slither.io
 
-Vlither is a client for [Slither.io](http://slither.com/io) which can run outside the browser. It is written in C and uses Vulkan for rendering all the graphics, thus providing better CPU/GPU utilization and faster rendering. A lot of the game-play code is a word-for-word C translation of the original JavaScript client (protocol version 14). It has only been tested on Windows (AMD and Intel) and Ubuntu (Intel).
+Vlither is a client for Slither.io which can run outside the browser. It is written in C and uses Vulkan for rendering all the graphics, thus providing better CPU/GPU utilization and faster rendering. A lot of the game-play code is a word-for-word C translation of the original JavaScript client (protocol version 14). It has only been tested on Windows (AMD and Intel) and Ubuntu (Intel).
 
 ### Running Instructions
 No dependencies are required to run the program. If your GPU supports at least Vulkan 1.0, you're good to go.
@@ -17,6 +17,7 @@ Prerequisites
 - GCC (mingw-w64 on Windows)
 - GDB (mingw-w64 on Windows)
 - Make (mingw-w64 on Windows)
+- X11 dependencies (only for Linux, [see here](https://www.glfw.org/docs/latest/compile.html))
 
 On Windows, the program is developed using MSYS2 to get access to GCC, GDB, and Make with mingw-w64 tool chain. It has **_not_** been tested with MSVC or Cygwin. It will most likely not work with MSVC out of the box due to the use of POSIX Threads API.
 
@@ -35,10 +36,9 @@ make config=debug # or config=release for release mode
 cd ../..
 build/bin/app
 ```
-You may also work on the cloned project with VS Code by opening the workspace file. All the build tasks and launch configurations have been set. Make sure you have the required extensions installed:
+You may also work on the project with VS Code by opening the `.code-workspace` file. All the build tasks and launch configurations have been set. Make sure you have the required extensions installed:
 - [C/C++ tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
 - [Makefile tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.makefile-tools)
-
 ## Features
 
 - Supports all 66 skins
@@ -49,6 +49,11 @@ You may also work on the cloned project with VS Code by opening the workspace fi
 - Leader board
 - Minimap
 - Kill count
+
+## Planned
+- Antennas
+- Better skin rendering
+- Light theme
 
 ## Tools Used
 
@@ -67,5 +72,3 @@ This project is licensed under the GNU General Public License v3.0 - see the [LI
 
 ### Notice
 This project was made entirely by one person - me. I have play-tested it for long hours and have not come across any bugs - the ones that I did come across, I fixed. It is unlikely that you will come across any while using this program. In the off chance that you do, I would really appreciate if you'd let me know by opening up an issue.
-
-
