@@ -25,7 +25,7 @@ Premake5 should be installed and put in path. Make sure `VULKAN_SDK` environment
 
 ```bash
 git clone https://github.com/for-loop9/vlither.git # or extract the downloaded zip here
-cd vlither/scripts
+cd vlither/scripts # or cd into the extracted folder
 python compile_shaders.py
 cd ..
 premake5 --file=build.lua gmake2
