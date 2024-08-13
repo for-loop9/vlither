@@ -24,10 +24,8 @@ On Windows, the program is developed using [MSYS2](https://www.msys2.org) to get
 Premake5 should be installed and put in path. Make sure `VULKAN_SDK` environment variable is set properly if on Windows.
 
 ```bash
-mkdir vlither
-cd vlither
 git clone https://github.com/for-loop9/vlither.git # or extract the downloaded zip here
-cd scripts
+cd vlither/scripts
 python compile_shaders.py
 cd ..
 premake5 --file=build.lua gmake2
