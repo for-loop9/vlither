@@ -66,6 +66,13 @@ The following libraries have been used to develop Vlither:
 
 ## Gallery
 To view a small demo, checkout [this video](https://www.youtube.com/watch?v=6sr8swOjj7U). Here are a few screenshots:
+| ![Image 0](gallery/ss0.png) | ![Image 1](gallery/ss1.png) |
+|:----------------------------:|:----------------------------:|
+| *Image 0*                    | *Image 1*                    |
+
+| ![Image 2](gallery/ss2.png) | ![Image 3](gallery/ss3.png) |
+|:----------------------------:|:----------------------------:|
+| *Image 2*                    | *Image 3*                    |
 
 ## License
 This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](./LICENSE) file for details.
