@@ -1,0 +1,8 @@
+# ignore compiled shader files
+*.spv
+
+# ignore .dat files
+*.dat
+
+# ignore build folder
+build/
