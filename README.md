@@ -19,7 +19,7 @@ Prerequisites
 - Make (mingw-w64 on Windows)
 - X11 dependencies (only for Linux, [see here](https://www.glfw.org/docs/latest/compile.html))
 
-On Windows, the program is developed using MSYS2 to get access to GCC, GDB, and Make with mingw-w64 tool chain. It has **_not_** been tested with MSVC or Cygwin. It will most likely not work with MSVC out of the box due to the use of POSIX Threads API.
+On Windows, the program is developed using [MSYS2](https://www.msys2.org) to get access to GCC, GDB, and Make with mingw-w64 tool chain. It has **_not_** been tested with MSVC or Cygwin. It will most likely not work with MSVC out of the box due to the use of POSIX Threads API.
 
 Premake5 should be installed and put in path. Make sure `VULKAN_SDK` environment variable is set properly if on Windows.
 
