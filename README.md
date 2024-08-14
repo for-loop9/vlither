@@ -78,4 +78,4 @@ Here are a few screenshots:
 This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](./LICENSE) file for details.
 
 ### Notice
-This project was made entirely by one person - me. I have play-tested it for long hours and have not come across any bugs - the ones that I did come across, I fixed. It is unlikely that you will come across any while using this program. In the off chance that you do, I would really appreciate if you'd let me know by opening up an issue.
+This project was made entirely by one person - me. I play-test it for long hours and upon coming across any bugs, I fix them. It is unlikely that you will come across any while using this program. In the off chance that you do, I would really appreciate if you'd let me know by opening up an issue.
