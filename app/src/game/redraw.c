@@ -7,7 +7,7 @@
 #define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
 #include "../external/cimgui/cimgui.h"
 
-void redraw(game* g, int fps_display) {
+void redraw(game* g, const input_data* input_data) {
 	renderer_start_imgui_frame(g->renderer);
 
 	float mww = g->icontext->default_frame.resolution.x;
@@ -19,10 +19,10 @@ void redraw(game* g, int fps_display) {
 
 	igSetNextWindowPos((ImVec2) { .x = 0, .y = 0 }, ImGuiCond_None, (ImVec2) {});
 	igSetNextWindowSize((ImVec2) { .x = g->icontext->default_frame.resolution.x, .y = g->icontext->default_frame.resolution.y }, ImGuiCond_None);
-	igBegin("hud", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoInputs);
+	igBegin("hud", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoScrollbar);
 	ImDrawList* draw_list = igGetWindowDrawList();
 
-	igPushFont(g->renderer->small_font);
+	igPushFont(g->renderer->fonts[RENDERER_FONT_SMALL]);
 	if (!g->snake_null) { // snake != NULL
 		if (!g->settings_instance.enable_zoom) {
 			float dgsc = 0.64285f + 0.514285714f / fmaxf(1, (g->os.snakes[0].sct + 16.0f) / 36.0f);
@@ -76,7 +76,7 @@ void redraw(game* g, int fps_display) {
 		.circ = {
 			.x = mww2 + (g->config.grd - g->config.view_xx) * g->config.gsc,
 			.y = mhh2 + (g->config.grd - g->config.view_yy) * g->config.gsc,
-			.z = (g->config.grd * 0.98f) * g->config.gsc },
+			.z = (g->config.grd * 2) * g->config.gsc },
 		.color = { .x = 0.186f, .y = 0.11f, .z = 0.13f }
 	});
 
@@ -93,7 +93,7 @@ void redraw(game* g, int fps_display) {
 			.y = (((-mhh / g->config.bgh2) / 2) / g->config.gsc) - g->config.bgy2,
 			.z = (mww / g->config.bgw2) / g->config.gsc,
 			.w = (mhh / g->config.bgh2) / g->config.gsc },
-		.color = { .x = 1, .y = 1, .z = 1 }
+		.color = { .x = 1 * (1 - g->settings_instance.black_bg), .y = 1 * (1 - g->settings_instance.black_bg), .z = 1 * (1 - g->settings_instance.black_bg) }
 	});
 
 	// foods
@@ -337,6 +337,15 @@ void redraw(game* g, int fps_display) {
 				}
 			}
 
+			// if (!g->snake_null && i == 0) {
+			// 	renderer_push_sprite(g->renderer, &(sprite_instance) {
+			// 		.rect = { .x = mww2 - 1, .y = mhh2 - 50, .z = 2, .w = 100 },
+			// 		.ratios = { .x = sinf(o->ang + PI / 2), .y = cosf(o->ang + PI / 2) },
+			// 		.uv_rect = { .x = 3 / 64.0f, .y = 3 / 64.0f, .z = 1 / 64.0f, .w = 1 / 64.0f },
+			// 		.color = { .x = 1, .y = 1, .z = 1 }
+			// 	});
+			// }
+
 			// eyes
 			float ed = 6 * ssc;
 			float esp = 6 * ssc;
@@ -406,18 +415,41 @@ void redraw(game* g, int fps_display) {
 				float nty = o->yy + o->fy;
 				ntx = mww2 + (ntx - g->config.view_xx) * g->config.gsc;
 				nty = mhh2 + (nty - g->config.view_yy) * g->config.gsc;
-				
-				int len; ImVec2 nick_txt_size; igCalcTextSize(&nick_txt_size, o->nk, NULL, 0, 0); len = nick_txt_size.x;
+				int len; ImVec2 nick_txt_size;
 
-				ImDrawList_AddText_Vec2(draw_list,
-					(ImVec2) {
-					.x = ntx - len / 2, .y = nty + 32 + 11 * o->sc * g->config.gsc
-				}, igColorConvertFloat4ToU32((ImVec4) { .x = 0.8f, .y = 0.8f, .z = 0.8f, .w = v }), o->nk, NULL);
+				if (g->settings_instance.show_lengths) {
+					int snake_length_k = (floorf((g->config.fpsls[o->sct] + o->fam / g->config.fmlts[o->sct] - 1) * 15 - 5) / 1) / 1000;
+					if (snake_length_k > 0) {
+						char nk_buff[64] = {};
+						if (o->nk[0])
+							sprintf(nk_buff, "%s @ %dK", o->nk, snake_length_k);
+						else
+							sprintf(nk_buff, "@ %dK", snake_length_k);
+
+						igCalcTextSize(&nick_txt_size, nk_buff, NULL, 0, 0); len = nick_txt_size.x;
+						ImDrawList_AddText_Vec2(draw_list,
+							(ImVec2) {
+							.x = ntx - len / 2, .y = nty + 32 + 11 * o->sc * g->config.gsc
+						}, igColorConvertFloat4ToU32((ImVec4) { .x = 0.9f, .y = 0.9f, .z = 0.9f, .w = v }), nk_buff, NULL);
+					} else {
+						igCalcTextSize(&nick_txt_size, o->nk, NULL, 0, 0); len = nick_txt_size.x;
+						ImDrawList_AddText_Vec2(draw_list,
+							(ImVec2) {
+							.x = ntx - len / 2, .y = nty + 32 + 11 * o->sc * g->config.gsc
+						}, igColorConvertFloat4ToU32((ImVec4) { .x = 0.9f, .y = 0.9f, .z = 0.9f, .w = v }), o->nk, NULL);
+					}
+				} else {
+					igCalcTextSize(&nick_txt_size, o->nk, NULL, 0, 0); len = nick_txt_size.x;
+					ImDrawList_AddText_Vec2(draw_list,
+							(ImVec2) {
+							.x = ntx - len / 2, .y = nty + 32 + 11 * o->sc * g->config.gsc
+						}, igColorConvertFloat4ToU32((ImVec4) { .x = 0.9f, .y = 0.9f, .z = 0.9f, .w = v }), o->nk, NULL);
+				}
 			}
 		}
 	}
 	igPopFont();
 
-	hud(g, fps_display);
+	hud(g, input_data);
 	igEnd();
 }

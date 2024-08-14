@@ -6,6 +6,6 @@ layout (location = 1) in vec2 out_uv;
 
 void main() {
 	float l = length(out_uv * 2.0 - 1.0);
-	float o = 1 - step(0.0, 1.0 - l);
+	float o = 1 - step(0.0, 0.5f * 0.98f - l);
 	color = vec4(out_color, 1.0) * o;
 }

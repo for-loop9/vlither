@@ -4,6 +4,24 @@
 #include "../game/game.h"
 #include <math.h>
 
+uint8_t* reduce_skin(game* g) {
+	uint8_t* reduced = ig_darray_create(uint8_t);
+	uint8_t sequence_count = 0;
+
+	for (int i = 0; i < g->settings_instance.exp_ptr; i++) {
+		sequence_count++;
+
+		uint8_t data_i = g->settings_instance.cusk_skin_data_exp[i];
+
+		if (g->settings_instance.cusk_skin_data_exp[i + 1] != data_i) {
+			ig_darray_push(&reduced, &sequence_count);
+			ig_darray_push(&reduced, &data_i);
+			sequence_count = 0;
+		}
+	}
+	return reduced;
+}
+
 void decode_secret(const uint8_t* packet, uint8_t* result) {
 	int int_packet[165] = {};
 	for (int i = 0; i < 165; i++) {
@@ -41,9 +59,10 @@ void decode_secret(const uint8_t* packet, uint8_t* result) {
 
 uint8_t* make_nickname_skin_data(game* g, int* nickname_skin_data_len) {
 	int nickname_len = (int) strlen(g->settings_instance.nickname);
-	int cusk_len = g->settings_instance.cusk ? g->settings_instance.cusk_ptr + 2 : 0;
 
-	uint8_t* result = malloc(*nickname_skin_data_len = 8 + nickname_len + 8 + cusk_len);
+	uint8_t* reduced_skin_data = reduce_skin(g);
+	int reduced_length = ig_darray_length(reduced_skin_data);
+	uint8_t* result = malloc(*nickname_skin_data_len = 8 + nickname_len + 8 + reduced_length);
 
 	result[0] = 115;
 	result[1] = 31;
@@ -70,9 +89,11 @@ uint8_t* make_nickname_skin_data(game* g, int* nickname_skin_data_len) {
 	result[j++] = (int) floorf(rand() % 256);
 	result[j++] = (int) floorf(rand() % 256);
 
-	for (int i = 0; i < cusk_len; i++) {
-		result[j++] = g->settings_instance.cusk_skin_data[i];
+	for (int i = 0; i < reduced_length; i++) {
+		result[j++] = reduced_skin_data[i];
 	}
+	
+	ig_darray_destroy(reduced_skin_data);
 
 	return result;
 }
@@ -116,6 +137,8 @@ void reset_game(game* g) {
 	g->config.lag_mult = 1;
 	g->network_done = 0;
 	g->config.my_pos = 0;
+	g->config.rank = 0;
+	g->config.total_players = 0;
 
 	snake_map_clear(&g->os);
 	ig_darray_clear(g->foods);

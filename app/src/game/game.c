@@ -4,6 +4,40 @@
 #include "prey.h"
 #include "title_screen.h"
 
+float luminance(ig_vec3 color) {
+	float r = (color.x <= 0.03928f) ? color.x / 12.92f : powf((color.x + 0.055f) / 1.055f, 2.4f);
+	float g = (color.y <= 0.03928f) ? color.y / 12.92f : powf((color.y + 0.055f) / 1.055f, 2.4f);
+	float b = (color.z <= 0.03928f) ? color.z / 12.92f : powf((color.z + 0.055f) / 1.055f, 2.4f);
+
+	return 0.2126f * r + 0.7152f * g + 0.0722f * b;
+}
+
+float contrast_ratio(ig_vec3 color1, ig_vec3 color2) {
+	float L1 = luminance(color1);
+	float L2 = luminance(color2);
+	if (L1 < L2) {
+		float temp = L1;
+		L1 = L2;
+		L2 = temp;
+	}
+	return (L1 + 0.05f) / (L2 + 0.05f);
+}
+
+ig_vec3 get_cg_opp_color(ig_vec3 cg_color) {
+	ig_vec3 black = { 0.0f, 0.0f, 0.0f };
+	ig_vec3 white = { 1.0f, 1.0f, 1.0f };
+
+	float contrast_with_black = contrast_ratio(cg_color, black);
+	float contrast_with_white = contrast_ratio(cg_color, white);
+
+	if (contrast_with_black > contrast_with_white) {
+		return black;
+	}
+	else {
+		return white;
+	}
+}
+
 void* network_worker(void* args) {
 	game* g = (game*) args;
 	struct mg_mgr mgr;
@@ -77,6 +111,9 @@ void create_game(int argc, char** argv) {
 			.nickname = "",
 			.ip = "15.204.212.200:444",
 			.hq = true,
+			.laser_length = 150,
+			.laser_thickness = 2,
+			.laser_color = { .x = 1, .y = 0.6f, .z = 0.6f }
 		},
 		.config = {
 			.grd = -1,
@@ -104,46 +141,46 @@ void create_game(int argc, char** argv) {
 			.lag_mult = 1,
 
 			.color_groups = {
-				[0] = { .x = 0.90f, .y = 0.60f, .z = 1.00f },
-				[1] = { .x = 0.67f, .y = 0.71f, .z = 1.00f },
-				[2] = { .x = 0.60f, .y = 0.97f, .z = 0.97f },
-				[3] = { .x = 0.60f, .y = 1.00f, .z = 0.60f },
-				[4] = { .x = 1.00f, .y = 1.00f, .z = 0.53f },
-				[5] = { .x = 1.00f, .y = 0.75f, .z = 0.45f },
-				[6] = { .x = 1.00f, .y = 0.67f, .z = 0.67f },
-				[7] = { .x = 1.00f, .y = 0.30f, .z = 0.30f },
-				[8] = { .x = 1.00f, .y = 0.22f, .z = 1.00f },
-				[9] = { .x = 1.00f, .y = 1.00f, .z = 1.00f },
-				[10] = { .x = 0.66f, .y = 0.71f, .z = 1.00f },
-				[11] = { .x = 0.37f, .y = 0.37f, .z = 0.37f },
-				[12] = { .x = 1.00f, .y = 0.89f, .z = 0.37f },
-				[13] = { .x = 0.18f, .y = 0.63f, .z = 0.45f },
-				[14] = { .x = 0.46f, .y = 0.55f, .z = 1.00f },
-				[15] = { .x = 0.56f, .y = 0.62f, .z = 1.00f },
-				[16] = { .x = 0.33f, .y = 0.39f, .z = 1.00f },
-				[17] = { .x = 0.75f, .y = 0.37f, .z = 1.00f },
-				[18] = { .x = 1.00f, .y = 1.00f, .z = 0.29f },
-				[19] = { .x = 0.26f, .y = 0.31f, .z = 1.00f },
-				[20] = { .x = 0.26f, .y = 0.31f, .z = 1.00f },
-				[21] = { .x = 0.36f, .y = 0.16f, .z = 0.89f },
-				[22] = { .x = 1.00f, .y = 0.40f, .z = 0.04f },
-				[23] = { .x = 0.45f, .y = 1.00f, .z = 1.00f },
-				[24] = { .x = 0.52f, .y = 0.46f, .z = 0.35f },
-				[25] = { .x = 0.24f, .y = 0.76f, .z = 0.28f },
-				[26] = { .x = 0.00f, .y = 1.00f, .z = 0.37f },
-				[27] = { .x = 0.99f, .y = 0.31f, .z = 0.31f },
-				[28] = { .x = 1.00f, .y = 0.25f, .z = 0.25f },
-				[29] = { .x = 0.55f, .y = 0.55f, .z = 0.55f },
-				[30] = { .x = 0.03f, .y = 0.03f, .z = 0.56f },
-				[31] = { .x = 0.56f, .y = 0.03f, .z = 0.03f },
-				[32] = { .x = 0.58f, .y = 0.58f, .z = 0.23f },
-				[33] = { .x = 0.58f, .y = 0.40f, .z = 0.23f },
-				[34] = { .x = 0.58f, .y = 0.23f, .z = 0.58f },
-				[35] = { .x = 0.23f, .y = 0.58f, .z = 0.23f },
-				[36] = { .x = 0.80f, .y = 0.15f, .z = 0.34f }, // britisher
-				[37] = { .x = 0.48f, .y = 0.60f, .z = 1.00f },
-				[38] = { .x = 0.00f, .y = 0.00f, .z = 0.52f },
-				[39] = { .x = 0.48f, .y = 0.18f, .z = 0.80f },
+				[0] = { .x = 0.75, .y = 0.50, .z = 1.00 },
+				[1] = { .x = 0.56, .y = 0.60, .z = 1.00 },
+				[2] = { .x = 0.50, .y = 0.82, .z = 0.82 },
+				[3] = { .x = 0.50, .y = 1.00, .z = 0.50 },
+				[4] = { .x = 0.93, .y = 0.93, .z = 0.44 },
+				[5] = { .x = 1.00, .y = 0.63, .z = 0.38 },
+				[6] = { .x = 1.00, .y = 0.56, .z = 0.56 },
+				[7] = { .x = 1.00, .y = 0.25, .z = 0.25 },
+				[8] = { .x = 0.88, .y = 0.19, .z = 0.88 },
+				[9] = { .x = 1.00, .y = 1.00, .z = 1.00 },
+				[10] = { .x = 0.56, .y = 0.60, .z = 1.00 },
+				[11] = { .x = 0.31, .y = 0.31, .z = 0.31 },
+				[12] = { .x = 1.00, .y = 0.75, .z = 0.31 },
+				[13] = { .x = 0.16, .y = 0.53, .z = 0.38 },
+				[14] = { .x = 0.39, .y = 0.46, .z = 1.00 },
+				[15] = { .x = 0.47, .y = 0.53, .z = 1.00 },
+				[16] = { .x = 0.28, .y = 0.33, .z = 1.00 },
+				[17] = { .x = 0.63, .y = 0.31, .z = 1.00 },
+				[18] = { .x = 1.00, .y = 0.88, .z = 0.25 },
+				[19] = { .x = 0.22, .y = 0.27, .z = 1.00 },
+				[20] = { .x = 0.22, .y = 0.27, .z = 1.00 },
+				[21] = { .x = 0.31, .y = 0.14, .z = 0.75 },
+				[22] = { .x = 1.00, .y = 0.34, .z = 0.04 },
+				[23] = { .x = 0.40, .y = 0.78, .z = 0.91 },
+				[24] = { .x = 0.50, .y = 0.52, .z = 0.56 },
+				[25] = { .x = 0.24, .y = 0.75, .z = 0.28 },
+				[26] = { .x = 0.00, .y = 1.00, .z = 0.33 },
+				[27] = { .x = 0.85, .y = 0.27, .z = 0.27 },
+				[28] = { .x = 1.00, .y = 0.25, .z = 0.25 },
+				[29] = { .x = 0.56, .y = 0.56, .z = 0.56 },
+				[30] = { .x = 0.13, .y = 0.13, .z = 0.94 },
+				[31] = { .x = 0.94, .y = 0.13, .z = 0.13 },
+				[32] = { .x = 0.94, .y = 0.94, .z = 0.13 },
+				[33] = { .x = 0.94, .y = 0.56, .z = 0.13 },
+				[34] = { .x = 0.94, .y = 0.13, .z = 0.94 },
+				[35] = { .x = 0.13, .y = 0.94, .z = 0.13 },
+				[36] = { .x = 0.16, .y = 0.24, .z = 0.68 }, // britisher color group
+				[37] = { .x = 0.41, .y = 0.50, .z = 1.00 },
+				[38] = { .x = 0.00, .y = 0.00, .z = 0.44 },
+				[39] = { .x = 0.41, .y = 0.16, .z = 0.67 }
 			},
 
 			.default_skins = {
@@ -213,14 +250,59 @@ void create_game(int argc, char** argv) {
 				[63] = { 6, 7, 7, 7, 11, 11, 11 },
 				[64] = { 4, 16, 16, 11, 11 },
 				[65] = { 8, 4, 4, 4, 4, 9, 9, 9, 9 },
+			},
+
+			.ntl_cg_map = {
+				[0] = 'z',
+				[1] = 'x',
+				[2] = 'c',
+				[3] = 'v',
+				[4] = 'b',
+				[5] = 'n',
+				[6] = 'm',
+				[7] = ',',
+				[8] = 'a',
+				[9] = 's',
+				[10] = 'd',
+				[11] = 'f',
+				[12] = 'g',
+				[13] = 'h',
+				[14] = 'j',
+				[15] = 'k',
+				[16] = 'l',
+				[17] = 'q',
+				[18] = 'w',
+				[19] = 'e',
+				[20] = 'r',
+				[21] = 't',
+				[22] = 'y',
+				[23] = 'u',
+				[24] = 'i',
+				[25] = 'o',
+				[26] = 'p',
+				[27] = '1',
+				[28] = '2',
+				[29] = '3',
+				[30] = '4',
+				[31] = '5',
+				[32] = '6',
+				[33] = '7',
+				[34] = '8',
+				[35] = '9',
+				[36] = '*', // britisher
+				[37] = '0',
+				[38] = '*', // idk
+				[39] = '-'
 			}
 		}
 	};
 
+	for (int i = 0; i < 40; i++) {
+		g.config.color_groups_opp[i] = get_cg_opp_color(g.config.color_groups[i]);
+	}
+
 	for (int i = 0; i < 256; i++) g.settings_instance.cusk_skin_data_exp[i] = -1;
-	g.settings_instance.cusk_ptr = 0;
 	g.settings_instance.exp_ptr = 0;
-	g.settings_instance.added_first = 0;
 
 	load_settings(&g);
 
@@ -294,8 +376,10 @@ void create_game(int argc, char** argv) {
 		input_data.mouse_pos = g.mouse->pos;
 		input_data.mouse_delta = g.mouse->delta;
 		input_data.mouse_dwheel = g.mouse->dwheel;
-		input_data.btn_down = ig_window_mouse_button_down(g.window, GLFW_MOUSE_BUTTON_LEFT);
-		// input_data.z_pressed = ig_keyboard_key_pressed(g.keyboard, GLFW_KEY_Z);
+		input_data.btn_down = ig_window_mouse_button_down(g.window, GLFW_MOUSE_BUTTON_LEFT) || ig_window_keyboard_key_down(g.window, GLFW_KEY_SPACE);
+		input_data.k_pressed = ig_keyboard_key_pressed(g.keyboard, GLFW_KEY_K);
+		input_data.m_pressed = ig_keyboard_key_pressed(g.keyboard, GLFW_KEY_M);
+		input_data.n_pressed = ig_keyboard_key_pressed(g.keyboard, GLFW_KEY_N);
 		input_data.ctm = glfwGetTime() * 1000;
 		float ct = glfwGetTime();
 		dt = ct - pdt;

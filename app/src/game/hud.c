@@ -5,11 +5,29 @@
 #include "../external/cimgui/cimgui.h"
 #include <math.h>
 
-void hud(game* g, int fps_display) {
+void hud(game* g, const input_data* input_data) {
 	float mww = g->icontext->default_frame.resolution.x;
 	float mhh = g->icontext->default_frame.resolution.y;
 	float mww2 = mww / 2;
 	float mhh2 = mhh / 2;
+	float mx = input_data->mouse_pos.x;
+	float my = input_data->mouse_pos.y;
+
+	if (!g->snake_null && g->config.laser) {
+		float laser_length = (0.5f * g->os.snakes[0].sc * 29 + g->settings_instance.laser_length) * g->config.gsc;
+
+		float laser_ang = atan2f(my - mhh2, mx - mww2);
+		float laser_sin = sinf(laser_ang);
+		float laser_cos = cosf(laser_ang);
+
+		renderer_push_sprite(g->renderer, &(sprite_instance) {
+			.rect = { .x = (mww2 - laser_length / 2) + (0.5f * laser_length * laser_cos), .y = (mhh2 - g->settings_instance.laser_thickness / 2) + (0.5f * laser_length * laser_sin), .z = laser_length, .w = g->settings_instance.laser_thickness },
+			.ratios = { .x = laser_sin, .y = laser_cos },
+			.uv_rect = { .x = 3 / 64.0f, .y = 3 / 64.0f, .z = 1 / 64.0f, .w = 1 / 64.0f },
+			.color = g->settings_instance.laser_color
+		});
+	}
+
 
 	ImGuiStyle* style = igGetStyle();
 	ImDrawList* draw_list = igGetWindowDrawList();
@@ -18,7 +36,7 @@ void hud(game* g, int fps_display) {
 
 	if (g->settings_instance.show_fps) {
 		char fps_str[32] = {};
-		sprintf(fps_str, "FPS: %d", fps_display);
+		sprintf(fps_str, "FPS: %d", input_data->fps_display);
 		ImDrawList_AddText_Vec2(draw_list,
 			(ImVec2) {
 				.x = g->icontext->default_frame.resolution.x / 2 - fps_text_size.x / 2, .y = 10
@@ -39,7 +57,7 @@ void hud(game* g, int fps_display) {
 		mm_labels[3][0] = 'S';
 	}
 
-	igPushFont(g->renderer->small_font);
+	igPushFont(g->renderer->fonts[RENDERER_FONT_SMALL]);
 	ImVec2 ll_txt_size; igCalcTextSize(&ll_txt_size, mm_labels[0], NULL, false, 0);
 	ImVec2 rl_txt_size; igCalcTextSize(&rl_txt_size, mm_labels[1], NULL, false, 0);
 	ImVec2 tl_txt_size; igCalcTextSize(&tl_txt_size, mm_labels[2], NULL, false, 0);
@@ -96,21 +114,43 @@ void hud(game* g, int fps_display) {
 	}
 
 	char stats_buff[64] = {};
-	sprintf(stats_buff, "Length = %d", g->config.length_display);
-	ImDrawList_AddText_Vec2(draw_list,
-	(ImVec2) {
-		.x = 4, .y = g->icontext->default_frame.resolution.y - fps_text_size.y 
-	}, igColorConvertFloat4ToU32((ImVec4) { .x = 1, .y = 0.5f, .z = 0.5f, .w = 1 }), stats_buff, NULL);
+
+	float orig_cx = igGetCursorPosX();
+	float orig_cy = igGetCursorPosY();
+
+	igSetCursorPosX(4);
+	igSetCursorPosY(g->icontext->default_frame.resolution.y - fps_text_size.y);
+	igPushFont(g->renderer->fonts[RENDERER_FONT_MED]);
+	igTextColored((ImVec4) { 1, 1, 1, 0.5f }, "Rank:"); igSameLine(0, -1);
+	igPopFont();
+	igPushFont(g->renderer->fonts[RENDERER_FONT_MED_BOLD]);
+	igTextColored((ImVec4) { 1, 1, 1, 0.6f }, "%d/%d", g->config.rank, g->config.total_players);
+	igPopFont();
+
+	igSetCursorPosX(4);
+	igSetCursorPosY(g->icontext->default_frame.resolution.y - fps_text_size.y * 2);
+	igPushFont(g->renderer->fonts[RENDERER_FONT_MED]);
+	igTextColored((ImVec4) { 1, 1, 1, 0.5f }, "Length:"); igSameLine(0, -1);
+	igPopFont();
+	igPushFont(g->renderer->fonts[RENDERER_FONT_MED_BOLD]);
+	igTextColored((ImVec4) { 1, 1, 1, 0.8f }, "%d", g->config.length_display);
+	igPopFont();
 
 	if (g->settings_instance.show_kill) {
-		sprintf(stats_buff, "Kills = %d", g->config.kills_display);
-		ImDrawList_AddText_Vec2(draw_list,
-		(ImVec2) {
-			.x = 4, .y = g->icontext->default_frame.resolution.y - fps_text_size.y * 2 
-		}, igColorConvertFloat4ToU32((ImVec4) { .x = 1, .y = 0.5f, .z = 0.5f, .w = 1 }), stats_buff, NULL);
+		igSetCursorPosX(4);
+		igSetCursorPosY(g->icontext->default_frame.resolution.y - fps_text_size.y * 3);
+		igPushFont(g->renderer->fonts[RENDERER_FONT_MED]);
+		igTextColored((ImVec4) { 1, 1, 1, 0.5f }, "Kills:"); igSameLine(0, -1);
+		igPopFont();
+		igPushFont(g->renderer->fonts[RENDERER_FONT_MED_BOLD]);
+		igTextColored((ImVec4) { 1, 1, 1, 0.8f }, "%d", g->config.kills_display);
+		igPopFont();
 	}
 
-	igPushFont(g->renderer->small_font);
+	igPushFont(g->renderer->fonts[RENDERER_FONT_SMALL]);
+
+	igSetCursorPosX(orig_cx);
+	igSetCursorPosY(orig_cy);
 
 	float rank_size; ImVec2 clm_txt_size; igCalcTextSize(&clm_txt_size, "10", NULL, 0, 0); rank_size = clm_txt_size.x;
 	float name_size; igCalcTextSize(&clm_txt_size, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", NULL, 0, 0); name_size = clm_txt_size.x;
@@ -135,14 +175,11 @@ void hud(game* g, int fps_display) {
 
 		if (g->config.my_pos == i + 1 && !g->snake_null) {
 			textColor.w = 1;
-			igPushFont(g->renderer->small_bold_font);
+			igPushFont(g->renderer->fonts[RENDERER_FONT_SMALL_BOLD]);
 			igText("%d", i + 1);
 
 			igTableSetColumnIndex(1);
-			if (strlen(entry->nk) == 0) {
-				igTextColored(textColor, "<NO NAME>");
-			}
-			else {
+			if (strlen(entry->nk) != 0) {
 				igTextColored(textColor, entry->nk);
 			}
 			igTableSetColumnIndex(2);
@@ -152,10 +189,7 @@ void hud(game* g, int fps_display) {
 			igText("%d", i + 1);
 
 			igTableSetColumnIndex(1);
-			if (strlen(entry->nk) == 0) {
-				igTextColored(textColor, "<NO NAME>");
-			}
-			else {
+			if (strlen(entry->nk) != 0) {
 				igTextColored(textColor, entry->nk);
 			}
 			igTableSetColumnIndex(2);

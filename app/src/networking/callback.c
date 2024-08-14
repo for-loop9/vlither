@@ -744,15 +744,17 @@ void client_callback(struct mg_connection* c, int ev, void* ev_data) {
 			int final_score = floorf((g->config.fpsls[g->os.snakes[0].sct] + g->os.snakes[0].fam / g->config.fmlts[g->os.snakes[0].sct] - 1) * 15 - 5) / 1;
 			printf("score was %d\n", final_score);
 
-			// g->network_done = 1;
+			if (g->settings_instance.instant_gameover) {
+				g->network_done = 1;
+			}
 			// g->frame_write = 1;
 
 		} else if (packet_type == 'l') { // leaderboard
 			memset(g->leaderboard, 0, sizeof(g->leaderboard));
 			// printf("leaderboard packet:\n");
 			g->config.my_pos = packet[p]; p++;
-			p += 2;
-			p += 2;
+			g->config.rank = packet[p] << 8 | packet[p + 1]; p += 2;
+			g->config.total_players = packet[p] << 8 | packet[p + 1]; p += 2;
 
 			int curr_n = 0;
 			while (p < packet_len) {
@@ -977,7 +979,7 @@ void client_callback(struct mg_connection* c, int ev, void* ev_data) {
 		g->woke_up = true;
 
 		pthread_mutex_lock(&g->render_mutex);
-		redraw(g, inp_data->fps_display);
+		redraw(g, inp_data);
 		g->frame_write = 1;
 		pthread_cond_signal(&g->render_cond);
 		pthread_mutex_unlock(&g->render_mutex);
@@ -993,7 +995,9 @@ void client_callback(struct mg_connection* c, int ev, void* ev_data) {
 		printf("connection closed\n");
 		if (!g->woke_up && g->connected) {
 			pthread_mutex_lock(&g->render_mutex);
-			redraw(g, -1);
+			redraw(g, &(input_data) {
+				.fps_display = -1
+			});
 			g->frame_write = 1;
 			pthread_cond_signal(&g->render_cond);
 			pthread_mutex_unlock(&g->render_mutex);

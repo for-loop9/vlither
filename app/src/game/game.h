@@ -19,8 +19,10 @@ typedef struct input_data {
 	ig_vec2 mouse_pos;
 	ig_vec2 mouse_delta;
 	float mouse_dwheel;
-	uint8_t btn_down;
-	uint8_t z_pressed;
+	bool btn_down;
+	bool k_pressed;
+	bool m_pressed;
+	bool n_pressed;
 	float ctm;
 	int fps_display;
 } input_data;
@@ -33,11 +35,9 @@ typedef struct settings {
 	char ip[60];
 	int cv;
 	bool cusk;
-	uint8_t cusk_skin_data[256];
 	int cusk_skin_data_exp[256];
 	int exp_ptr;
-	int cusk_ptr;
-	bool added_first;
+	char skin_code[256];
 	bool hq;
 	bool clk;
 	bool vsync;
@@ -46,6 +46,12 @@ typedef struct settings {
 	bool show_kill;
 	bool notify_kills;
 	bool enable_zoom;
+	bool show_lengths;
+	bool instant_gameover;
+	bool black_bg;
+	int laser_length;
+	int laser_thickness;
+	ig_vec3 laser_color;
 } settings;
 
 typedef struct game {
@@ -174,10 +180,15 @@ typedef struct game {
 
 		// skin stuff:
 		ig_vec3 color_groups[40];
+		ig_vec3 color_groups_opp[40];
 		uint8_t default_skins[66][64];
+		char ntl_cg_map[40];
 
 		int length_display;
 		int kills_display;
+		int rank;
+		int total_players;
+		bool laser;
 	} config;
 	
 	settings settings_instance;

@@ -48,15 +48,18 @@ void oef(game* g, struct mg_connection* c, const input_data* input_data) {
 	}
 
 	if (!g->snake_null) {
-		// if (input_data->z_pressed) {
-		// 	if (!g->config.enable_zoom) {
-		// 		g->config.zoom = g->config.gsc;
-		// 	}
-		// 	g->config.enable_zoom = !g->config.enable_zoom;
-		// }
+		if (input_data->k_pressed) {
+			g->config.laser = !g->config.laser;
+		}
 		if (g->settings_instance.enable_zoom) {
+			if (input_data->m_pressed) {
+				g->config.zoom -= 2 * 0.1f * g->config.gsc;
+			} else if (input_data->n_pressed) {
+				g->config.zoom += 2 * 0.1f * g->config.gsc;
+			}
+
 			g->config.zoom += input_data->mouse_dwheel * 0.1f * g->config.gsc;
-			g->config.zoom = fmaxf(0.2f, fminf(g->config.zoom, 8));
+			g->config.zoom = fmaxf(0.1f, fminf(g->config.zoom, 8));
 
 			g->config.gsc += (g->config.zoom - g->config.gsc) * 0.09f * g->config.vfr;
 		}

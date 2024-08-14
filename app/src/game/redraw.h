@@ -4,6 +4,6 @@
 typedef struct game game;
 typedef struct input_data input_data;
 
-void redraw(game* g, int fps_display);
+void redraw(game* g, const input_data* input_data);
 
 #endif

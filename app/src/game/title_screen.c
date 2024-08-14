@@ -31,24 +31,24 @@ void title_screen(game* g) {
 			char buff[64] = {};
 			sprintf(buff, "Length: %d", g->config.length_display);
 			
-			igPushFont(g->renderer->med_font);
+			igPushFont(g->renderer->fonts[RENDERER_FONT_MED]);
 			ImVec2 txt_size; igCalcTextSize(&txt_size, buff, NULL, false, 0);
 			igSetCursorPosX(((logo_len - 60) - txt_size.x) / 2);
 			// highscore
 			igText("Length:"); igSameLine(0, -1);
 			igPopFont();
-			igPushFont(g->renderer->med_bold_font);
+			igPushFont(g->renderer->fonts[RENDERER_FONT_MED_BOLD]);
 			igText("%d", g->config.length_display);
 			igPopFont();
 
-			igPushFont(g->renderer->med_font);
+			igPushFont(g->renderer->fonts[RENDERER_FONT_MED]);
 			sprintf(buff, "Kills: %d", g->config.kills_display);
 			igCalcTextSize(&txt_size, buff, NULL, false, 0);
 			igSetCursorPosX(((logo_len - 60) - txt_size.x) / 2);
 			// highscore
 			igText("Kills:"); igSameLine(0, -1);
 			igPopFont();
-			igPushFont(g->renderer->med_bold_font);
+			igPushFont(g->renderer->fonts[RENDERER_FONT_MED_BOLD]);
 			igText("%d", g->config.kills_display);
 			igPopFont();
 		}

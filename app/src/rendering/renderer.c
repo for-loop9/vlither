@@ -32,11 +32,12 @@ void imgui_init(game* g, ig_context* context, ig_window* window, renderer* rende
 	igImplGlfw_InitForVulkan(window->native_handle, 1);
 	igImplVulkan_Init(&vk_imgui_init_info);
 
-	renderer->big_font = ImFontAtlas_AddFontFromFileTTF(igGetIO()->Fonts, "app/res/fonts/Poppins-Regular.ttf", 28, NULL, NULL);
-	renderer->med_font = ImFontAtlas_AddFontFromFileTTF(igGetIO()->Fonts, "app/res/fonts/Poppins-Regular.ttf", 24, NULL, NULL);
-	renderer->med_bold_font = ImFontAtlas_AddFontFromFileTTF(igGetIO()->Fonts, "app/res/fonts/Poppins-Bold.ttf", 24, NULL, NULL);
-	renderer->small_font = ImFontAtlas_AddFontFromFileTTF(igGetIO()->Fonts, "app/res/fonts/Poppins-Regular.ttf", 20, NULL, NULL);
-	renderer->small_bold_font = ImFontAtlas_AddFontFromFileTTF(igGetIO()->Fonts, "app/res/fonts/Poppins-Bold.ttf", 20, NULL, NULL);
+	renderer->fonts[RENDERER_FONT_BIG] = ImFontAtlas_AddFontFromFileTTF(igGetIO()->Fonts, "app/res/fonts/Poppins-Regular.ttf", 28, NULL, NULL);
+	renderer->fonts[RENDERER_FONT_MED] = ImFontAtlas_AddFontFromFileTTF(igGetIO()->Fonts, "app/res/fonts/Poppins-Regular.ttf", 24, NULL, NULL);
+	renderer->fonts[RENDERER_FONT_MED_BOLD] = ImFontAtlas_AddFontFromFileTTF(igGetIO()->Fonts, "app/res/fonts/Poppins-Bold.ttf", 24, NULL, NULL);
+	renderer->fonts[RENDERER_FONT_SMALL] = ImFontAtlas_AddFontFromFileTTF(igGetIO()->Fonts, "app/res/fonts/Poppins-Regular.ttf", 20, NULL, NULL);
+	renderer->fonts[RENDERER_FONT_SMALL_BOLD] = ImFontAtlas_AddFontFromFileTTF(igGetIO()->Fonts, "app/res/fonts/Poppins-Bold.ttf", 20, NULL, NULL);
+
 	igImplVulkan_CreateFontsTexture();
 }
 

@@ -9,6 +9,14 @@
 
 typedef struct ImFont ImFont;
 
+enum {
+	RENDERER_FONT_BIG = 0,
+	RENDERER_FONT_MED,
+	RENDERER_FONT_MED_BOLD,
+	RENDERER_FONT_SMALL,
+	RENDERER_FONT_SMALL_BOLD,
+};
+
 typedef struct renderer {
 	ig_context* context;
 	ig_buffer* quad_buffer;
@@ -19,11 +27,7 @@ typedef struct renderer {
 	sprite_renderer* sprite_renderer;
 	text_renderer* text_renderer;
 	mm_renderer* mm_renderer;
-	ImFont* big_font;
-	ImFont* med_font;
-	ImFont* med_bold_font;
-	ImFont* small_font;
-	ImFont* small_bold_font;
+	ImFont* fonts[5];
 } renderer;
 
 typedef struct game game;

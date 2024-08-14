@@ -8,15 +8,18 @@
 void settings_screen(game* g) {
 	ImGuiStyle* style = igGetStyle();
 	int sx = g->icontext->default_frame.resolution.x / 2 - 200;
-	igSetNextWindowPos((ImVec2) { .x = sx, .y = g->icontext->default_frame.resolution.y / 2 - 250 }, ImGuiCond_None, (ImVec2) {});
-	igSetNextWindowSize((ImVec2) { .x = 400, .y = 500 }, ImGuiCond_None);
+	int win_height = 522;
+	igSetNextWindowPos((ImVec2) { .x = sx, .y = g->icontext->default_frame.resolution.y / 2 - win_height / 2 }, ImGuiCond_None, (ImVec2) {});
+	igSetNextWindowSize((ImVec2) { .x = 400, .y = win_height }, ImGuiCond_None);
+	igPushFont(g->renderer->fonts[RENDERER_FONT_MED]);
 	igBegin("settings", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground);
-
 	igColumns(2, "settings_clmn", 0);
 	igAlignTextToFramePadding();
 	igText("Quality");
 	igAlignTextToFramePadding();
 	igText("Minimap");
+	igAlignTextToFramePadding();
+	igText("Background");
 	igAlignTextToFramePadding();
 	igText("VSync");
 	igAlignTextToFramePadding();
@@ -29,6 +32,10 @@ void settings_screen(game* g) {
 	igText("Zoom");
 	igAlignTextToFramePadding();
 	igText("Fullscreen");
+	igAlignTextToFramePadding();
+	igText("Player lengths");
+	igAlignTextToFramePadding();
+	igText("Instant gameover");
 	igNextColumn();
 
 	igSetNextItemWidth(igGetColumnWidth(1) - style->WindowPadding.x - 5);
@@ -50,6 +57,16 @@ void settings_screen(game* g) {
 		}
 		if (igSelectable_Bool("Clock", g->settings_instance.clk, ImGuiSelectableFlags_None, (ImVec2) { 0, 0 })) {
 			g->settings_instance.clk = true;
+		}
+		igEndCombo();
+	}
+	igSetNextItemWidth(igGetColumnWidth(1) - style->WindowPadding.x - 5);
+	if (igBeginCombo("##background", g->settings_instance.black_bg ? "Black" : "Default", ImGuiComboFlags_None)) {
+		if (igSelectable_Bool("Default", !g->settings_instance.black_bg, ImGuiSelectableFlags_None, (ImVec2) { 0, 0 })) {
+			g->settings_instance.black_bg = false;
+		}
+		if (igSelectable_Bool("Black", g->settings_instance.black_bg, ImGuiSelectableFlags_None, (ImVec2) { 0, 0 })) {
+			g->settings_instance.black_bg = true;
 		}
 		igEndCombo();
 	}
@@ -90,12 +107,44 @@ void settings_screen(game* g) {
 			.color = { .x = 1, .y = 0.5f, .z = 0.3f, .w = 1 }
 		}));
 	}
+	cx = igGetCursorPosX();
+	igSetCursorPosX(cx + (igGetColumnWidth(1) - style->WindowPadding.x - 5) - igGetFrameHeight());
+	igCheckbox("##show_lengths", &g->settings_instance.show_lengths);
+	cx = igGetCursorPosX();
+	igSetCursorPosX(cx + (igGetColumnWidth(1) - style->WindowPadding.x - 5) - igGetFrameHeight());
+	igCheckbox("##instant_gameover", &g->settings_instance.instant_gameover);
 
 	igColumns(1, NULL, false);
+	igSeparatorText("Laser");
+	igColumns(2, NULL, false);
+	igAlignTextToFramePadding();
+	igText("Length");
+	igAlignTextToFramePadding();
+	igText("Thickness");
+	igAlignTextToFramePadding();
+	igText("Color");
+	igNextColumn();
+	igSetNextItemWidth(igGetColumnWidth(1) - style->WindowPadding.x - 5);
+	igSliderInt("##laser_length", &g->settings_instance.laser_length, 50, 300, NULL, ImGuiSliderFlags_None);
+	igSetNextItemWidth(igGetColumnWidth(1) - style->WindowPadding.x - 5);
+	igSliderInt("##laser_thickness", &g->settings_instance.laser_thickness, 1, 6, NULL, ImGuiSliderFlags_None);
+	igSetNextItemWidth(igGetColumnWidth(1) - style->WindowPadding.x - 5);
+	float laser_color_ref[3] = { g->settings_instance.laser_color.x, g->settings_instance.laser_color.y, g->settings_instance.laser_color.z };
+	if (igColorEdit3("##laser_color", laser_color_ref, ImGuiColorEditFlags_None)) {
+		g->settings_instance.laser_color.x = laser_color_ref[0];
+		g->settings_instance.laser_color.y = laser_color_ref[1];
+		g->settings_instance.laser_color.z = laser_color_ref[2];
+	}
+	igColumns(1, NULL, false);
+	igEnd();
 
+	igSetNextWindowPos((ImVec2) { .x = sx, .y = (g->icontext->default_frame.resolution.y / 2 - win_height / 2) + win_height }, ImGuiCond_None, (ImVec2) {});
+	igSetNextWindowSize((ImVec2) { .x = 400, .y = 200 }, ImGuiCond_None);
+	igBegin("dd", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground);
 	if (igButton("Save", (ImVec2) { -1, 0 })) {
 		save_settings(g);
 		g->show_settings = false;
 	}
 	igEnd();
+	igPopFont();
 }
