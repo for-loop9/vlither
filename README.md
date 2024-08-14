@@ -67,7 +67,7 @@ The following libraries have been used to develop Vlither:
 - [Cimgui](https://github.com/cimgui/cimgui) - A C wrapper for [Dear ImGui](https://github.com/ocornut/imgui), a wonderful immediate mode UI library.
 
 ## Gallery
-To view a small demo, checkout [this video](https://www.youtube.com/watch?v=6sr8swOjj7U). Here are a few screenshots:
+Here are a few screenshots:
 | ![Image 0](gallery/ss3.png) | ![Image 1](gallery/ss0.png) |
 |:----------------------------:|:----------------------------:|
 
