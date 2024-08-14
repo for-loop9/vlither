@@ -30,7 +30,7 @@ python compile_shaders.py
 cd ..
 premake5 --file=build.lua gmake2
 cd build/makefiles
-make config=debug # or config=release for release mode
+make config=debug
 cd ../..
 build/bin/app
 ```
