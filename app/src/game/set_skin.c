@@ -26,58 +26,213 @@ void set_skin(game* g) {
 
 	ImGuiStyle* style = igGetStyle();
 	int sx = (g->icontext->default_frame.resolution.x / 2 - 200) - 4;
-	int sy = (g->icontext->default_frame.resolution.y / 2 - 180) - 40;
+	int sy = (g->icontext->default_frame.resolution.y / 2 - 260) - 40;
 
 	uint8_t* skin_data = g->config.default_skins[g->settings_instance.cv] + 1;
 	uint8_t skin_data_len = *(skin_data - 1);
-	for (int i = 0; i < 76; i++) {
+	int tot_segments = 48 * 4;
+	for (int i = 0; i < tot_segments / 4; i++) {
 		if (g->settings_instance.cusk) {
 			ig_vec4 col = { .w = 1 };
 			
-			if (g->settings_instance.cusk_skin_data_exp[(75 - i) % 255] != -1) {
-				ig_vec3* cg_grp = g->config.color_groups + g->settings_instance.cusk_skin_data_exp[(75 - i) % 255];
+			if (g->settings_instance.cusk_skin_data_exp[((tot_segments - 1) - i) % 255] != -1) {
+				ig_vec3* cg_grp = g->config.color_groups + g->settings_instance.cusk_skin_data_exp[((tot_segments - 1) - i) % 255];
 				col.x = cg_grp->x;
 				col.y = cg_grp->y;
 				col.z = cg_grp->z;
 			}
-			renderer_push_circle(g->renderer, &(circle_instance) {
-				.circ = { .x = sx + (i * 5), .y = sy, .z = 33 },
+			renderer_push_bp(g->renderer, &(bp_instance) {
+				.circ = { .x = sx + (i * 8), .y = sy, .z = 0, .w = 33 },
 				.ratios = { .x = 0, .y = 1 },
 				.color = col
 			});
 		} else {
-			ig_vec3* col = g->config.color_groups + skin_data[(76 - i) % skin_data_len];
+			ig_vec3* col = g->config.color_groups + skin_data[((tot_segments - 1) - i) % skin_data_len];
 
-			renderer_push_circle(g->renderer, &(circle_instance) {
-				.circ = { .x = sx + (i * 5), .y = sy, .z = 33 },
+			renderer_push_bp(g->renderer, &(bp_instance) {
+				.circ = { .x = sx + (i * 8), .y = sy, .z = 0, .w = 33 },
 				.ratios = { .x = 0, .y = 1 },
 				.color = { .x = col->x, .y = col->y, .z = col->z, .w = 1 }
 			});
 		}
 
-		if (i == 75) {
-			renderer_push_circle(g->renderer, &(circle_instance) {
-				.circ = { .x = (sx + (i * 5)) + 17, .y = sy + 2, .z = 13 },
+		if (i == tot_segments - 1) {
+			renderer_push_eye(g->renderer, &(eye_instance) {
+				.circ = { .x = (sx + (i * 8)) + 17, .y = sy + 2, .z = 0.01f, .w = 13 },
 				.ratios = { .x = 0, .y = 1 },
 				.color = { .x = 1, .y = 1, .z = 1, .w = 1 }
 			});
-			renderer_push_circle(g->renderer, &(circle_instance) {
-				.circ = { .x = (sx + (i * 5)) + 17, .y = sy + 17, .z = 13 },
+			renderer_push_eye(g->renderer, &(eye_instance) {
+				.circ = { .x = (sx + (i * 8)) + 17, .y = sy + 17, .z = 0.01f, .w = 13 },
 				.ratios = { .x = 0, .y = 1 },
 				.color = { .x = 1, .y = 1, .z = 1, .w = 1 }
 			});
-			renderer_push_circle(g->renderer, &(circle_instance) {
-				.circ = { .x = (sx + (i * 5)) + 22, .y = sy + 5, .z = 8 },
+			renderer_push_eye(g->renderer, &(eye_instance) {
+				.circ = { .x = (sx + (i * 8)) + 22, .y = sy + 5, .z = 0.01f, .w = 8 },
 				.ratios = { .x = 0, .y = 1 },
 				.color = { .x = 0, .y = 0, .z = 0, .w = 1 }
 			});
-			renderer_push_circle(g->renderer, &(circle_instance) {
-				.circ = { .x = (sx + (i * 5)) + 22, .y = sy + 19, .z = 8 },
+			renderer_push_eye(g->renderer, &(eye_instance) {
+				.circ = { .x = (sx + (i * 8)) + 22, .y = sy + 19, .z = 0.01f, .w = 8 },
 				.ratios = { .x = 0, .y = 1 },
 				.color = { .x = 0, .y = 0, .z = 0, .w = 1 }
 			});
 		}
 	}
+
+	sy += 40;
+
+	for (int i = tot_segments / 4, c = 0; i < tot_segments / 2; i++, c++) {
+		if (g->settings_instance.cusk) {
+			ig_vec4 col = { .w = 1 };
+			
+			if (g->settings_instance.cusk_skin_data_exp[((tot_segments - 1) - i) % 255] != -1) {
+				ig_vec3* cg_grp = g->config.color_groups + g->settings_instance.cusk_skin_data_exp[((tot_segments - 1) - i) % 255];
+				col.x = cg_grp->x;
+				col.y = cg_grp->y;
+				col.z = cg_grp->z;
+			}
+			renderer_push_bp(g->renderer, &(bp_instance) {
+				.circ = { .x = sx + (c * 8), .y = sy, .z = 0, .w = 33 },
+				.ratios = { .x = 0, .y = 1 },
+				.color = col
+			});
+		} else {
+			ig_vec3* col = g->config.color_groups + skin_data[((tot_segments - 1) - i) % skin_data_len];
+
+			renderer_push_bp(g->renderer, &(bp_instance) {
+				.circ = { .x = sx + (c * 8), .y = sy, .z = 0, .w = 33 },
+				.ratios = { .x = 0, .y = 1 },
+				.color = { .x = col->x, .y = col->y, .z = col->z, .w = 1 }
+			});
+		}
+
+		if (i == tot_segments - 1) {
+			renderer_push_eye(g->renderer, &(eye_instance) {
+				.circ = { .x = (sx + (c * 8)) + 17, .y = sy + 2, .z = 0.01f, .w = 13 },
+				.ratios = { .x = 0, .y = 1 },
+				.color = { .x = 1, .y = 1, .z = 1, .w = 1 }
+			});
+			renderer_push_eye(g->renderer, &(eye_instance) {
+				.circ = { .x = (sx + (c * 8)) + 17, .y = sy + 17, .z = 0.01f, .w = 13 },
+				.ratios = { .x = 0, .y = 1 },
+				.color = { .x = 1, .y = 1, .z = 1, .w = 1 }
+			});
+			renderer_push_eye(g->renderer, &(eye_instance) {
+				.circ = { .x = (sx + (c * 8)) + 22, .y = sy + 5, .z = 0.01f, .w = 8 },
+				.ratios = { .x = 0, .y = 1 },
+				.color = { .x = 0, .y = 0, .z = 0, .w = 1 }
+			});
+			renderer_push_eye(g->renderer, &(eye_instance) {
+				.circ = { .x = (sx + (c * 8)) + 22, .y = sy + 19, .z = 0.01f, .w = 8 },
+				.ratios = { .x = 0, .y = 1 },
+				.color = { .x = 0, .y = 0, .z = 0, .w = 1 }
+			});
+		}
+	}
+
+	sy += 40;
+
+	for (int i = tot_segments / 2, c = 0; i < 3 * tot_segments / 4; i++, c++) {
+		if (g->settings_instance.cusk) {
+			ig_vec4 col = { .w = 1 };
+			
+			if (g->settings_instance.cusk_skin_data_exp[((tot_segments - 1) - i) % 255] != -1) {
+				ig_vec3* cg_grp = g->config.color_groups + g->settings_instance.cusk_skin_data_exp[((tot_segments - 1) - i) % 255];
+				col.x = cg_grp->x;
+				col.y = cg_grp->y;
+				col.z = cg_grp->z;
+			}
+			renderer_push_bp(g->renderer, &(bp_instance) {
+				.circ = { .x = sx + (c * 8), .y = sy, .z = 0, .w = 33 },
+				.ratios = { .x = 0, .y = 1 },
+				.color = col
+			});
+		} else {
+			ig_vec3* col = g->config.color_groups + skin_data[((tot_segments - 1) - i) % skin_data_len];
+
+			renderer_push_bp(g->renderer, &(bp_instance) {
+				.circ = { .x = sx + (c * 8), .y = sy, .z = 0, .w = 33 },
+				.ratios = { .x = 0, .y = 1 },
+				.color = { .x = col->x, .y = col->y, .z = col->z, .w = 1 }
+			});
+		}
+
+		if (i == tot_segments - 1) {
+			renderer_push_eye(g->renderer, &(eye_instance) {
+				.circ = { .x = (sx + (c * 8)) + 17, .y = sy + 2, .z = 0.01f, .w = 13 },
+				.ratios = { .x = 0, .y = 1 },
+				.color = { .x = 1, .y = 1, .z = 1, .w = 1 }
+			});
+			renderer_push_eye(g->renderer, &(eye_instance) {
+				.circ = { .x = (sx + (c * 8)) + 17, .y = sy + 17, .z = 0.01f, .w = 13 },
+				.ratios = { .x = 0, .y = 1 },
+				.color = { .x = 1, .y = 1, .z = 1, .w = 1 }
+			});
+			renderer_push_eye(g->renderer, &(eye_instance) {
+				.circ = { .x = (sx + (c * 8)) + 22, .y = sy + 5, .z = 0.01f, .w = 8 },
+				.ratios = { .x = 0, .y = 1 },
+				.color = { .x = 0, .y = 0, .z = 0, .w = 1 }
+			});
+			renderer_push_eye(g->renderer, &(eye_instance) {
+				.circ = { .x = (sx + (c * 8)) + 22, .y = sy + 19, .z = 0.01f, .w = 8 },
+				.ratios = { .x = 0, .y = 1 },
+				.color = { .x = 0, .y = 0, .z = 0, .w = 1 }
+			});
+		}
+	}
+
+	sy += 40;
+
+	for (int i = 3 * tot_segments / 4, c = 0; i < tot_segments; i++, c++) {
+		if (g->settings_instance.cusk) {
+			ig_vec4 col = { .w = 1 };
+			
+			if (g->settings_instance.cusk_skin_data_exp[((tot_segments - 1) - i) % 255] != -1) {
+				ig_vec3* cg_grp = g->config.color_groups + g->settings_instance.cusk_skin_data_exp[((tot_segments - 1) - i) % 255];
+				col.x = cg_grp->x;
+				col.y = cg_grp->y;
+				col.z = cg_grp->z;
+			}
+			renderer_push_bp(g->renderer, &(bp_instance) {
+				.circ = { .x = sx + (c * 8), .y = sy, .z = 0, .w = 33 },
+				.ratios = { .x = 0, .y = 1 },
+				.color = col
+			});
+		} else {
+			ig_vec3* col = g->config.color_groups + skin_data[((tot_segments - 1) - i) % skin_data_len];
+
+			renderer_push_bp(g->renderer, &(bp_instance) {
+				.circ = { .x = sx + (c * 8), .y = sy, .z = 0, .w = 33 },
+				.ratios = { .x = 0, .y = 1 },
+				.color = { .x = col->x, .y = col->y, .z = col->z, .w = 1 }
+			});
+		}
+
+		if (i == tot_segments - 1) {
+			renderer_push_eye(g->renderer, &(eye_instance) {
+				.circ = { .x = (sx + (c * 8)) + 17, .y = sy + 2, .z = 0.01f, .w = 13 },
+				.ratios = { .x = 0, .y = 1 },
+				.color = { .x = 1, .y = 1, .z = 1, .w = 1 }
+			});
+			renderer_push_eye(g->renderer, &(eye_instance) {
+				.circ = { .x = (sx + (c * 8)) + 17, .y = sy + 17, .z = 0.01f, .w = 13 },
+				.ratios = { .x = 0, .y = 1 },
+				.color = { .x = 1, .y = 1, .z = 1, .w = 1 }
+			});
+			renderer_push_eye(g->renderer, &(eye_instance) {
+				.circ = { .x = (sx + (c * 8)) + 22, .y = sy + 5, .z = 0.01f, .w = 8 },
+				.ratios = { .x = 0, .y = 1 },
+				.color = { .x = 0, .y = 0, .z = 0, .w = 1 }
+			});
+			renderer_push_eye(g->renderer, &(eye_instance) {
+				.circ = { .x = (sx + (c * 8)) + 22, .y = sy + 19, .z = 0.01f, .w = 8 },
+				.ratios = { .x = 0, .y = 1 },
+				.color = { .x = 0, .y = 0, .z = 0, .w = 1 }
+			});
+		}
+	}
+
 
 	igSetNextWindowPos((ImVec2) { .x = sx + 4, .y = sy + 40 }, ImGuiCond_None, (ImVec2) {});
 	igSetNextWindowSize((ImVec2) { .x = 400, .y = 360 }, ImGuiCond_None);
@@ -115,7 +270,7 @@ void set_skin(game* g) {
 				igPushStyleColor_Vec4(ImGuiCol_ButtonActive, (ImVec4) { col_at_idx->x, col_at_idx->y, col_at_idx->z, 0.3f }); // Lighten color when active
 				igPushStyleColor_Vec4(ImGuiCol_Text, (ImVec4) { opp_col_at_idx->x,opp_col_at_idx->y,opp_col_at_idx->z, 1});
 				if (igButton(btn_label, (ImVec2) { -1, 0 })) {
-					if (g->settings_instance.exp_ptr < 76) {
+					if (g->settings_instance.exp_ptr < tot_segments) {
 						g->settings_instance.cusk_skin_data_exp[g->settings_instance.exp_ptr++] = i;
 					} else {
 						message_queue_push(&g->msg_queue, (&(message) {
@@ -142,7 +297,7 @@ void set_skin(game* g) {
 				igPushStyleColor_Vec4(ImGuiCol_ButtonActive, (ImVec4) { col_at_idx->x, col_at_idx->y, col_at_idx->z, 0.3f }); // Lighten color when active
 				igPushStyleColor_Vec4(ImGuiCol_Text, (ImVec4) { opp_col_at_idx->x,opp_col_at_idx->y,opp_col_at_idx->z, 1});
 				if (igButton(btn_label, (ImVec2) { -1, 0 })) {
-					if (g->settings_instance.exp_ptr < 76) {
+					if (g->settings_instance.exp_ptr < tot_segments) {
 						g->settings_instance.cusk_skin_data_exp[g->settings_instance.exp_ptr++] = i;
 					} else {
 						message_queue_push(&g->msg_queue, (&(message) {
@@ -169,7 +324,7 @@ void set_skin(game* g) {
 				igPushStyleColor_Vec4(ImGuiCol_ButtonActive, (ImVec4) { col_at_idx->x, col_at_idx->y, col_at_idx->z, 0.3f }); // Lighten color when active
 				igPushStyleColor_Vec4(ImGuiCol_Text, (ImVec4) { opp_col_at_idx->x,opp_col_at_idx->y,opp_col_at_idx->z, 1});
 				if (igButton(btn_label, (ImVec2) { -1, 0 })) {
-					if (g->settings_instance.exp_ptr < 76) {
+					if (g->settings_instance.exp_ptr < tot_segments) {
 						g->settings_instance.cusk_skin_data_exp[g->settings_instance.exp_ptr++] = i;
 					} else {
 						message_queue_push(&g->msg_queue, (&(message) {
@@ -196,7 +351,7 @@ void set_skin(game* g) {
 				igPushStyleColor_Vec4(ImGuiCol_ButtonActive, (ImVec4) { col_at_idx->x, col_at_idx->y, col_at_idx->z, 0.3f }); // Lighten color when active
 				igPushStyleColor_Vec4(ImGuiCol_Text, (ImVec4) { opp_col_at_idx->x,opp_col_at_idx->y,opp_col_at_idx->z, 1 });
 				if (igButton(btn_label, (ImVec2) { -1, 0 })) {
-					if (g->settings_instance.exp_ptr < 76) {
+					if (g->settings_instance.exp_ptr < tot_segments) {
 						g->settings_instance.cusk_skin_data_exp[g->settings_instance.exp_ptr++] = i;
 					} else {
 						message_queue_push(&g->msg_queue, (&(message) {

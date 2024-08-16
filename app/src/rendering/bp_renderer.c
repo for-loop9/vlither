@@ -1,15 +1,15 @@
-#include "circle_renderer.h"
+#include "bp_renderer.h"
 #include <stdlib.h>
 #include <string.h>
 #include <graphics/ig_buffer.h>
 
-circle_renderer* circle_renderer_create(ig_context* context, unsigned int max_instances) {
-	circle_renderer* r = malloc(sizeof(circle_renderer));
+bp_renderer* bp_renderer_create(ig_context* context, unsigned int max_instances) {
+	bp_renderer* r = malloc(sizeof(bp_renderer));
 	r->instance_count = 0;
-	r->instances = malloc(max_instances * sizeof(circle_instance));
+	r->instances = malloc(max_instances * sizeof(bp_instance));
 
-	VkShaderModule vertex_shader = ig_context_create_shader_from_file(context, "app/res/shaders/circlev.spv");
-	VkShaderModule fragment_shader = ig_context_create_shader_from_file(context, "app/res/shaders/circlef.spv");
+	VkShaderModule vertex_shader = ig_context_create_shader_from_file(context, "app/res/shaders/bpv.spv");
+	VkShaderModule fragment_shader = ig_context_create_shader_from_file(context, "app/res/shaders/bpf.spv");
 
 	vkCreateGraphicsPipelines(context->device, VK_NULL_HANDLE, 1, &(VkGraphicsPipelineCreateInfo) {
 		.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
@@ -49,7 +49,7 @@ circle_renderer* circle_renderer_create(ig_context* context, unsigned int max_in
 				},
 				{
 					.binding = 1,
-					.stride = sizeof(circle_instance),
+					.stride = sizeof(bp_instance),
 					.inputRate = VK_VERTEX_INPUT_RATE_INSTANCE
 				},
 			},
@@ -64,20 +64,20 @@ circle_renderer* circle_renderer_create(ig_context* context, unsigned int max_in
 				{
 					.location = 1,
 					.binding = 1,
-					.format = VK_FORMAT_R32G32B32_SFLOAT,
+					.format = VK_FORMAT_R32G32B32A32_SFLOAT,
 					.offset = 0
 				},
 				{
 					.location = 2,
 					.binding = 1,
 					.format = VK_FORMAT_R32G32_SFLOAT,
-					.offset = offsetof(circle_instance, ratios)
+					.offset = offsetof(bp_instance, ratios)
 				},
 				{
 					.location = 3,
 					.binding = 1,
 					.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-					.offset = offsetof(circle_instance, color)
+					.offset = offsetof(bp_instance, color)
 				}
 			}
 		},
@@ -137,7 +137,14 @@ circle_renderer* circle_renderer_create(ig_context* context, unsigned int max_in
 			.alphaToCoverageEnable = VK_FALSE,
 			.alphaToOneEnable = VK_FALSE
 		},
-		.pDepthStencilState = NULL,
+		.pDepthStencilState = &(VkPipelineDepthStencilStateCreateInfo) {
+			.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
+			.pNext = NULL,
+			.flags = 0,
+			.depthTestEnable = VK_TRUE,
+			.depthWriteEnable = VK_TRUE,
+			.depthCompareOp = VK_COMPARE_OP_GREATER_OR_EQUAL
+		},
 		.pColorBlendState = &(VkPipelineColorBlendStateCreateInfo) {
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
 			.pNext = NULL,
@@ -168,26 +175,26 @@ circle_renderer* circle_renderer_create(ig_context* context, unsigned int max_in
 	vkDestroyShaderModule(context->device, fragment_shader, NULL);
 	vkDestroyShaderModule(context->device, vertex_shader, NULL);
 
-	r->instance_buffer = ig_context_dbuffer_create(context, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, NULL, max_instances * sizeof(circle_instance));
+	r->instance_buffer = ig_context_dbuffer_create(context, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, NULL, max_instances * sizeof(bp_instance));
 
 	return r;
 }
 
-void circle_renderer_push(circle_renderer* circle_renderer, const circle_instance* circle_instance) {
-	circle_renderer->instances[circle_renderer->instance_count++] = *circle_instance;
+void bp_renderer_push(bp_renderer* bp_renderer, const bp_instance* bp_instance) {
+	bp_renderer->instances[bp_renderer->instance_count++] = *bp_instance;
 }
 
-void circle_renderer_flush(circle_renderer* circle_renderer, ig_context* context, _ig_frame* frame) {
-	memcpy(circle_renderer->instance_buffer[context->frame_idx].data, circle_renderer->instances, circle_renderer->instance_count * sizeof(circle_instance));
-	vkCmdBindPipeline(frame->cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, circle_renderer->pipeline);
-	vkCmdBindVertexBuffers(frame->cmd_buffer, 1, 1, &circle_renderer->instance_buffer[context->frame_idx].buffer, (VkDeviceSize[]) { 0 });
-	vkCmdDraw(frame->cmd_buffer, 4, circle_renderer->instance_count, 0, 0);
-	circle_renderer->instance_count = 0;
+void bp_renderer_flush(bp_renderer* bp_renderer, ig_context* context, _ig_frame* frame) {
+	memcpy(bp_renderer->instance_buffer[context->frame_idx].data, bp_renderer->instances, bp_renderer->instance_count * sizeof(bp_instance));
+	vkCmdBindPipeline(frame->cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, bp_renderer->pipeline);
+	vkCmdBindVertexBuffers(frame->cmd_buffer, 1, 1, &bp_renderer->instance_buffer[context->frame_idx].buffer, (VkDeviceSize[]) { 0 });
+	vkCmdDraw(frame->cmd_buffer, 4, bp_renderer->instance_count, 0, 0);
+	bp_renderer->instance_count = 0;
 }
 
-void circle_renderer_destroy(circle_renderer* circle_renderer, ig_context* context) {
-	ig_context_dbuffer_destroy(context, circle_renderer->instance_buffer);
-	vkDestroyPipeline(context->device, circle_renderer->pipeline, NULL);
-	free(circle_renderer->instances);
-	free(circle_renderer);
+void bp_renderer_destroy(bp_renderer* bp_renderer, ig_context* context) {
+	ig_context_dbuffer_destroy(context, bp_renderer->instance_buffer);
+	vkDestroyPipeline(context->device, bp_renderer->pipeline, NULL);
+	free(bp_renderer->instances);
+	free(bp_renderer);
 }

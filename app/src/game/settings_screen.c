@@ -9,10 +9,11 @@ void settings_screen(game* g) {
 	ImGuiStyle* style = igGetStyle();
 	int sx = g->icontext->default_frame.resolution.x / 2 - 200;
 	int win_height = 522;
-	igSetNextWindowPos((ImVec2) { .x = sx, .y = g->icontext->default_frame.resolution.y / 2 - win_height / 2 }, ImGuiCond_None, (ImVec2) {});
-	igSetNextWindowSize((ImVec2) { .x = 400, .y = win_height }, ImGuiCond_None);
-	igPushFont(g->renderer->fonts[RENDERER_FONT_MED]);
+	igSetNextWindowPos((ImVec2) { .x = 0, .y = 0 }, ImGuiCond_None, (ImVec2) {});
+	igSetNextWindowSize((ImVec2) { .x = g->icontext->default_frame.resolution.x / 4, .y = g->icontext->default_frame.resolution.y }, ImGuiCond_None);
+	igPushFont(g->renderer->fonts[RENDERER_FONT_SMALL]);
 	igBegin("settings", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground);
+	igSeparatorText("General");
 	igColumns(2, "settings_clmn", 0);
 	igAlignTextToFramePadding();
 	igText("Quality");
@@ -32,8 +33,6 @@ void settings_screen(game* g) {
 	igText("Zoom");
 	igAlignTextToFramePadding();
 	igText("Fullscreen");
-	igAlignTextToFramePadding();
-	igText("Player lengths");
 	igAlignTextToFramePadding();
 	igText("Instant gameover");
 	igNextColumn();
@@ -92,7 +91,7 @@ void settings_screen(game* g) {
 	cx = igGetCursorPosX();
 	igSetCursorPosX(cx + (igGetColumnWidth(1) - style->WindowPadding.x - 5) - igGetFrameHeight());
 	if (igCheckbox("##zoom", &g->settings_instance.enable_zoom)) {
-		if (!&g->settings_instance.enable_zoom) {
+		if (!g->settings_instance.enable_zoom) {
 			g->config.gsc = 0.9f * 18.0f / 14.0f;
 		} else {
 			g->config.gsc = g->config.zoom;
@@ -109,23 +108,59 @@ void settings_screen(game* g) {
 	}
 	cx = igGetCursorPosX();
 	igSetCursorPosX(cx + (igGetColumnWidth(1) - style->WindowPadding.x - 5) - igGetFrameHeight());
-	igCheckbox("##show_lengths", &g->settings_instance.show_lengths);
-	cx = igGetCursorPosX();
-	igSetCursorPosX(cx + (igGetColumnWidth(1) - style->WindowPadding.x - 5) - igGetFrameHeight());
 	igCheckbox("##instant_gameover", &g->settings_instance.instant_gameover);
 
 	igColumns(1, NULL, false);
-	igSeparatorText("Laser");
+	igSeparatorText("Player names (P)");
 	igColumns(2, NULL, false);
 	igAlignTextToFramePadding();
-	igText("Length");
+	igText("Font");
+	igAlignTextToFramePadding();
+	igText("Show lengths");
+	igAlignTextToFramePadding();
+	igText("Color");
+	igNextColumn();
+
+	const char* font_size_strs[] = {
+		"Large",
+		"Medium",
+		"Medium bold",
+		"Small",
+		"Small bold",
+	};
+
+	igSetNextItemWidth(igGetColumnWidth(1) - style->WindowPadding.x - 5);
+	if (igBeginCombo("##names_font", font_size_strs[g->settings_instance.names_font], ImGuiComboFlags_None)) {
+		if (igSelectable_Bool("Small", g->settings_instance.names_font == RENDERER_FONT_SMALL, ImGuiSelectableFlags_None, (ImVec2) { 0, 0 })) {
+			g->settings_instance.names_font = RENDERER_FONT_SMALL;
+		}
+		if (igSelectable_Bool("Medium", g->settings_instance.names_font == RENDERER_FONT_MED, ImGuiSelectableFlags_None, (ImVec2) { 0, 0 })) {
+			g->settings_instance.names_font = RENDERER_FONT_MED;
+		}
+		if (igSelectable_Bool("Large", g->settings_instance.names_font == RENDERER_FONT_BIG, ImGuiSelectableFlags_None, (ImVec2) { 0, 0 })) {
+			g->settings_instance.names_font = RENDERER_FONT_BIG;
+		}
+		igEndCombo();
+	}
+	cx = igGetCursorPosX();
+	igSetCursorPosX(cx + (igGetColumnWidth(1) - style->WindowPadding.x - 5) - igGetFrameHeight());
+	igCheckbox("##show_lengths", &g->settings_instance.show_lengths);
+	igSetNextItemWidth(igGetColumnWidth(1) - style->WindowPadding.x - 5);
+	float names_color_ref[3] = { g->settings_instance.names_color.x, g->settings_instance.names_color.y, g->settings_instance.names_color.z };
+	if (igColorEdit3("##names_color", names_color_ref, ImGuiColorEditFlags_None)) {
+		g->settings_instance.names_color.x = names_color_ref[0];
+		g->settings_instance.names_color.y = names_color_ref[1];
+		g->settings_instance.names_color.z = names_color_ref[2];
+	}
+	igColumns(1, NULL, false);
+
+	igSeparatorText("Laser (K)");
+	igColumns(2, NULL, false);
 	igAlignTextToFramePadding();
 	igText("Thickness");
 	igAlignTextToFramePadding();
 	igText("Color");
 	igNextColumn();
-	igSetNextItemWidth(igGetColumnWidth(1) - style->WindowPadding.x - 5);
-	igSliderInt("##laser_length", &g->settings_instance.laser_length, 50, 300, NULL, ImGuiSliderFlags_None);
 	igSetNextItemWidth(igGetColumnWidth(1) - style->WindowPadding.x - 5);
 	igSliderInt("##laser_thickness", &g->settings_instance.laser_thickness, 1, 6, NULL, ImGuiSliderFlags_None);
 	igSetNextItemWidth(igGetColumnWidth(1) - style->WindowPadding.x - 5);
@@ -136,12 +171,25 @@ void settings_screen(game* g) {
 		g->settings_instance.laser_color.z = laser_color_ref[2];
 	}
 	igColumns(1, NULL, false);
+	igSeparatorText("Food");
+	igColumns(2, NULL, false);
+	igAlignTextToFramePadding();
+	igText("Food scale");
+	igAlignTextToFramePadding();
+	igText("Big food only (B)");
+	igNextColumn();
+	igSetNextItemWidth(igGetColumnWidth(1) - style->WindowPadding.x - 5);
+	igSliderFloat("##food_scale", &g->settings_instance.food_scale, 0.1f, 1, "%.2f", ImGuiSliderFlags_None);
+	cx = igGetCursorPosX();
+	igSetCursorPosX(cx + (igGetColumnWidth(1) - style->WindowPadding.x - 5) - igGetFrameHeight());
+	igCheckbox("##big_food", &g->settings_instance.big_food);
+	igColumns(1, NULL, false);
 	igEnd();
 
-	igSetNextWindowPos((ImVec2) { .x = sx, .y = (g->icontext->default_frame.resolution.y / 2 - win_height / 2) + win_height }, ImGuiCond_None, (ImVec2) {});
-	igSetNextWindowSize((ImVec2) { .x = 400, .y = 200 }, ImGuiCond_None);
+	igSetNextWindowPos((ImVec2) { .x = g->icontext->default_frame.resolution.x - 150, .y = g->icontext->default_frame.resolution.y - 52 }, ImGuiCond_None, (ImVec2) {});
+	igSetNextWindowSize((ImVec2) { .x = 150, .y = 52 }, ImGuiCond_None);
 	igBegin("dd", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground);
-	if (igButton("Save", (ImVec2) { -1, 0 })) {
+	if (igButton("Save", (ImVec2) { -1, -1 })) {
 		save_settings(g);
 		g->show_settings = false;
 	}

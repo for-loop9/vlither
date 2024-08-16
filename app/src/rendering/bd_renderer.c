@@ -131,7 +131,12 @@ bd_renderer* ig_bd_renderer_create(ig_context* context, unsigned int max_instanc
 			.alphaToCoverageEnable = VK_FALSE,
 			.alphaToOneEnable = VK_FALSE
 		},
-		.pDepthStencilState = NULL,
+		.pDepthStencilState = &(VkPipelineDepthStencilStateCreateInfo) {
+			.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
+			.pNext = NULL,
+			.flags = 0,
+			.depthTestEnable = VK_FALSE,
+		},
 		.pColorBlendState = &(VkPipelineColorBlendStateCreateInfo) {
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
 			.pNext = NULL,

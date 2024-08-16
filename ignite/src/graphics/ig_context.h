@@ -52,6 +52,9 @@ typedef struct ig_context {
 		VkImage color_attachment;
 		VmaAllocation color_attachment_memory;
 		VkImageView color_attachment_view;
+		VkImage depth_attachment;
+		VmaAllocation depth_attachment_memory;
+		VkImageView depth_attachment_view;
 		VkFramebuffer framebuffer;
 	} default_frame;
 

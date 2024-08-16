@@ -14,7 +14,7 @@ void hud(game* g, const input_data* input_data) {
 	float my = input_data->mouse_pos.y;
 
 	if (!g->snake_null && g->config.laser) {
-		float laser_length = (0.5f * g->os.snakes[0].sc * 29 + g->settings_instance.laser_length) * g->config.gsc;
+		float laser_length = sqrtf((mx - mww2) * (mx - mww2) + (my - mhh2) * (my - mhh2));
 
 		float laser_ang = atan2f(my - mhh2, mx - mww2);
 		float laser_sin = sinf(laser_ang);
@@ -27,7 +27,6 @@ void hud(game* g, const input_data* input_data) {
 			.color = g->settings_instance.laser_color
 		});
 	}
-
 
 	ImGuiStyle* style = igGetStyle();
 	ImDrawList* draw_list = igGetWindowDrawList();
@@ -197,6 +196,38 @@ void hud(game* g, const input_data* input_data) {
 		}
     }
 
+	float bp_mem = g->renderer->bp_renderer->instance_count / (float) MAX_BP_RENDER;
+	float food_mem = g->renderer->food_renderer->instance_count / (float) MAX_FOOD_RENDER;
+	float eye_mem = g->renderer->eye_renderer->instance_count / (float) MAX_EYE_RENDER;
+
     igEndTable();
+	igSetCursorPosX(4);
+	igSetCursorPosY(4);
+	ImVec4 bar_col = {}; igImLerp_Vec4(&bar_col, (ImVec4) { 0, 1, 0, 0.5f }, (ImVec4) { 1, 0, 0, 0.5f }, bp_mem);
+	igPushStyleColor_Vec4(ImGuiCol_PlotHistogram, bar_col);
+	igProgressBar(bp_mem, (ImVec2) { 100, 20 }, NULL);
+	igPopStyleColor(1);
+	igSetCursorPosX(4);
+	igImLerp_Vec4(&bar_col, (ImVec4) { 0, 1, 0, 0.5f }, (ImVec4) { 1, 0, 0, 0.5f }, food_mem);
+	igPushStyleColor_Vec4(ImGuiCol_PlotHistogram, bar_col);
+	igProgressBar(food_mem, (ImVec2) { 100, 20 }, NULL);
+	igPopStyleColor(1);
+	igSetCursorPosX(4);
+	igImLerp_Vec4(&bar_col, (ImVec4) { 0, 1, 0, 0.5f }, (ImVec4) { 1, 0, 0, 0.5f }, eye_mem);
+	igPushStyleColor_Vec4(ImGuiCol_PlotHistogram, bar_col);
+	igProgressBar(eye_mem, (ImVec2) { 100, 20 }, NULL);
+	igPopStyleColor(1);
 	igPopFont();
+
+	if (bp_mem >= 0.8f || food_mem >= 0.8f || eye_mem >= 0.8f) {
+		message msg = {
+			.message = "MEMORY WARNING",
+			.tt = 1,
+			.color = { .x = 1, .y = 0.2f, .z = 0.2f, .w = 1 }
+		};
+
+		pthread_mutex_lock(&g->msg_mutex);
+		message_queue_push(&g->msg_queue, &msg);
+		pthread_mutex_unlock(&g->msg_mutex);
+	}
 }

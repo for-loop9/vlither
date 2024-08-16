@@ -1,17 +1,15 @@
-#include "text_renderer.h"
+#include "food_renderer.h"
 #include <stdlib.h>
 #include <string.h>
-#include <graphics/ig_context.h>
 #include <graphics/ig_buffer.h>
-#include <graphics/ig_texture.h>
 
-text_renderer* text_renderer_create(ig_context* context, const ig_texture* font_sheet, unsigned int max_instances) {
-	text_renderer* r = malloc(sizeof(text_renderer));
+food_renderer* food_renderer_create(ig_context* context, unsigned int max_instances) {
+	food_renderer* r = malloc(sizeof(food_renderer));
 	r->instance_count = 0;
-	r->instances = malloc(max_instances * sizeof(ig_text_instance));
+	r->instances = malloc(max_instances * sizeof(food_instance));
 
-	VkShaderModule vertex_shader = ig_context_create_shader_from_file(context, "app/res/shaders/textv.spv");
-	VkShaderModule fragment_shader = ig_context_create_shader_from_file(context, "app/res/shaders/textf.spv");
+	VkShaderModule vertex_shader = ig_context_create_shader_from_file(context, "app/res/shaders/foodv.spv");
+	VkShaderModule fragment_shader = ig_context_create_shader_from_file(context, "app/res/shaders/foodf.spv");
 
 	vkCreateGraphicsPipelines(context->device, VK_NULL_HANDLE, 1, &(VkGraphicsPipelineCreateInfo) {
 		.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
@@ -51,7 +49,7 @@ text_renderer* text_renderer_create(ig_context* context, const ig_texture* font_
 				},
 				{
 					.binding = 1,
-					.stride = sizeof(ig_text_instance),
+					.stride = sizeof(food_instance),
 					.inputRate = VK_VERTEX_INPUT_RATE_INSTANCE
 				},
 			},
@@ -72,14 +70,14 @@ text_renderer* text_renderer_create(ig_context* context, const ig_texture* font_
 				{
 					.location = 2,
 					.binding = 1,
-					.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-					.offset = offsetof(ig_text_instance, uv_rect)
+					.format = VK_FORMAT_R32G32_SFLOAT,
+					.offset = offsetof(food_instance, ratios)
 				},
 				{
 					.location = 3,
 					.binding = 1,
 					.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-					.offset = offsetof(ig_text_instance, color)
+					.offset = offsetof(food_instance, color)
 				}
 			}
 		},
@@ -143,7 +141,9 @@ text_renderer* text_renderer_create(ig_context* context, const ig_texture* font_
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
 			.pNext = NULL,
 			.flags = 0,
-			.depthTestEnable = VK_FALSE,
+			.depthTestEnable = VK_TRUE,
+			.depthWriteEnable = VK_TRUE,
+			.depthCompareOp = VK_COMPARE_OP_GREATER_OR_EQUAL
 		},
 		.pColorBlendState = &(VkPipelineColorBlendStateCreateInfo) {
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
@@ -175,74 +175,26 @@ text_renderer* text_renderer_create(ig_context* context, const ig_texture* font_
 	vkDestroyShaderModule(context->device, fragment_shader, NULL);
 	vkDestroyShaderModule(context->device, vertex_shader, NULL);
 
-	r->instance_buffer = ig_context_dbuffer_create(context, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, NULL, max_instances * sizeof(ig_text_instance));
-
-	vkAllocateDescriptorSets(context->device, &(VkDescriptorSetAllocateInfo) {
-		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
-		.pNext = NULL,
-		.descriptorPool = context->descriptor_pool,
-		.descriptorSetCount = 1,
-		.pSetLayouts = &context->texture_layout
-	}, &r->font_sheet_ptr);
-
-	vkUpdateDescriptorSets(context->device, 1, &(VkWriteDescriptorSet) {
-		.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-		.pNext = NULL,
-		.dstSet = r->font_sheet_ptr,
-		.dstBinding = 0,
-		.dstArrayElement = 0,
-		.descriptorCount = 1,
-		.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-		.pImageInfo = &(VkDescriptorImageInfo) {
-			.sampler = context->nearest_sampler,
-			.imageView = font_sheet->view,
-			.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
-		},
-		.pBufferInfo = NULL,
-		.pTexelBufferView = NULL
-	}, 0, NULL);
+	r->instance_buffer = ig_context_dbuffer_create(context, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, NULL, max_instances * sizeof(food_instance));
 
 	return r;
 }
 
-void text_renderer_push(text_renderer* text_renderer, const char* str, const ig_vec3* transform, const ig_vec4* color, ig_vec3* transform_out) {
-	transform_out->x = transform->x;
-	transform_out->y = transform->y;
-	transform_out->z = transform->z;
-
-	const char* c = str;
-	while (*c != 0) {
-		ig_text_instance* text_instance = text_renderer->instances + text_renderer->instance_count;
-		text_instance->transform.x = transform_out->x;
-		text_instance->transform.y = transform_out->y;
-		text_instance->transform.z = transform->z;
-		text_instance->uv_rect.x = ((*c - 32) % 10) / 10.0f;
-		text_instance->uv_rect.y = ((*c - 32) / 10) / 10.0f;
-		text_instance->uv_rect.z = 0.1f;
-		text_instance->uv_rect.w = 0.1f;
-		text_instance->color = *color;
-
-		transform_out->x += transform->z + transform->z / 7;
-		text_renderer->instance_count++;
-
-		c++;
-	}
+void food_renderer_push(food_renderer* food_renderer, const food_instance* food_instance) {
+	food_renderer->instances[food_renderer->instance_count++] = *food_instance;
 }
 
-void text_renderer_flush(text_renderer* text_renderer, ig_context* context, _ig_frame* frame) {
-	memcpy(text_renderer->instance_buffer[context->frame_idx].data, text_renderer->instances, text_renderer->instance_count * sizeof(ig_text_instance));
-
-	vkCmdBindDescriptorSets(frame->cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, context->standard_layout, 1, 1, &text_renderer->font_sheet_ptr, 0, NULL);
-	vkCmdBindPipeline(frame->cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, text_renderer->pipeline);
-	vkCmdBindVertexBuffers(frame->cmd_buffer, 1, 1, &text_renderer->instance_buffer[context->frame_idx].buffer, (VkDeviceSize[]) { 0 });
-	vkCmdDraw(frame->cmd_buffer, 4, text_renderer->instance_count, 0, 0);
-
-	text_renderer->instance_count = 0;
+void food_renderer_flush(food_renderer* food_renderer, ig_context* context, _ig_frame* frame) {
+	memcpy(food_renderer->instance_buffer[context->frame_idx].data, food_renderer->instances, food_renderer->instance_count * sizeof(food_instance));
+	vkCmdBindPipeline(frame->cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, food_renderer->pipeline);
+	vkCmdBindVertexBuffers(frame->cmd_buffer, 1, 1, &food_renderer->instance_buffer[context->frame_idx].buffer, (VkDeviceSize[]) { 0 });
+	vkCmdDraw(frame->cmd_buffer, 4, food_renderer->instance_count, 0, 0);
+	food_renderer->instance_count = 0;
 }
 
-void text_renderer_destroy(text_renderer* text_renderer, ig_context* context) {
-	ig_context_dbuffer_destroy(context, text_renderer->instance_buffer);
-	vkDestroyPipeline(context->device, text_renderer->pipeline, NULL);
-	free(text_renderer->instances);
-	free(text_renderer);
+void food_renderer_destroy(food_renderer* food_renderer, ig_context* context) {
+	ig_context_dbuffer_destroy(context, food_renderer->instance_buffer);
+	vkDestroyPipeline(context->device, food_renderer->pipeline, NULL);
+	free(food_renderer->instances);
+	free(food_renderer);
 }

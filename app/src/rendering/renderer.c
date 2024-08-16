@@ -53,7 +53,7 @@ void imgui_destroy() {
     igDestroyContext(NULL);
 }
 
-renderer* renderer_create(game* g, ig_context* context, ig_window* window, const ig_texture* sprite_sheet, unsigned int max_circles, unsigned int max_sprites, ig_texture* font_sheet, ig_texture* bg_tex, unsigned int max_chars) {
+renderer* renderer_create(game* g, ig_context* context, ig_window* window, const ig_texture* sprite_sheet, unsigned int max_circles, unsigned int max_eyes, unsigned int max_foods, unsigned int max_sprites, ig_texture* font_sheet, ig_texture* bg_tex, unsigned int max_chars) {
 	renderer* r = malloc(sizeof(renderer));
 	r->context = context;
 
@@ -67,13 +67,15 @@ renderer* renderer_create(game* g, ig_context* context, ig_window* window, const
 	struct {
 		ig_mat4 projection;
 	} global;
-	ig_mat4_ortho(&global.projection, 0, context->default_frame.resolution.x, context->default_frame.resolution.y, 0, -1, 1);
+	ig_mat4_ortho(&global.projection, 0, context->default_frame.resolution.x, context->default_frame.resolution.y, 0, 1, -1);
 
 	r->quad_buffer = ig_context_buffer_create(context, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, quad_data, sizeof(quad_data));
 	r->global_buffer = ig_context_buffer_create(context, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, &global, sizeof(global));
 	r->bd_renderer = ig_bd_renderer_create(context, 1);
 	r->bg_renderer = sprite_renderer_create(context, bg_tex, 1);
-	r->circle_renderer = circle_renderer_create(context, max_circles);
+	r->food_renderer = food_renderer_create(context, max_foods);
+	r->bp_renderer = bp_renderer_create(context, max_circles);
+	r->eye_renderer = eye_renderer_create(context, max_eyes);
 	r->sprite_renderer = sprite_renderer_create(context, sprite_sheet, max_sprites);
 	r->text_renderer = text_renderer_create(context, font_sheet, max_chars);
 	r->mm_renderer = mm_renderer_create(context, 1);
@@ -113,8 +115,16 @@ void renderer_push_bd(renderer* renderer, const bd_instance* bd_instance) {
 	ig_bd_renderer_push(renderer->bd_renderer, bd_instance);
 }
 
-void renderer_push_circle(renderer* renderer, const circle_instance* circle_instance) {
-	circle_renderer_push(renderer->circle_renderer, circle_instance);
+void renderer_push_food(renderer* renderer, const food_instance* food_instance) {
+	food_renderer_push(renderer->food_renderer, food_instance);
+}
+
+void renderer_push_bp(renderer* renderer, const bp_instance* bp_instance) {
+	bp_renderer_push(renderer->bp_renderer, bp_instance);
+}
+
+void renderer_push_eye(renderer* renderer, const eye_instance* eye_instance) {
+	eye_renderer_push(renderer->eye_renderer, eye_instance);
 }
 
 void renderer_push_sprite(renderer* renderer, const sprite_instance* sprite_instance) {
@@ -150,14 +160,17 @@ void renderer_flush(renderer* renderer) {
 				.height = renderer->context->default_frame.resolution.y
 			}
 		},
-		.clearValueCount = 1,
-		.pClearValues = &(VkClearValue) {
-			.color = { .float32 = { 0.086f, 0.11f, 0.13f, 1.0f } }
+		.clearValueCount = 2,
+		.pClearValues = (VkClearValue[]) {
+			{ .color = { .float32 = { 0.086f, 0.11f, 0.13f, 1.0f } } },
+			{ .depthStencil = { .depth = 0, .stencil = 0 }}
 		}
 	}, VK_SUBPASS_CONTENTS_INLINE);
 	vkCmdBindVertexBuffers(frame->cmd_buffer, 0, 1, &renderer->quad_buffer->buffer, (VkDeviceSize[]) { 0 });
 	sprite_renderer_flush(renderer->bg_renderer, renderer->context, frame);
-	circle_renderer_flush(renderer->circle_renderer, renderer->context, frame);
+	food_renderer_flush(renderer->food_renderer, renderer->context, frame);
+	eye_renderer_flush(renderer->eye_renderer, renderer->context, frame);
+	bp_renderer_flush(renderer->bp_renderer, renderer->context, frame);
 	ig_bd_renderer_flush(renderer->bd_renderer, renderer->context, frame);
 	mm_renderer_flush(renderer->mm_renderer, renderer->context, frame);
 	sprite_renderer_flush(renderer->sprite_renderer, renderer->context, frame);
@@ -172,7 +185,9 @@ void renderer_destroy(renderer* renderer) {
 	mm_renderer_destroy(renderer->mm_renderer, renderer->context);
 	text_renderer_destroy(renderer->text_renderer, renderer->context);
 	sprite_renderer_destroy(renderer->sprite_renderer, renderer->context);
-	circle_renderer_destroy(renderer->circle_renderer, renderer->context);
+	eye_renderer_destroy(renderer->eye_renderer, renderer->context);
+	bp_renderer_destroy(renderer->bp_renderer, renderer->context);
+	food_renderer_destroy(renderer->food_renderer, renderer->context);
 	sprite_renderer_destroy(renderer->bg_renderer, renderer->context);
 	ig_bd_renderer_destroy(renderer->bd_renderer, renderer->context);
 	ig_context_buffer_destroy(renderer->context, renderer->global_buffer);

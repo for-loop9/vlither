@@ -102,7 +102,8 @@ void create_game(int argc, char** argv) {
 		.msg_queue = message_queue_create(),
 		.settings_instance = {
 			.show_fps = false,
-			.notify_kills = true,
+			.notify_kills = false,
+			.show_kill = true,
 			.clk = true,
 			.vsync = true,
 			.enable_zoom = 1,
@@ -111,11 +112,15 @@ void create_game(int argc, char** argv) {
 			.nickname = "",
 			.ip = "15.204.212.200:444",
 			.hq = true,
-			.laser_length = 150,
 			.laser_thickness = 2,
-			.laser_color = { .x = 1, .y = 0.6f, .z = 0.6f }
+			.laser_color = { .x = 1, .y = 0.6f, .z = 0.6f },
+			.names_color = { .x = 0.9f, .y = 0.9f, .z = 0.9f },
+			.food_scale = 0.25f,
+			.names_font = RENDERER_FONT_SMALL
 		},
 		.config = {
+			.player_names = true,
+
 			.grd = -1,
 			.mscps = -1,
 			.ssd256 = -1,
@@ -329,8 +334,6 @@ void create_game(int argc, char** argv) {
 		j += (.5 * (1 - cosf(PI * j)) - j) * .5;
 		g.config.vfas[i] = j;
 	}
-	for (int yy = 0; yy < 256; yy++) 
-		for (int xx = 0; xx < 256; xx++) g.config.at2lt[yy << 8 | xx] = atan2f(yy - 128, xx - 128);
 	
 	int i = 0;
 	for (float j = 2.8f; j <= 18.8f; j += 1) {
@@ -357,7 +360,7 @@ void create_game(int argc, char** argv) {
 	ig_texture* font_sheet = ig_context_texture_create_from_file(g.icontext, "app/res/textures/font_sheet.png");
 	ig_texture* bg_tex = ig_context_texture_create_from_file(g.icontext, "app/res/textures/bg54.jpg");
 
-	g.renderer = renderer_create(&g, g.icontext, g.window, sprite_sheet, 8192, 128, font_sheet, bg_tex, 512);
+	g.renderer = renderer_create(&g, g.icontext, g.window, sprite_sheet, MAX_BP_RENDER, MAX_EYE_RENDER, MAX_FOOD_RENDER, 128, font_sheet, bg_tex, 512);
 
 	input_data input_data = {};
 
@@ -380,6 +383,8 @@ void create_game(int argc, char** argv) {
 		input_data.k_pressed = ig_keyboard_key_pressed(g.keyboard, GLFW_KEY_K);
 		input_data.m_pressed = ig_keyboard_key_pressed(g.keyboard, GLFW_KEY_M);
 		input_data.n_pressed = ig_keyboard_key_pressed(g.keyboard, GLFW_KEY_N);
+		input_data.b_pressed = ig_keyboard_key_pressed(g.keyboard, GLFW_KEY_B);
+		input_data.p_pressed = ig_keyboard_key_pressed(g.keyboard, GLFW_KEY_P);
 		input_data.ctm = glfwGetTime() * 1000;
 		float ct = glfwGetTime();
 		dt = ct - pdt;

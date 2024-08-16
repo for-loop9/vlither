@@ -602,7 +602,7 @@ void client_callback(struct mg_connection* c, int ev, void* ev_data) {
 				yy = ayy + ry * g->config.ssd256;
 				rad = packet[p] / 5.0f; p++;
 				id = sx << 24 | sy << 16 | rx << 8 | ry;
-				int cv2 = floorf(FOOD_SIZES * g->config.gsc * rad / 16.5f);
+				int cv2 = floorf(FOOD_SIZES * rad / 16.5f);
 				if (cv2 < 0) cv2 = 0;
 				if (cv2 >= FOOD_SIZES) cv2 = FOOD_SIZES - 1;
 
@@ -656,7 +656,7 @@ void client_callback(struct mg_connection* c, int ev, void* ev_data) {
 			}
 			else cv = g->config.lfcv;
 			float rad = packet[p] / 5.0f; p++;
-			int cv2 = floorf(FOOD_SIZES * g->config.gsc * rad / 16.5f);
+			int cv2 = floorf(FOOD_SIZES * rad / 16.5f);
 			if (cv2 < 0) cv2 = 0;
 			if (cv2 >= FOOD_SIZES) cv2 = FOOD_SIZES - 1;
 			
@@ -889,7 +889,7 @@ void client_callback(struct mg_connection* c, int ev, void* ev_data) {
 				float ang = (packet[p] << 16 | packet[p + 1] << 8 | packet[p + 2]) * 2 * PI / 16777215.0f; p += 3;
 				float speed = (packet[p] << 8 | packet[p + 1]) / 1e3; p += 2;
 
-				int cv2 = floorf(PREY_SIZES * g->config.gsc * rad / 9.0f);
+				int cv2 = floorf(PREY_SIZES * rad / 9.0f);
 				if (cv2 < 0) cv2 = 0;
 				if (cv2 >= PREY_SIZES) cv2 = PREY_SIZES - 1;
 				

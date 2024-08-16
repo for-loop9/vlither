@@ -8,6 +8,21 @@
 #include "../external/cimgui/cimgui.h"
 
 void title_screen(game* g) {
+	// renderer_start_imgui_frame(g->renderer);
+
+	// renderer_push_bp(g->renderer, &(bp_instance) {
+	// 	.circ = { 100, 100, 0.1f, 250 },
+	// 	.ratios = { 0, 1 },
+	// 	.color = { 1, 0, 1, 0.2f }
+	// });
+	// renderer_push_eye(g->renderer, &(eye_instance) {
+	// 	.circ = { 300, 100, 0, 250 },
+	// 	.ratios = { 0, 1 },
+	// 	.color = { 1, 1, 1, 1 }
+	// });
+
+	// renderer_flush(g->renderer);
+	// return;
 	renderer_start_imgui_frame(g->renderer);
 	ImGuiStyle* style = igGetStyle();
 
@@ -68,12 +83,12 @@ void title_screen(game* g) {
 		// if (off > 0.0f)
 		//     igSetCursorPosX(igGetCursorPosX() + off);
 		if (igButton(did_play ? "Play again" : "Play", (ImVec2) { -1, 0 })) {
+			reset_game(g);
 			message_queue_push(&g->msg_queue, (&(message) {
 				.message = "Connecting",
 					.tt = 1,
 					.color = { .x = 1, .y = 0.5f, .z = 0.3f, .w = 1 }
 			}));
-			reset_game(g);
 
 			if (g->played) {
 				pthread_join(g->load_thread, NULL);

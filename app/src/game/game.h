@@ -14,6 +14,9 @@
 typedef struct prey prey;
 
 #define PREY_SIZES 22
+#define MAX_BP_RENDER 8192
+#define MAX_FOOD_RENDER 4096
+#define MAX_EYE_RENDER 128
 
 typedef struct input_data {
 	ig_vec2 mouse_pos;
@@ -23,6 +26,8 @@ typedef struct input_data {
 	bool k_pressed;
 	bool m_pressed;
 	bool n_pressed;
+	bool b_pressed;
+	bool p_pressed;
 	float ctm;
 	int fps_display;
 } input_data;
@@ -47,11 +52,14 @@ typedef struct settings {
 	bool notify_kills;
 	bool enable_zoom;
 	bool show_lengths;
+	renderer_font names_font;
 	bool instant_gameover;
 	bool black_bg;
-	int laser_length;
+	bool big_food;
 	int laser_thickness;
 	ig_vec3 laser_color;
+	ig_vec3 names_color;
+	float food_scale;
 } settings;
 
 typedef struct game {
@@ -137,7 +145,6 @@ typedef struct game {
 		float hfas[HFC];
 		float afas[AFC];
 		float vfas[VFC];
-		float at2lt[65536];
 		float pbx[32767 * 2];
 		float pby[32767 * 2];
 		float pba[32767 * 2];
@@ -189,6 +196,7 @@ typedef struct game {
 		int rank;
 		int total_players;
 		bool laser;
+		bool player_names;
 	} config;
 	
 	settings settings_instance;

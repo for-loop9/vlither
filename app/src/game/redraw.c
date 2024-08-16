@@ -102,23 +102,25 @@ void redraw(game* g, const input_data* input_data) {
 		food* fo = g->foods + i;
 		ig_vec3* col = g->config.color_groups + fo->cv;
 
+		if (g->settings_instance.big_food && fo->f < 60) continue;
+
 		if (fo->rx >= g->config.fpx1 && fo->ry >= g->config.fpy1 && fo->rx <= g->config.fpx2 && fo->ry <= g->config.fpy2) {
 			if (fo->rad == 1) {
-				float fx = mww2 + g->config.gsc * (fo->rx - g->config.view_xx) - ((fo->rad * fo->f2) / 4.0f);
-				float fy = mhh2 + g->config.gsc * (fo->ry - g->config.view_yy) - ((fo->rad * fo->f2) / 4.0f);
+				float fx = mww2 + g->config.gsc * (fo->rx - g->config.view_xx) - g->config.gsc * ((fo->rad * fo->f2) * g->settings_instance.food_scale);
+				float fy = mhh2 + g->config.gsc * (fo->ry - g->config.view_yy) - g->config.gsc * ((fo->rad * fo->f2) * g->settings_instance.food_scale);
 				
-				renderer_push_circle(g->renderer, &(circle_instance) {
-					.circ = { .x = fx, .y = fy, .z = (fo->rad * fo->f) / 4.0f },
+				renderer_push_food(g->renderer, &(food_instance) {
+					.circ = { .x = fx, .y = fy, .z = ((fo->rad * fo->f) * g->settings_instance.food_scale) * g->config.gsc },
 					.ratios = { .x = 0, .y = 1 },
 					.color = { .x = col->x, .y = col->y, .z = col->z, .w = 1 }
 				});
 			}
 			else {
-				float fx = mww2 + g->config.gsc * (fo->rx - g->config.view_xx) - ((fo->rad * fo->f2) / 4.0f);
-				float fy = mhh2 + g->config.gsc * (fo->ry - g->config.view_yy) - ((fo->rad * fo->f2) / 4.0f);
+				float fx = mww2 + g->config.gsc * (fo->rx - g->config.view_xx) - g->config.gsc * ((fo->rad * fo->f2) * g->settings_instance.food_scale);
+				float fy = mhh2 + g->config.gsc * (fo->ry - g->config.view_yy) - g->config.gsc * ((fo->rad * fo->f2) * g->settings_instance.food_scale);
 
-				renderer_push_circle(g->renderer, &(circle_instance) {
-					.circ = { .x = fx, .y = fy, .z = (fo->rad * fo->f) / 4.0f },
+				renderer_push_food(g->renderer, &(food_instance) {
+					.circ = { .x = fx, .y = fy, .z = ((fo->rad * fo->f) * g->settings_instance.food_scale) * g->config.gsc },
 					.ratios = { .x = 0, .y = 1 },
 					.color = { .x = col->x, .y = col->y, .z = col->z, .w = 1 }
 				});
@@ -147,19 +149,19 @@ void redraw(game* g, const input_data* input_data) {
 				}
 			}
 			if (pr->rad == 1) {
-				float fx = px - pr->f2 / 4.0f;
-				float fy = py - pr->f2 / 4.0f;
-				renderer_push_circle(g->renderer, &(circle_instance) {
-					.circ = { .x = fx, .y = fy, .z = pr->f / 4.0f },
+				float fx = px - g->config.gsc * (pr->f2 / 3.0f);
+				float fy = py - g->config.gsc * (pr->f2 / 3.0f);
+				renderer_push_food(g->renderer, &(food_instance) {
+					.circ = { .x = fx, .y = fy, .z = g->config.gsc * (pr->f / 3.0f) },
 					.ratios = { .x = 0, .y = 1 },
 					.color = { .x = col->x + pr->blink * (1 - col->x), .y = col->y + pr->blink * (1 - col->y), .z = col->z + pr->blink * (1 - col->z), .w = pr->fr }
 				});
 			} else {
-				float fx = px - (pr->f2 * pr->rad) / 4.0f;
-				float fy = py - (pr->f2 * pr->rad) / 4.0f;
+				float fx = px - g->config.gsc * ((pr->f2 * pr->rad) / 3.0f);
+				float fy = py - g->config.gsc * ((pr->f2 * pr->rad) / 3.0f);
 				
-				renderer_push_circle(g->renderer, &(circle_instance) {
-					.circ = { .x = fx, .y = fy, .z = (pr->f * pr->rad) / 4.0f },
+				renderer_push_food(g->renderer, &(food_instance) {
+					.circ = { .x = fx, .y = fy, .z = g->config.gsc * ((pr->f * pr->rad) / 3.0f) },
 					.ratios = { .x = 0, .y = 1 },
 					.color = { .x = col->x + pr->blink * (1 - col->x), .y = col->y + pr->blink * (1 - col->y), .z = col->z + pr->blink * (1 - col->z), .w = pr->fr }
 				});
@@ -280,11 +282,7 @@ void redraw(game* g, const input_data* input_data) {
 									g->config.pbu[bp] = 2;
 									float tx = ax - lax;
 									float ty = ay - lay;
-									if (tx >= -4 && ty >= -4 && tx < 4 && ty < 4) g->config.pba[bp] = g->config.at2lt[((int) (ty * 32 + 128) << 8) | (int) (tx * 32 + 128)];
-									else if (tx >= -8 && ty >= -8 && tx < 8 && ty < 8) g->config.pba[bp] = g->config.at2lt[((int)(ty * 16 + 128) << 8) | (int) (tx * 16 + 128)];
-									else if (tx >= -16 && ty >= -16 && tx < 16 && ty < 16) g->config.pba[bp] = g->config.at2lt[((int)(ty * 8 + 128) << 8) | (int) (tx * 8 + 128)];
-									else if (tx >= -127 && ty >= -127 && tx < 127 && ty < 127) g->config.pba[bp] = g->config.at2lt[((int) (ty + 128)) << 8 | (int) (tx + 128)];
-									else g->config.pba[bp] = atan2f(ty, tx);
+									g->config.pba[bp] = atan2f(ty, tx);
 								}
 								else g->config.pbu[bp] = 0;
 								bp++;
@@ -309,6 +307,7 @@ void redraw(game* g, const input_data* input_data) {
 			bp++;
 
 			float v = (1 - o->dead_amt) * o->alive_amt;
+			float snake_z = 1 - (i / (float) snakes_len);
 
 			for (int j = bp - 1; j >= 0; j--) {
 				if (g->config.pbu[j] >= 1) {
@@ -317,8 +316,8 @@ void redraw(game* g, const input_data* input_data) {
 						px = (mww2 + ((g->config.pbx[j - 1] - g->config.view_xx) * g->config.gsc));
 						py = (mhh2 + ((g->config.pby[j - 1] - g->config.view_yy) * g->config.gsc));
 
-						renderer_push_circle(g->renderer, &(circle_instance) {
-							.circ = { .x = px - shsz, .y = py - shsz, .z = shsz * 2 },
+						renderer_push_bp(g->renderer, &(bp_instance) {
+							.circ = { .x = px - shsz, .y = py - shsz, .z = 1 - snake_z, .w = shsz * 2 },
 							.ratios = { .x = 0, .y = 1 },
 							.color = { .x = 0, .y = 0, .z = 0, .w = 0.2f * v }
 						});
@@ -329,9 +328,9 @@ void redraw(game* g, const input_data* input_data) {
 					px = mww2 + ((g->config.pbx[j] - g->config.view_xx) * g->config.gsc);
 					py = mhh2 + ((g->config.pby[j] - g->config.view_yy) * g->config.gsc);
 
-					renderer_push_circle(g->renderer, &(circle_instance) {
-						.circ = { .x = px + (-g->config.gsc * lsz), .y = py + (-g->config.gsc * lsz), .z = g->config.gsc * 2 * lsz },
-						.ratios = { .x = 0, .y = 1 },
+					renderer_push_bp(g->renderer, &(bp_instance) {
+						.circ = { .x = px + (-g->config.gsc * lsz), .y = py + (-g->config.gsc * lsz), .z = 1 - snake_z, .w = g->config.gsc * 2 * lsz },
+						.ratios = { .x = sinf(g->config.pba[j]), .y = cosf(g->config.pba[j]) },
 						.color = { .x = col->x, .y = col->y, .z = col->z, .w = v }
 					});
 				}
@@ -355,11 +354,12 @@ void redraw(game* g, const input_data* input_data) {
 
 			float rd2 = (6 * ssc * g->config.gsc) * 2;
 
-			renderer_push_circle(g->renderer, &(circle_instance) {
+			renderer_push_eye(g->renderer, &(eye_instance) {
 				.circ = {
 					.x = (mww2 + (ex + hx - g->config.view_xx) * g->config.gsc) - rd2 / 2,
 					.y = (mhh2 + (ey + hy - g->config.view_yy) * g->config.gsc) - rd2 / 2,
-					.z = rd2
+					.z = (1 - snake_z) + 0.01f,
+					.w = rd2
 				},
 				.ratios = { .x = 0, .y = 1 },
 				.color = { .x = 1, .y = 1, .z = 1, .w = v }
@@ -369,11 +369,12 @@ void redraw(game* g, const input_data* input_data) {
 			ey = sinf(fang) * (ed + 0.5f) + o->rey * ssc + sinf(fang - PI / 2) * esp;
 			rd2 = (3.5f * ssc * g->config.gsc) * 2;
 
-			renderer_push_circle(g->renderer, &(circle_instance) {
+			renderer_push_eye(g->renderer, &(eye_instance) {
 				.circ = {
 					.x = (mww2 + (ex + hx - g->config.view_xx) * g->config.gsc) - rd2 / 2,
 					.y = (mhh2 + (ey + hy - g->config.view_yy) * g->config.gsc) - rd2 / 2,
-					.z = rd2
+					.z = (1 - snake_z) + 0.01f,
+					.w = rd2
 				},
 				.ratios = { .x = 0, .y = 1 },
 				.color = { .x = 0, .y = 0, .z = 0, .w = v }
@@ -386,11 +387,12 @@ void redraw(game* g, const input_data* input_data) {
 			// if (!g->snake_null && o == g->os.snakes)
 			// 	printf("iris size = %d, bp size = %d, pupil size = %d\n", (int) rd2, (int) (g->config.gsc * 2 * lsz), (int) ((3.5f * ssc * g->config.gsc) * 2));
 
-			renderer_push_circle(g->renderer, &(circle_instance) {
+			renderer_push_eye(g->renderer, &(eye_instance) {
 				.circ = {
 					.x = (mww2 + (ex + hx - g->config.view_xx) * g->config.gsc) - rd2 / 2,
 					.y = (mhh2 + (ey + hy - g->config.view_yy) * g->config.gsc) - rd2 / 2,
-					.z = rd2
+					.z = (1 - snake_z) + 0.01f,
+					.w = rd2
 				},
 				.ratios = { .x = 0, .y = 1 },
 				.color = { .x = 1, .y = 1, .z = 1, .w = v }
@@ -400,50 +402,55 @@ void redraw(game* g, const input_data* input_data) {
 			ey = sinf(fang) * (ed + 0.5f) + o->rey * ssc + sinf(fang + PI / 2) * esp;
 			rd2 = (3.5f * ssc * g->config.gsc) * 2;
 
-			renderer_push_circle(g->renderer, &(circle_instance) {
+			renderer_push_eye(g->renderer, &(eye_instance) {
 				.circ = {
 					.x = (mww2 + (ex + hx - g->config.view_xx) * g->config.gsc) - rd2 / 2,
 					.y = (mhh2 + (ey + hy - g->config.view_yy) * g->config.gsc) - rd2 / 2,
-					.z = rd2
+					.z = (1 - snake_z) + 0.01f,
+					.w = rd2
 				},
 				.ratios = { .x = 0, .y = 1 },
 				.color = { .x = 0, .y = 0, .z = 0, .w = v }
 			});
 
-			if (g->snake_null || o != g->os.snakes + 0) {
-				float ntx = o->xx + o->fx;
-				float nty = o->yy + o->fy;
-				ntx = mww2 + (ntx - g->config.view_xx) * g->config.gsc;
-				nty = mhh2 + (nty - g->config.view_yy) * g->config.gsc;
-				int len; ImVec2 nick_txt_size;
+			if (g->config.player_names) {
+				if (g->snake_null || o != g->os.snakes + 0) {
+					igPushFont(g->renderer->fonts[g->settings_instance.names_font]);
+					float ntx = o->xx + o->fx;
+					float nty = o->yy + o->fy;
+					ntx = mww2 + (ntx - g->config.view_xx) * g->config.gsc;
+					nty = mhh2 + (nty - g->config.view_yy) * g->config.gsc;
+					int len; ImVec2 nick_txt_size;
 
-				if (g->settings_instance.show_lengths) {
-					int snake_length_k = (floorf((g->config.fpsls[o->sct] + o->fam / g->config.fmlts[o->sct] - 1) * 15 - 5) / 1) / 1000;
-					if (snake_length_k > 0) {
-						char nk_buff[64] = {};
-						if (o->nk[0])
-							sprintf(nk_buff, "%s @ %dK", o->nk, snake_length_k);
-						else
-							sprintf(nk_buff, "@ %dK", snake_length_k);
+					if (g->settings_instance.show_lengths) {
+						int snake_length_k = (floorf((g->config.fpsls[o->sct] + o->fam / g->config.fmlts[o->sct] - 1) * 15 - 5) / 1) / 1000;
+						if (snake_length_k > 0) {
+							char nk_buff[64] = {};
+							if (o->nk[0])
+								sprintf(nk_buff, "%s @ %dK", o->nk, snake_length_k);
+							else
+								sprintf(nk_buff, "@ %dK", snake_length_k);
 
-						igCalcTextSize(&nick_txt_size, nk_buff, NULL, 0, 0); len = nick_txt_size.x;
-						ImDrawList_AddText_Vec2(draw_list,
-							(ImVec2) {
-							.x = ntx - len / 2, .y = nty + 32 + 11 * o->sc * g->config.gsc
-						}, igColorConvertFloat4ToU32((ImVec4) { .x = 0.9f, .y = 0.9f, .z = 0.9f, .w = v }), nk_buff, NULL);
+							igCalcTextSize(&nick_txt_size, nk_buff, NULL, 0, 0); len = nick_txt_size.x;
+							ImDrawList_AddText_Vec2(draw_list,
+								(ImVec2) {
+								.x = ntx - len / 2, .y = nty + 32 + 11 * o->sc * g->config.gsc
+							}, igColorConvertFloat4ToU32((ImVec4) { .x = g->settings_instance.names_color.x, .y = g->settings_instance.names_color.y, .z = g->settings_instance.names_color.z, .w = v }), nk_buff, NULL);
+						} else {
+							igCalcTextSize(&nick_txt_size, o->nk, NULL, 0, 0); len = nick_txt_size.x;
+							ImDrawList_AddText_Vec2(draw_list,
+								(ImVec2) {
+								.x = ntx - len / 2, .y = nty + 32 + 11 * o->sc * g->config.gsc
+							}, igColorConvertFloat4ToU32((ImVec4) { .x = g->settings_instance.names_color.x, .y = g->settings_instance.names_color.y, .z = g->settings_instance.names_color.z, .w = v }), o->nk, NULL);
+						}
 					} else {
 						igCalcTextSize(&nick_txt_size, o->nk, NULL, 0, 0); len = nick_txt_size.x;
 						ImDrawList_AddText_Vec2(draw_list,
-							(ImVec2) {
-							.x = ntx - len / 2, .y = nty + 32 + 11 * o->sc * g->config.gsc
-						}, igColorConvertFloat4ToU32((ImVec4) { .x = 0.9f, .y = 0.9f, .z = 0.9f, .w = v }), o->nk, NULL);
+								(ImVec2) {
+								.x = ntx - len / 2, .y = nty + 32 + 11 * o->sc * g->config.gsc
+							}, igColorConvertFloat4ToU32((ImVec4) { .x = g->settings_instance.names_color.x, .y = g->settings_instance.names_color.y, .z = g->settings_instance.names_color.z, .w = v }), o->nk, NULL);
 					}
-				} else {
-					igCalcTextSize(&nick_txt_size, o->nk, NULL, 0, 0); len = nick_txt_size.x;
-					ImDrawList_AddText_Vec2(draw_list,
-							(ImVec2) {
-							.x = ntx - len / 2, .y = nty + 32 + 11 * o->sc * g->config.gsc
-						}, igColorConvertFloat4ToU32((ImVec4) { .x = 0.9f, .y = 0.9f, .z = 0.9f, .w = v }), o->nk, NULL);
+					igPopFont();
 				}
 			}
 		}

@@ -50,7 +50,12 @@ void oef(game* g, struct mg_connection* c, const input_data* input_data) {
 	if (!g->snake_null) {
 		if (input_data->k_pressed) {
 			g->config.laser = !g->config.laser;
+		} else if (input_data->b_pressed) {
+			g->settings_instance.big_food = !g->settings_instance.big_food;
+		} else if (input_data->p_pressed) {
+			g->config.player_names = !g->config.player_names;
 		}
+
 		if (g->settings_instance.enable_zoom) {
 			if (input_data->m_pressed) {
 				g->config.zoom -= 2 * 0.1f * g->config.gsc;

@@ -556,17 +556,29 @@ ig_context* ig_context_create(ig_window* window, const ig_ivec2* resolution, int
 		.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
 		.pNext = NULL,
 		.flags = 0,
-		.attachmentCount = 1,
-		.pAttachments = &(VkAttachmentDescription) {
-			.flags = 0,
-			.format = r->surface_format.format,
-			.samples = VK_SAMPLE_COUNT_1_BIT,
-			.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
-			.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
-			.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-			.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-			.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-			.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+		.attachmentCount = 2,
+		.pAttachments = (VkAttachmentDescription[]) {
+			{
+				.flags = 0,
+				.format = r->surface_format.format,
+				.samples = VK_SAMPLE_COUNT_1_BIT,
+				.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+				.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+				.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+				.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+				.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+				.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+			}, {
+				.flags = 0,
+				.format = VK_FORMAT_D32_SFLOAT,
+				.samples = VK_SAMPLE_COUNT_1_BIT,
+				.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+				.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+				.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+				.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+				.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+				.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
+			}
 		},
 		.subpassCount = 1,
 		.pSubpasses = &(VkSubpassDescription) {
@@ -579,7 +591,9 @@ ig_context* ig_context_create(ig_window* window, const ig_ivec2* resolution, int
 				.attachment = 0, .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
 			},
 			.pResolveAttachments = NULL,
-			.pDepthStencilAttachment = NULL,
+			.pDepthStencilAttachment = &(VkAttachmentReference) {
+				.attachment = 1, .layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
+			},
 			.preserveAttachmentCount = 0,
 			.pPreserveAttachments = NULL
 		},
@@ -587,7 +601,7 @@ ig_context* ig_context_create(ig_window* window, const ig_ivec2* resolution, int
 		.pDependencies = &(VkSubpassDependency) {
 			.srcSubpass = 0,
 			.dstSubpass = VK_SUBPASS_EXTERNAL,
-			.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+			.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
 			.dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
 			.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
 			.dstAccessMask = VK_ACCESS_SHADER_READ_BIT,
@@ -648,13 +662,66 @@ ig_context* ig_context_create(ig_window* window, const ig_ivec2* resolution, int
 		}
 	}, NULL, &r->default_frame.color_attachment_view);
 
+	vmaCreateImage(r->allocator, &(VkImageCreateInfo) {
+		.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
+		.pNext = NULL,
+		.flags = 0,
+		.imageType = VK_IMAGE_TYPE_2D,
+		.format = VK_FORMAT_D32_SFLOAT,
+		.extent = {
+			.width = r->default_frame.resolution.x,
+			.height = r->default_frame.resolution.y,
+			.depth = 1
+		},
+		.mipLevels = 1,
+		.arrayLayers = 1,
+		.samples = VK_SAMPLE_COUNT_1_BIT,
+		.tiling = VK_IMAGE_TILING_OPTIMAL,
+		.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
+		.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+		.queueFamilyIndexCount = 0,
+		.pQueueFamilyIndices = NULL,
+		.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED
+	}, &(VmaAllocationCreateInfo) {
+		.flags = VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT,
+		.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE,
+		.requiredFlags = 0,
+		.preferredFlags = 0,
+		.memoryTypeBits = 0,
+		.pool = VK_NULL_HANDLE,
+		.pUserData = NULL,
+		.priority = 0
+	}, &r->default_frame.depth_attachment, &r->default_frame.depth_attachment_memory, NULL);
+
+	vkCreateImageView(r->device, &(VkImageViewCreateInfo) {
+		.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+		.pNext = NULL,
+		.flags = 0,
+		.image = r->default_frame.depth_attachment,
+		.viewType = VK_IMAGE_VIEW_TYPE_2D,
+		.format = VK_FORMAT_D32_SFLOAT,
+		.components = {
+			.r = VK_COMPONENT_SWIZZLE_IDENTITY,
+			.g = VK_COMPONENT_SWIZZLE_IDENTITY,
+			.b = VK_COMPONENT_SWIZZLE_IDENTITY,
+			.a = VK_COMPONENT_SWIZZLE_IDENTITY
+		},
+		.subresourceRange = {
+			.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT,
+			.baseMipLevel = 0,
+			.levelCount = 1,
+			.baseArrayLayer = 0,
+			.layerCount = 1
+		}
+	}, NULL, &r->default_frame.depth_attachment_view);
+
 	vkCreateFramebuffer(r->device, &(VkFramebufferCreateInfo) {
 		.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
 		.pNext = NULL,
 		.flags = 0,
 		.renderPass = r->default_frame.render_pass,
-		.attachmentCount = 1,
-		.pAttachments = &r->default_frame.color_attachment_view,
+		.attachmentCount = 2,
+		.pAttachments = (VkImageView[]) { r->default_frame.color_attachment_view, r->default_frame.depth_attachment_view },
 		.width = r->default_frame.resolution.x,
 		.height = r->default_frame.resolution.y,
 		.layers = 1
@@ -820,6 +887,8 @@ void ig_context_destroy(ig_context* context) {
 
 	// default frame:
 	vkDestroyFramebuffer(context->device, context->default_frame.framebuffer, NULL);
+	vkDestroyImageView(context->device, context->default_frame.depth_attachment_view, NULL);
+	vmaDestroyImage(context->allocator, context->default_frame.depth_attachment, context->default_frame.depth_attachment_memory);
 	vkDestroyImageView(context->device, context->default_frame.color_attachment_view, NULL);
 	vmaDestroyImage(context->allocator, context->default_frame.color_attachment, context->default_frame.color_attachment_memory);
 	vkDestroyRenderPass(context->device, context->default_frame.render_pass, NULL);

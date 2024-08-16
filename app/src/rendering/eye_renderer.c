@@ -1,17 +1,15 @@
-#include "text_renderer.h"
+#include "eye_renderer.h"
 #include <stdlib.h>
 #include <string.h>
-#include <graphics/ig_context.h>
 #include <graphics/ig_buffer.h>
-#include <graphics/ig_texture.h>
 
-text_renderer* text_renderer_create(ig_context* context, const ig_texture* font_sheet, unsigned int max_instances) {
-	text_renderer* r = malloc(sizeof(text_renderer));
+eye_renderer* eye_renderer_create(ig_context* context, unsigned int max_instances) {
+	eye_renderer* r = malloc(sizeof(eye_renderer));
 	r->instance_count = 0;
-	r->instances = malloc(max_instances * sizeof(ig_text_instance));
+	r->instances = malloc(max_instances * sizeof(eye_instance));
 
-	VkShaderModule vertex_shader = ig_context_create_shader_from_file(context, "app/res/shaders/textv.spv");
-	VkShaderModule fragment_shader = ig_context_create_shader_from_file(context, "app/res/shaders/textf.spv");
+	VkShaderModule vertex_shader = ig_context_create_shader_from_file(context, "app/res/shaders/eyev.spv");
+	VkShaderModule fragment_shader = ig_context_create_shader_from_file(context, "app/res/shaders/eyef.spv");
 
 	vkCreateGraphicsPipelines(context->device, VK_NULL_HANDLE, 1, &(VkGraphicsPipelineCreateInfo) {
 		.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
@@ -51,7 +49,7 @@ text_renderer* text_renderer_create(ig_context* context, const ig_texture* font_
 				},
 				{
 					.binding = 1,
-					.stride = sizeof(ig_text_instance),
+					.stride = sizeof(eye_instance),
 					.inputRate = VK_VERTEX_INPUT_RATE_INSTANCE
 				},
 			},
@@ -66,20 +64,20 @@ text_renderer* text_renderer_create(ig_context* context, const ig_texture* font_
 				{
 					.location = 1,
 					.binding = 1,
-					.format = VK_FORMAT_R32G32B32_SFLOAT,
+					.format = VK_FORMAT_R32G32B32A32_SFLOAT,
 					.offset = 0
 				},
 				{
 					.location = 2,
 					.binding = 1,
-					.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-					.offset = offsetof(ig_text_instance, uv_rect)
+					.format = VK_FORMAT_R32G32_SFLOAT,
+					.offset = offsetof(eye_instance, ratios)
 				},
 				{
 					.location = 3,
 					.binding = 1,
 					.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-					.offset = offsetof(ig_text_instance, color)
+					.offset = offsetof(eye_instance, color)
 				}
 			}
 		},
@@ -143,7 +141,9 @@ text_renderer* text_renderer_create(ig_context* context, const ig_texture* font_
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
 			.pNext = NULL,
 			.flags = 0,
-			.depthTestEnable = VK_FALSE,
+			.depthTestEnable = VK_TRUE,
+			.depthWriteEnable = VK_TRUE,
+			.depthCompareOp = VK_COMPARE_OP_GREATER_OR_EQUAL
 		},
 		.pColorBlendState = &(VkPipelineColorBlendStateCreateInfo) {
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
@@ -175,74 +175,26 @@ text_renderer* text_renderer_create(ig_context* context, const ig_texture* font_
 	vkDestroyShaderModule(context->device, fragment_shader, NULL);
 	vkDestroyShaderModule(context->device, vertex_shader, NULL);
 
-	r->instance_buffer = ig_context_dbuffer_create(context, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, NULL, max_instances * sizeof(ig_text_instance));
-
-	vkAllocateDescriptorSets(context->device, &(VkDescriptorSetAllocateInfo) {
-		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
-		.pNext = NULL,
-		.descriptorPool = context->descriptor_pool,
-		.descriptorSetCount = 1,
-		.pSetLayouts = &context->texture_layout
-	}, &r->font_sheet_ptr);
-
-	vkUpdateDescriptorSets(context->device, 1, &(VkWriteDescriptorSet) {
-		.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-		.pNext = NULL,
-		.dstSet = r->font_sheet_ptr,
-		.dstBinding = 0,
-		.dstArrayElement = 0,
-		.descriptorCount = 1,
-		.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-		.pImageInfo = &(VkDescriptorImageInfo) {
-			.sampler = context->nearest_sampler,
-			.imageView = font_sheet->view,
-			.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
-		},
-		.pBufferInfo = NULL,
-		.pTexelBufferView = NULL
-	}, 0, NULL);
+	r->instance_buffer = ig_context_dbuffer_create(context, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, NULL, max_instances * sizeof(eye_instance));
 
 	return r;
 }
 
-void text_renderer_push(text_renderer* text_renderer, const char* str, const ig_vec3* transform, const ig_vec4* color, ig_vec3* transform_out) {
-	transform_out->x = transform->x;
-	transform_out->y = transform->y;
-	transform_out->z = transform->z;
-
-	const char* c = str;
-	while (*c != 0) {
-		ig_text_instance* text_instance = text_renderer->instances + text_renderer->instance_count;
-		text_instance->transform.x = transform_out->x;
-		text_instance->transform.y = transform_out->y;
-		text_instance->transform.z = transform->z;
-		text_instance->uv_rect.x = ((*c - 32) % 10) / 10.0f;
-		text_instance->uv_rect.y = ((*c - 32) / 10) / 10.0f;
-		text_instance->uv_rect.z = 0.1f;
-		text_instance->uv_rect.w = 0.1f;
-		text_instance->color = *color;
-
-		transform_out->x += transform->z + transform->z / 7;
-		text_renderer->instance_count++;
-
-		c++;
-	}
+void eye_renderer_push(eye_renderer* eye_renderer, const eye_instance* eye_instance) {
+	eye_renderer->instances[eye_renderer->instance_count++] = *eye_instance;
 }
 
-void text_renderer_flush(text_renderer* text_renderer, ig_context* context, _ig_frame* frame) {
-	memcpy(text_renderer->instance_buffer[context->frame_idx].data, text_renderer->instances, text_renderer->instance_count * sizeof(ig_text_instance));
-
-	vkCmdBindDescriptorSets(frame->cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, context->standard_layout, 1, 1, &text_renderer->font_sheet_ptr, 0, NULL);
-	vkCmdBindPipeline(frame->cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, text_renderer->pipeline);
-	vkCmdBindVertexBuffers(frame->cmd_buffer, 1, 1, &text_renderer->instance_buffer[context->frame_idx].buffer, (VkDeviceSize[]) { 0 });
-	vkCmdDraw(frame->cmd_buffer, 4, text_renderer->instance_count, 0, 0);
-
-	text_renderer->instance_count = 0;
+void eye_renderer_flush(eye_renderer* eye_renderer, ig_context* context, _ig_frame* frame) {
+	memcpy(eye_renderer->instance_buffer[context->frame_idx].data, eye_renderer->instances, eye_renderer->instance_count * sizeof(eye_instance));
+	vkCmdBindPipeline(frame->cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, eye_renderer->pipeline);
+	vkCmdBindVertexBuffers(frame->cmd_buffer, 1, 1, &eye_renderer->instance_buffer[context->frame_idx].buffer, (VkDeviceSize[]) { 0 });
+	vkCmdDraw(frame->cmd_buffer, 4, eye_renderer->instance_count, 0, 0);
+	eye_renderer->instance_count = 0;
 }
 
-void text_renderer_destroy(text_renderer* text_renderer, ig_context* context) {
-	ig_context_dbuffer_destroy(context, text_renderer->instance_buffer);
-	vkDestroyPipeline(context->device, text_renderer->pipeline, NULL);
-	free(text_renderer->instances);
-	free(text_renderer);
+void eye_renderer_destroy(eye_renderer* eye_renderer, ig_context* context) {
+	ig_context_dbuffer_destroy(context, eye_renderer->instance_buffer);
+	vkDestroyPipeline(context->device, eye_renderer->pipeline, NULL);
+	free(eye_renderer->instances);
+	free(eye_renderer);
 }

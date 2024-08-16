@@ -61,7 +61,7 @@ uint8_t* make_nickname_skin_data(game* g, int* nickname_skin_data_len) {
 	int nickname_len = (int) strlen(g->settings_instance.nickname);
 
 	uint8_t* reduced_skin_data = reduce_skin(g);
-	int reduced_length = ig_darray_length(reduced_skin_data);
+	int reduced_length = g->settings_instance.cusk ? ig_darray_length(reduced_skin_data) : 0;
 	uint8_t* result = malloc(*nickname_skin_data_len = 8 + nickname_len + 8 + reduced_length);
 
 	result[0] = 115;
