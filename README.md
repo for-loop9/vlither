@@ -11,7 +11,7 @@ No dependencies are required to run the program. If your GPU supports at least V
 
 ### Build Instructions
 Prerequisites
-- [Premake](https://premake.github.io) for generating the makefiles
+- [Premake](https://premake.github.io) for generating makefiles
 - [Vulkan SDK](https://www.lunarg.com/vulkan-sdk)
 - [Python 3](https://www.python.org/downloads) (for automated shader compilation)
 - GCC (mingw-w64 on Windows)
