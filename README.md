@@ -78,4 +78,4 @@ Here are a few screenshots:
 This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](./LICENSE) file for details.
 
 ### Notice
-This project was made entirely by one person - me. It is tested by me and a few people in official [Slither.io Discord server](https://discord.com/invite/slither). Upon coming across any bugs, I fix them. It is unlikely that you will come across any while using this program. In the off chance that you do, I would really appreciate if you'd let me know by opening up an issue.
+This project was made entirely by one person - me. It is tested by me and a few people in the official [Slither.io Discord server](https://discord.com/invite/slither). Upon coming across any bugs, I fix them. It is unlikely that you will come across any while using this program. In the off chance that you do, I would really appreciate if you'd let me know by opening up an issue.
