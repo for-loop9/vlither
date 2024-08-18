@@ -53,7 +53,6 @@ You may also work on the project with VS Code by opening the `.code-workspace` f
 - Accessories
 - ~~Better skin rendering~~
 - Light theme
-- Multisampling
 - Android
 - Mac
 
