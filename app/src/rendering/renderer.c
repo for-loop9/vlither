@@ -135,8 +135,8 @@ void renderer_set_map_data(renderer* renderer, const uint8_t* map_data) {
 	mm_renderer_set_map_data(renderer->mm_renderer, map_data);
 }
 
-void renderer_push_mm(renderer* renderer, const mm_instance* mm_instance) {
-	mm_renderer_push(renderer->mm_renderer, mm_instance);
+void renderer_push_mm(renderer* renderer, const mm_instance* mm_instance, int size) {
+	mm_renderer_push(renderer->mm_renderer, mm_instance, size);
 }
 
 void renderer_push_text(renderer* renderer, const char* str, const ig_vec3* transform, const ig_vec4* color, ig_vec3* transform_out) {
@@ -146,7 +146,9 @@ void renderer_push_text(renderer* renderer, const char* str, const ig_vec3* tran
 void renderer_flush(renderer* renderer) {
 	_ig_frame* frame = renderer->context->frames + renderer->context->frame_idx;
 
-	mm_renderer_transfer_map(renderer->mm_renderer, renderer->context, frame);
+	if (renderer->mm_renderer->curr_sz) {
+		mm_renderer_transfer_map(renderer->mm_renderer, renderer->context, frame);
+	}
 
 	vkCmdBeginRenderPass(frame->cmd_buffer, &(VkRenderPassBeginInfo) {
 		.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,

@@ -326,8 +326,8 @@ void client_callback(struct mg_connection* c, int ev, void* ev_data) {
 					g->snake_null = 0;
 					g->config.view_xx = xx;
 					g->config.view_yy = yy;
-					// snake.md = false;
-					// snake.wmd = false;
+					g->config.md = false;
+					g->config.wmd = false;
 					g->config.lfsx = -1;
 					g->config.lfsy = -1;
 					g->config.lfcv = 0;
@@ -352,7 +352,7 @@ void client_callback(struct mg_connection* c, int ev, void* ev_data) {
 				o.ssp = g->config.nsp1 + g->config.nsp2 * o.sc;
 				o.fsp = o.ssp + 0.1f;
 				o.wsep = 6 * o.sc;
-				float mwsep = 4.5f / 1.157142857f;
+				float mwsep = 4.5f / 0.7f;
 				if (o.wsep < mwsep) o.wsep = mwsep;
 				o.sep = o.wsep;
 				snake_update_length(&o, g);
@@ -494,7 +494,7 @@ void client_callback(struct mg_connection* c, int ev, void* ev_data) {
 				o->ssp = g->config.nsp1 + g->config.nsp2 * o->sc;
 				o->fsp = o->ssp + 0.1f;
 				o->wsep = 6.0f * o->sc;
-				float mwsep = 4.5f / 1.157142857f;
+				float mwsep = 4.5f / 0.7f;
 				if (o->wsep < mwsep) o->wsep = mwsep;
 				if (adding_only) snake_update_length(o, g);
 
@@ -570,7 +570,7 @@ void client_callback(struct mg_connection* c, int ev, void* ev_data) {
 						o->ssp = g->config.nsp1 + g->config.nsp2 * o->sc;
 						o->fsp = o->ssp + 0.1;
 						o->wsep = 6 * o->sc;
-						float mwsep = 4.5f / 1.157142857f;
+						float mwsep = 4.5f / 0.7f;
                         if (o->wsep < mwsep) o->wsep = mwsep;
 						break;
 					}
@@ -778,11 +778,12 @@ void client_callback(struct mg_connection* c, int ev, void* ev_data) {
 				curr_n++;
 			}
 		} else if (packet_type == 'M') { // minimap
+			g->config.mmsize = packet[p] << 8 | packet[p + 1];
 			p += 2;
-			int xx = 136 - 1;
-			int yy = 136 - 1;
+			int xx = g->config.mmsize - 1;
+			int yy = g->config.mmsize - 1;
 			int u_m[] = { 64, 32, 16, 8, 4, 2, 1 };
-			memset(g->config.mmdata, 0, 136 * 136);
+			memset(g->config.mmdata, 0, g->config.mmsize * g->config.mmsize);
 
 			while (p < packet_len) {
 				if (yy < 0) break;
@@ -793,7 +794,7 @@ void client_callback(struct mg_connection* c, int ev, void* ev_data) {
 					for (int i = 0; i < k; i++) {
 						xx--;
 						if (xx < 0) {
-							xx = 136 - 1;
+							xx = g->config.mmsize - 1;
 							yy--;
 							if (yy < 0) break;
 						}
@@ -802,11 +803,11 @@ void client_callback(struct mg_connection* c, int ev, void* ev_data) {
 				else {
 					for (int i = 0; i < 7; i++) {
 						if ((k & u_m[i]) > 0) {
-							g->config.mmdata[yy * 136 + xx] = 255;
+							g->config.mmdata[yy * g->config.mmsize + xx] = 255;
 						}
 						xx--;
 						if (xx < 0) {
-							xx = 136 - 1;
+							xx = g->config.mmsize - 1;
 							yy--;
 							if (yy < 0) break;
 						}
@@ -814,8 +815,8 @@ void client_callback(struct mg_connection* c, int ev, void* ev_data) {
 				}
 			}
 		} else if (packet_type == 'V') { // minimap
-			int xx = 136 - 1;
-			int yy = 136 - 1;
+			int xx = g->config.mmsize - 1;
+			int yy = g->config.mmsize - 1;
 			int u_m[] = { 64, 32, 16, 8, 4, 2, 1 };
 
 			while (p < packet_len) {
@@ -827,7 +828,7 @@ void client_callback(struct mg_connection* c, int ev, void* ev_data) {
 					for (int i = 0; i < k; i++) {
 						xx--;
 						if (xx < 0) {
-							xx = 136 - 1;
+							xx = g->config.mmsize - 1;
 							yy--;
 							if (yy < 0) break;
 						}
@@ -836,7 +837,7 @@ void client_callback(struct mg_connection* c, int ev, void* ev_data) {
 				else {
 					for (int i = 0; i < 7; i++) {
 						if ((k & u_m[i]) > 0) {
-							int j = yy * 136 + xx;
+							int j = yy * g->config.mmsize + xx;
 							if (g->config.mmdata[j]) {
 								g->config.mmdata[j] = 0;
 								// ctx.clearRect(xx, yy, 1, 1)
@@ -848,7 +849,7 @@ void client_callback(struct mg_connection* c, int ev, void* ev_data) {
 						}
 						xx--;
 						if (xx < 0) {
-							xx = 136 - 1;
+							xx = g->config.mmsize - 1;
 							yy--;
 							if (yy < 0) break;
 						}

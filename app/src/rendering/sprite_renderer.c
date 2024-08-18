@@ -199,7 +199,7 @@ sprite_renderer* sprite_renderer_create(ig_context* context, const ig_texture* s
 		.descriptorCount = 1,
 		.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
 		.pImageInfo = &(VkDescriptorImageInfo) {
-			.sampler = context->nearest_sampler,
+			.sampler = context->linear_sampler,
 			.imageView = sprite_sheet->view,
 			.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
 		},

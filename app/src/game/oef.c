@@ -56,6 +56,8 @@ void oef(game* g, struct mg_connection* c, const input_data* input_data) {
 			g->config.player_names = !g->config.player_names;
 		} else if (input_data->s_pressed) {
 			g->config.shadow = !g->config.shadow;
+		} else if (input_data->h_pressed) {
+			g->config.show_hud = !g->config.show_hud;
 		}
 
 		if (g->settings_instance.enable_zoom) {

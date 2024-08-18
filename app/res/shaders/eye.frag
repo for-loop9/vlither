@@ -6,7 +6,6 @@ layout (location = 1) in vec2 out_uv;
 
 void main() {
 	float l = length(out_uv * 2.0 - 1.0);
-	//float g = abs(out_uv * 2.0 - 1.0).y;
 	float o = step(0.0, 1.0 - l);
 
 	if (o == 0.0) discard;

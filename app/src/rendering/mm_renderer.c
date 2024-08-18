@@ -17,8 +17,8 @@ ig_texture* create_mm_dtexture(mm_renderer* mm_renderer, ig_context* context) {
 			.imageType = VK_IMAGE_TYPE_2D,
 			.format = VK_FORMAT_R8_UNORM,
 			.extent = {
-				.width = 136,
-				.height = 136,
+				.width = 512,
+				.height = 512,
 				.depth = 1
 			},
 			.mipLevels = 1,
@@ -100,7 +100,7 @@ ig_texture* create_mm_dtexture(mm_renderer* mm_renderer, ig_context* context) {
 				.layerCount = 1
 			},
 			.imageOffset = { .x = 0, .y = 0, .z = 0 },
-			.imageExtent = { .width = 136, .height = 136, .depth = 1 }
+			.imageExtent = { .width = 512, .height = 512, .depth = 1 }
 		});
 		vkCmdPipelineBarrier(context->transfer_cmd_buffer,
 			VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, NULL, 0, NULL, 1, &(VkImageMemoryBarrier) {
@@ -146,11 +146,12 @@ mm_renderer* mm_renderer_create(ig_context* context, unsigned int max_instances)
 	mm_renderer* r = malloc(sizeof(mm_renderer));
 	r->instance_count = 0;
 	r->instances = malloc(max_instances * sizeof(mm_instance));
-	memset(r->map_data, 0, 136 * 136);
+	r->curr_sz = 0;
+	memset(r->map_data, 0, 512 * 512);
 
-	r->transfer_buffer = ig_context_dbuffer_create(context, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, NULL, 136 * 136);
+	r->transfer_buffer = ig_context_dbuffer_create(context, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, NULL, 512 * 512);
 	for (int i = 0; i < context->fif; i++) {
-		memset(r->transfer_buffer[i].data, 255, 136 * 136);
+		memset(r->transfer_buffer[i].data, 255, 512 * 512);
 	}
 
 	r->tex = create_mm_dtexture(r, context);
@@ -200,7 +201,7 @@ mm_renderer* mm_renderer_create(ig_context* context, unsigned int max_instances)
 					.inputRate = VK_VERTEX_INPUT_RATE_INSTANCE
 				},
 			},
-			.vertexAttributeDescriptionCount = 3,
+			.vertexAttributeDescriptionCount = 4,
 			.pVertexAttributeDescriptions = (VkVertexInputAttributeDescription[]) {
 				{
 					.location = 0,
@@ -219,6 +220,12 @@ mm_renderer* mm_renderer_create(ig_context* context, unsigned int max_instances)
 					.binding = 1,
 					.format = VK_FORMAT_R32G32B32_SFLOAT,
 					.offset = offsetof(mm_instance, color)
+				},
+				{
+					.location = 3,
+					.binding = 1,
+					.format = VK_FORMAT_R32_SFLOAT,
+					.offset = offsetof(mm_instance, usage)
 				}
 			}
 		},
@@ -348,7 +355,7 @@ mm_renderer* mm_renderer_create(ig_context* context, unsigned int max_instances)
 }
 
 void mm_renderer_transfer_map(mm_renderer* mm_renderer, ig_context* context, _ig_frame* frame) {
-	memcpy(mm_renderer->transfer_buffer[context->frame_idx].data, mm_renderer->map_data, 136 * 136);
+	memcpy(mm_renderer->transfer_buffer[context->frame_idx].data, mm_renderer->map_data, mm_renderer->curr_sz * mm_renderer->curr_sz);
 	vkCmdPipelineBarrier(frame->cmd_buffer,
 		VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, NULL, 0, NULL, 1, &(VkImageMemoryBarrier) {
 			.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
@@ -379,7 +386,7 @@ void mm_renderer_transfer_map(mm_renderer* mm_renderer, ig_context* context, _ig
 			.layerCount = 1
 		},
 		.imageOffset = { .x = 0, .y = 0, .z = 0 },
-		.imageExtent = { .width = 136, .height = 136, .depth = 1 }
+		.imageExtent = { .width = mm_renderer->curr_sz, .height = mm_renderer->curr_sz, .depth = 1 }
 	});
 	vkCmdPipelineBarrier(frame->cmd_buffer,
 		VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, NULL, 0, NULL, 1, &(VkImageMemoryBarrier) {
@@ -403,16 +410,16 @@ void mm_renderer_transfer_map(mm_renderer* mm_renderer, ig_context* context, _ig
 }
 
 void mm_renderer_set_map_data(mm_renderer* mm_renderer, const uint8_t* map_data) {
-	memcpy(mm_renderer->map_data, map_data, 136 * 136);
+	memcpy(mm_renderer->map_data, map_data, mm_renderer->curr_sz * mm_renderer->curr_sz);
 }
 
-void mm_renderer_push(mm_renderer* mm_renderer, const mm_instance* mm_instance) {
+void mm_renderer_push(mm_renderer* mm_renderer, const mm_instance* mm_instance, int curr_sz) {
 	mm_renderer->instances[mm_renderer->instance_count++] = *mm_instance;
+	mm_renderer->curr_sz = curr_sz;
 }
 
 void mm_renderer_flush(mm_renderer* mm_renderer, ig_context* context, _ig_frame* frame) {
 	memcpy(mm_renderer->instance_buffer[context->frame_idx].data, mm_renderer->instances, mm_renderer->instance_count * sizeof(mm_instance));
-	// memcpy(mm_renderer->tex[context->frame_idx].data, mm_renderer->tex_data, 138 * 138);
 
 	vkCmdBindDescriptorSets(frame->cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, context->standard_layout, 1, 1, &mm_renderer->tex_data_ptr[context->frame_idx], 0, NULL);
 	

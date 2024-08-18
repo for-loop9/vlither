@@ -45,7 +45,7 @@ void renderer_push_bp(renderer* renderer, const bp_instance* bp_instance);
 void renderer_push_eye(renderer* renderer, const eye_instance* eye_instance);
 void renderer_push_sprite(renderer* renderer, const sprite_instance* sprite_instance);
 void renderer_set_map_data(renderer* renderer, const uint8_t* map_data);
-void renderer_push_mm(renderer* renderer, const mm_instance* mm_instance);
+void renderer_push_mm(renderer* renderer, const mm_instance* mm_instance, int size);
 void renderer_push_text(renderer* renderer, const char* str, const ig_vec3* transform, const ig_vec4* color, ig_vec3* transform_out);
 void renderer_flush(renderer* renderer);
 void renderer_destroy(renderer* renderer);

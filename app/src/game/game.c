@@ -120,6 +120,7 @@ void create_game(int argc, char** argv) {
 		.config = {
 			.player_names = true,
 			.shadow = true,
+			.show_hud = true,
 
 			.grd = -1,
 			.mscps = -1,
@@ -386,6 +387,7 @@ void create_game(int argc, char** argv) {
 		input_data.b_pressed = ig_keyboard_key_pressed(g.keyboard, GLFW_KEY_B);
 		input_data.p_pressed = ig_keyboard_key_pressed(g.keyboard, GLFW_KEY_P);
 		input_data.s_pressed = ig_keyboard_key_pressed(g.keyboard, GLFW_KEY_S);
+		input_data.h_pressed = ig_keyboard_key_pressed(g.keyboard, GLFW_KEY_H);
 		input_data.ctm = glfwGetTime() * 1000;
 		float ct = glfwGetTime();
 		dt = ct - pdt;

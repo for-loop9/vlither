@@ -226,11 +226,11 @@ void redraw(game* g, const input_data* input_data) {
 			float ay = py;
 			if (o->sep != o->wsep) {
 				if (o->sep < o->wsep) {
-					o->sep += 0.002f;
+					o->sep += 0.002f * g->config.vfr;
 					if (o->sep >= o->wsep) o->sep = o->wsep;
 				}
 				else if (o->sep > o->wsep) {
-					o->sep -= 0.002f;
+					o->sep -= 0.002f * g->config.vfr;
 					if (o->sep <= o->wsep) o->sep = o->wsep;
 				}
 			}
@@ -319,7 +319,7 @@ void redraw(game* g, const input_data* input_data) {
 						renderer_push_bp(g->renderer, &(bp_instance) {
 							.circ = { .x = px - shsz, .y = py - shsz, .z = 1 - snake_z, .w = shsz * 2 },
 							.ratios = { .x = 0, .y = 1 },
-							.color = { .x = 0, .y = 0, .z = 0, .w = g->config.shadow * 0.4f * v },
+							.color = { .x = 0, .y = 0, .z = 0, .w = g->config.shadow * 0.5f * v },
 							.shadow = 1
 						});
 					}
@@ -459,6 +459,7 @@ void redraw(game* g, const input_data* input_data) {
 	}
 	igPopFont();
 
-	hud(g, input_data);
+	if (g->config.show_hud)
+		hud(g, input_data);
 	igEnd();
 }
