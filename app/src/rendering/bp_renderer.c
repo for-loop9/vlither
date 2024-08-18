@@ -53,7 +53,7 @@ bp_renderer* bp_renderer_create(ig_context* context, unsigned int max_instances)
 					.inputRate = VK_VERTEX_INPUT_RATE_INSTANCE
 				},
 			},
-			.vertexAttributeDescriptionCount = 4,
+			.vertexAttributeDescriptionCount = 5,
 			.pVertexAttributeDescriptions = (VkVertexInputAttributeDescription[]) {
 				{
 					.location = 0,
@@ -78,6 +78,12 @@ bp_renderer* bp_renderer_create(ig_context* context, unsigned int max_instances)
 					.binding = 1,
 					.format = VK_FORMAT_R32G32B32A32_SFLOAT,
 					.offset = offsetof(bp_instance, color)
+				},
+				{
+					.location = 4,
+					.binding = 1,
+					.format = VK_FORMAT_R32_SFLOAT,
+					.offset = offsetof(bp_instance, shadow)
 				}
 			}
 		},

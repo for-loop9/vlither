@@ -80,6 +80,7 @@ ig_context* ig_context_create(ig_window* window, const ig_ivec2* resolution, int
 		int supports_swapchain = 0;
 		int supports_fifo = 0;
 		int supports_immediate = 0;
+		int supports_msaa4 = 0;
 
 		unsigned int format_count;
 		unsigned int queue_count;
@@ -107,6 +108,11 @@ ig_context* ig_context_create(ig_window* window, const ig_ivec2* resolution, int
 		vkGetPhysicalDeviceSurfacePresentModesKHR(devices[i], r->surface, &present_mode_count, NULL);
 		VkPresentModeKHR* present_modes = malloc(present_mode_count * sizeof(VkPresentModeKHR));
 		vkGetPhysicalDeviceSurfacePresentModesKHR(devices[i], r->surface, &present_mode_count, present_modes);
+		VkPhysicalDeviceProperties properties; vkGetPhysicalDeviceProperties(devices[i], &properties);
+
+		if ((properties.limits.framebufferColorSampleCounts & VK_SAMPLE_COUNT_4_BIT) && (properties.limits.framebufferDepthSampleCounts & VK_SAMPLE_COUNT_4_BIT))
+			supports_msaa4 = 1;
+
 		for (int j = 0; j < present_mode_count; j++) {
 			if (present_modes[j] == VK_PRESENT_MODE_FIFO_KHR) {
 				supports_fifo = 1;
@@ -144,7 +150,7 @@ ig_context* ig_context_create(ig_window* window, const ig_ivec2* resolution, int
 				break;
 			}
 		}
-		if (selected_queue != -1 && selected_format != -1 && supports_swapchain && supports_fifo && supports_immediate) {
+		if (selected_queue != -1 && selected_format != -1 && supports_swapchain && supports_fifo && supports_immediate && supports_msaa4) {
 			r->queue_family = selected_queue;
 			r->surface_format = formats[selected_format];
 			r->gpu = devices[i];

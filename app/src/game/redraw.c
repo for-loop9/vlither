@@ -149,19 +149,19 @@ void redraw(game* g, const input_data* input_data) {
 				}
 			}
 			if (pr->rad == 1) {
-				float fx = px - g->config.gsc * (pr->f2 / 3.0f);
-				float fy = py - g->config.gsc * (pr->f2 / 3.0f);
+				float fx = px - g->config.gsc * (pr->f2 * 1.5f);
+				float fy = py - g->config.gsc * (pr->f2 * 1.5f);
 				renderer_push_food(g->renderer, &(food_instance) {
-					.circ = { .x = fx, .y = fy, .z = g->config.gsc * (pr->f / 3.0f) },
+					.circ = { .x = fx, .y = fy, .z = g->config.gsc * (pr->f * 1.5f) },
 					.ratios = { .x = 0, .y = 1 },
 					.color = { .x = col->x + pr->blink * (1 - col->x), .y = col->y + pr->blink * (1 - col->y), .z = col->z + pr->blink * (1 - col->z), .w = pr->fr }
 				});
 			} else {
-				float fx = px - g->config.gsc * ((pr->f2 * pr->rad) / 3.0f);
-				float fy = py - g->config.gsc * ((pr->f2 * pr->rad) / 3.0f);
+				float fx = px - g->config.gsc * ((pr->f2 * pr->rad) * 1.5f);
+				float fy = py - g->config.gsc * ((pr->f2 * pr->rad) * 1.5f);
 				
 				renderer_push_food(g->renderer, &(food_instance) {
-					.circ = { .x = fx, .y = fy, .z = g->config.gsc * ((pr->f * pr->rad) / 3.0f) },
+					.circ = { .x = fx, .y = fy, .z = g->config.gsc * ((pr->f * pr->rad) * 1.5f) },
 					.ratios = { .x = 0, .y = 1 },
 					.color = { .x = col->x + pr->blink * (1 - col->x), .y = col->y + pr->blink * (1 - col->y), .z = col->z + pr->blink * (1 - col->z), .w = pr->fr }
 				});
@@ -312,14 +312,15 @@ void redraw(game* g, const input_data* input_data) {
 			for (int j = bp - 1; j >= 0; j--) {
 				if (g->config.pbu[j] >= 1) {
 					if (j >= 1 && g->config.pbu[j - 1] == 2) {
-						float shsz = (g->config.gsc * lsz * 62.0f / 32.0f) * 0.6f;
+						float shsz = (g->config.gsc * lsz * 62.0f / 32.0f);
 						px = (mww2 + ((g->config.pbx[j - 1] - g->config.view_xx) * g->config.gsc));
 						py = (mhh2 + ((g->config.pby[j - 1] - g->config.view_yy) * g->config.gsc));
 
 						renderer_push_bp(g->renderer, &(bp_instance) {
 							.circ = { .x = px - shsz, .y = py - shsz, .z = 1 - snake_z, .w = shsz * 2 },
 							.ratios = { .x = 0, .y = 1 },
-							.color = { .x = 0, .y = 0, .z = 0, .w = 0.2f * v }
+							.color = { .x = 0, .y = 0, .z = 0, .w = g->config.shadow * 0.4f * v },
+							.shadow = 1
 						});
 					}
 
@@ -331,7 +332,8 @@ void redraw(game* g, const input_data* input_data) {
 					renderer_push_bp(g->renderer, &(bp_instance) {
 						.circ = { .x = px + (-g->config.gsc * lsz), .y = py + (-g->config.gsc * lsz), .z = 1 - snake_z, .w = g->config.gsc * 2 * lsz },
 						.ratios = { .x = sinf(g->config.pba[j]), .y = cosf(g->config.pba[j]) },
-						.color = { .x = col->x, .y = col->y, .z = col->z, .w = v }
+						.color = { .x = col->x, .y = col->y, .z = col->z, .w = v },
+						.shadow = 0
 					});
 				}
 			}

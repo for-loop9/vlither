@@ -111,15 +111,15 @@ void create_game(int argc, char** argv) {
 			.cusk = 0,
 			.nickname = "",
 			.ip = "15.204.212.200:444",
-			.hq = true,
 			.laser_thickness = 2,
 			.laser_color = { .x = 1, .y = 0.6f, .z = 0.6f },
 			.names_color = { .x = 0.9f, .y = 0.9f, .z = 0.9f },
-			.food_scale = 0.25f,
+			.food_scale = 1,
 			.names_font = RENDERER_FONT_SMALL
 		},
 		.config = {
 			.player_names = true,
+			.shadow = true,
 
 			.grd = -1,
 			.mscps = -1,
@@ -131,7 +131,7 @@ void create_game(int argc, char** argv) {
 			.mamu = -1,
 			.mamu2 = -1,
 			.cst = -1,
-			.qsm = 1, // 1 = high quality, 1.7 = low quality
+			.qsm = 1.7f, // 1 = high quality, 1.7 = low quality
 			.fmlts = ig_darray_create(float),
 			.fpsls = ig_darray_create(float),
 			.lfsx = -1,
@@ -385,6 +385,7 @@ void create_game(int argc, char** argv) {
 		input_data.n_pressed = ig_keyboard_key_pressed(g.keyboard, GLFW_KEY_N);
 		input_data.b_pressed = ig_keyboard_key_pressed(g.keyboard, GLFW_KEY_B);
 		input_data.p_pressed = ig_keyboard_key_pressed(g.keyboard, GLFW_KEY_P);
+		input_data.s_pressed = ig_keyboard_key_pressed(g.keyboard, GLFW_KEY_S);
 		input_data.ctm = glfwGetTime() * 1000;
 		float ct = glfwGetTime();
 		dt = ct - pdt;

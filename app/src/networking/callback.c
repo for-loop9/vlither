@@ -352,7 +352,7 @@ void client_callback(struct mg_connection* c, int ev, void* ev_data) {
 				o.ssp = g->config.nsp1 + g->config.nsp2 * o.sc;
 				o.fsp = o.ssp + 0.1f;
 				o.wsep = 6 * o.sc;
-				float mwsep = 4.5f / g->config.gsc;
+				float mwsep = 4.5f / 1.157142857f;
 				if (o.wsep < mwsep) o.wsep = mwsep;
 				o.sep = o.wsep;
 				snake_update_length(&o, g);
@@ -494,7 +494,7 @@ void client_callback(struct mg_connection* c, int ev, void* ev_data) {
 				o->ssp = g->config.nsp1 + g->config.nsp2 * o->sc;
 				o->fsp = o->ssp + 0.1f;
 				o->wsep = 6.0f * o->sc;
-				float mwsep = 4.5f / g->config.gsc;
+				float mwsep = 4.5f / 1.157142857f;
 				if (o->wsep < mwsep) o->wsep = mwsep;
 				if (adding_only) snake_update_length(o, g);
 
@@ -570,7 +570,7 @@ void client_callback(struct mg_connection* c, int ev, void* ev_data) {
 						o->ssp = g->config.nsp1 + g->config.nsp2 * o->sc;
 						o->fsp = o->ssp + 0.1;
 						o->wsep = 6 * o->sc;
-						float mwsep = 4.5f / g->config.gsc;
+						float mwsep = 4.5f / 1.157142857f;
                         if (o->wsep < mwsep) o->wsep = mwsep;
 						break;
 					}

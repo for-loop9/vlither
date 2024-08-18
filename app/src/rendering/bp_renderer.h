@@ -11,6 +11,7 @@ typedef struct bp_instance {
 	ig_vec4 circ;
 	ig_vec2 ratios;
 	ig_vec4 color;
+	float shadow;
 } bp_instance;
 
 typedef struct bp_renderer {

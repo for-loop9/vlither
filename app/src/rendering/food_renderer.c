@@ -155,7 +155,7 @@ food_renderer* food_renderer_create(ig_context* context, unsigned int max_instan
 			.pAttachments = &(VkPipelineColorBlendAttachmentState) {
 				.blendEnable = VK_TRUE,
 				.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
-				.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
+				.dstColorBlendFactor = VK_BLEND_FACTOR_ONE,
 				.colorBlendOp = VK_BLEND_OP_ADD,
 				.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE,
 				.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO,

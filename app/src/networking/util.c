@@ -162,6 +162,5 @@ void load_settings(game* g) {
 		return;
 	}
 	fread(&g->settings_instance, sizeof(settings), 1, file);
-	g->config.qsm = g->settings_instance.hq ? 1 : 1.7f;
 	fclose(file);
 }

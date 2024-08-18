@@ -16,8 +16,6 @@ void settings_screen(game* g) {
 	igSeparatorText("General");
 	igColumns(2, "settings_clmn", 0);
 	igAlignTextToFramePadding();
-	igText("Quality");
-	igAlignTextToFramePadding();
 	igText("Minimap");
 	igAlignTextToFramePadding();
 	igText("Background");
@@ -36,19 +34,7 @@ void settings_screen(game* g) {
 	igAlignTextToFramePadding();
 	igText("Instant gameover");
 	igNextColumn();
-
-	igSetNextItemWidth(igGetColumnWidth(1) - style->WindowPadding.x - 5);
-	if (igBeginCombo("##quality", g->settings_instance.hq ? "High" : "Low", ImGuiComboFlags_None)) {
-		if (igSelectable_Bool("High", g->settings_instance.hq, ImGuiSelectableFlags_None, (ImVec2) { 0, 0 })) {
-			g->settings_instance.hq = true;
-			g->config.qsm = 1.0f;
-		}
-		if (igSelectable_Bool("Low", !g->settings_instance.hq, ImGuiSelectableFlags_None, (ImVec2) { 0, 0 })) {
-			g->settings_instance.hq = false;
-			g->config.qsm = 1.7f;
-		}
-		igEndCombo();
-	}
+	
 	igSetNextItemWidth(igGetColumnWidth(1) - style->WindowPadding.x - 5);
 	if (igBeginCombo("##minimap", g->settings_instance.clk ? "Clock" : "Compass", ImGuiComboFlags_None)) {
 		if (igSelectable_Bool("Compass", !g->settings_instance.clk, ImGuiSelectableFlags_None, (ImVec2) { 0, 0 })) {
@@ -179,7 +165,7 @@ void settings_screen(game* g) {
 	igText("Big food only (B)");
 	igNextColumn();
 	igSetNextItemWidth(igGetColumnWidth(1) - style->WindowPadding.x - 5);
-	igSliderFloat("##food_scale", &g->settings_instance.food_scale, 0.1f, 1, "%.2f", ImGuiSliderFlags_None);
+	igSliderFloat("##food_scale", &g->settings_instance.food_scale, 0.5f, 2, "%.2f", ImGuiSliderFlags_None);
 	cx = igGetCursorPosX();
 	igSetCursorPosX(cx + (igGetColumnWidth(1) - style->WindowPadding.x - 5) - igGetFrameHeight());
 	igCheckbox("##big_food", &g->settings_instance.big_food);
