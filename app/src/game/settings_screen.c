@@ -16,7 +16,7 @@ void settings_screen(game* g) {
 	igSeparatorText("General");
 	igColumns(2, "settings_clmn", 0);
 	igAlignTextToFramePadding();
-	igText("Minimap");
+	igText("Quality");
 	igAlignTextToFramePadding();
 	igText("Background");
 	igAlignTextToFramePadding();
@@ -36,12 +36,12 @@ void settings_screen(game* g) {
 	igNextColumn();
 	
 	igSetNextItemWidth(igGetColumnWidth(1) - style->WindowPadding.x - 5);
-	if (igBeginCombo("##minimap", g->settings_instance.clk ? "Clock" : "Compass", ImGuiComboFlags_None)) {
-		if (igSelectable_Bool("Compass", !g->settings_instance.clk, ImGuiSelectableFlags_None, (ImVec2) { 0, 0 })) {
-			g->settings_instance.clk = false;
+	if (igBeginCombo("##hq", g->settings_instance.hq ? "High" : "Low", ImGuiComboFlags_None)) {
+		if (igSelectable_Bool("Low", !g->settings_instance.hq, ImGuiSelectableFlags_None, (ImVec2) { 0, 0 })) {
+			g->settings_instance.hq = false;
 		}
-		if (igSelectable_Bool("Clock", g->settings_instance.clk, ImGuiSelectableFlags_None, (ImVec2) { 0, 0 })) {
-			g->settings_instance.clk = true;
+		if (igSelectable_Bool("High", g->settings_instance.hq, ImGuiSelectableFlags_None, (ImVec2) { 0, 0 })) {
+			g->settings_instance.hq = true;
 		}
 		igEndCombo();
 	}
@@ -140,12 +140,16 @@ void settings_screen(game* g) {
 	}
 	igColumns(1, NULL, false);
 
-	igSeparatorText("Laser (K)");
+	igSeparatorText("Assist (K)");
 	igColumns(2, NULL, false);
 	igAlignTextToFramePadding();
-	igText("Thickness");
+	igText("Laser thickness");
 	igAlignTextToFramePadding();
-	igText("Color");
+	igText("Laser color");
+	igAlignTextToFramePadding();
+	igText("Hurt point size");
+	igAlignTextToFramePadding();
+	igText("Hurt point color");
 	igNextColumn();
 	igSetNextItemWidth(igGetColumnWidth(1) - style->WindowPadding.x - 5);
 	igSliderInt("##laser_thickness", &g->settings_instance.laser_thickness, 1, 6, NULL, ImGuiSliderFlags_None);
@@ -155,6 +159,15 @@ void settings_screen(game* g) {
 		g->settings_instance.laser_color.x = laser_color_ref[0];
 		g->settings_instance.laser_color.y = laser_color_ref[1];
 		g->settings_instance.laser_color.z = laser_color_ref[2];
+	}
+	igSetNextItemWidth(igGetColumnWidth(1) - style->WindowPadding.x - 5);
+	igSliderInt("##hp_thickness", &g->settings_instance.hp_size, 1, 6, NULL, ImGuiSliderFlags_None);
+	igSetNextItemWidth(igGetColumnWidth(1) - style->WindowPadding.x - 5);
+	float hp_color_ref[3] = { g->settings_instance.hp_color.x, g->settings_instance.hp_color.y, g->settings_instance.hp_color.z };
+	if (igColorEdit3("##hp_color", hp_color_ref, ImGuiColorEditFlags_None)) {
+		g->settings_instance.hp_color.x = hp_color_ref[0];
+		g->settings_instance.hp_color.y = hp_color_ref[1];
+		g->settings_instance.hp_color.z = hp_color_ref[2];
 	}
 	igColumns(1, NULL, false);
 	igSeparatorText("Food");
@@ -170,6 +183,25 @@ void settings_screen(game* g) {
 	igSetCursorPosX(cx + (igGetColumnWidth(1) - style->WindowPadding.x - 5) - igGetFrameHeight());
 	igCheckbox("##big_food", &g->settings_instance.big_food);
 	igColumns(1, NULL, false);
+	igSeparatorText("Minimap");
+	igColumns(2, NULL, false);
+	igAlignTextToFramePadding();
+	igText("Label");
+	igAlignTextToFramePadding();
+	igText("Scale");
+	igNextColumn();
+	igSetNextItemWidth(igGetColumnWidth(1) - style->WindowPadding.x - 5);
+	if (igBeginCombo("##minimap", g->settings_instance.clk ? "Clock" : "Compass", ImGuiComboFlags_None)) {
+		if (igSelectable_Bool("Compass", !g->settings_instance.clk, ImGuiSelectableFlags_None, (ImVec2) { 0, 0 })) {
+			g->settings_instance.clk = false;
+		}
+		if (igSelectable_Bool("Clock", g->settings_instance.clk, ImGuiSelectableFlags_None, (ImVec2) { 0, 0 })) {
+			g->settings_instance.clk = true;
+		}
+		igEndCombo();
+	}
+	igSetNextItemWidth(igGetColumnWidth(1) - style->WindowPadding.x - 5);
+	igSliderFloat("##mm_scale", &g->settings_instance.mm_scale, 1, 3, "%.2f", ImGuiSliderFlags_None);
 	igEnd();
 
 	igSetNextWindowPos((ImVec2) { .x = g->icontext->default_frame.resolution.x - 150, .y = g->icontext->default_frame.resolution.y - 52 }, ImGuiCond_None, (ImVec2) {});

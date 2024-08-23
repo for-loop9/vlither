@@ -53,7 +53,7 @@ bp_renderer* bp_renderer_create(ig_context* context, unsigned int max_instances)
 					.inputRate = VK_VERTEX_INPUT_RATE_INSTANCE
 				},
 			},
-			.vertexAttributeDescriptionCount = 5,
+			.vertexAttributeDescriptionCount = 6,
 			.pVertexAttributeDescriptions = (VkVertexInputAttributeDescription[]) {
 				{
 					.location = 0,
@@ -84,6 +84,12 @@ bp_renderer* bp_renderer_create(ig_context* context, unsigned int max_instances)
 					.binding = 1,
 					.format = VK_FORMAT_R32_SFLOAT,
 					.offset = offsetof(bp_instance, shadow)
+				},
+				{
+					.location = 5,
+					.binding = 1,
+					.format = VK_FORMAT_R32_SFLOAT,
+					.offset = offsetof(bp_instance, eye)
 				}
 			}
 		},
@@ -147,8 +153,8 @@ bp_renderer* bp_renderer_create(ig_context* context, unsigned int max_instances)
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
 			.pNext = NULL,
 			.flags = 0,
-			.depthTestEnable = VK_TRUE,
-			.depthWriteEnable = VK_TRUE,
+			.depthTestEnable = VK_FALSE,
+			.depthWriteEnable = VK_FALSE,
 			.depthCompareOp = VK_COMPARE_OP_GREATER_OR_EQUAL
 		},
 		.pColorBlendState = &(VkPipelineColorBlendStateCreateInfo) {

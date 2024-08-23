@@ -13,7 +13,19 @@ void hud(game* g, const input_data* input_data) {
 	float mx = input_data->mouse_pos.x;
 	float my = input_data->mouse_pos.y;
 
-	if (!g->snake_null && g->config.laser) {
+	if (!g->snake_null && g->config.assist) {
+		// crosshair:
+		float cx = mww2 + (g->os.snakes[0].sc * 29 * 0.5f * g->config.gsc) * cosf(g->os.snakes[0].ang);
+		float cy = mhh2 + (g->os.snakes[0].sc * 29 * 0.5f * g->config.gsc) * sinf(g->os.snakes[0].ang);
+		float extr = g->settings_instance.hp_size * g->config.gsc * g->os.snakes[0].sc;
+
+		renderer_push_bp(g->renderer, &(bp_instance) {
+			.circ = { .x = cx - extr, .y = cy - extr, .z = 1, .w = extr * 2 },
+			.ratios = { .x = 0, .y = 1 },
+			.color = { .x = g->settings_instance.hp_color.x, .y = g->settings_instance.hp_color.y, .z = g->settings_instance.hp_color.z, .w = 1 },
+			.eye = 1
+		});
+
 		float laser_length = sqrtf((mx - mww2) * (mx - mww2) + (my - mhh2) * (my - mhh2));
 
 		float laser_ang = atan2f(my - mhh2, mx - mww2);
@@ -32,15 +44,6 @@ void hud(game* g, const input_data* input_data) {
 	ImDrawList* draw_list = igGetWindowDrawList();
 	ImVec2 fps_text_size;
 	igCalcTextSize(&fps_text_size, "FPS: 000", NULL, 0, 0);
-
-	if (g->settings_instance.show_fps) {
-		char fps_str[32] = {};
-		sprintf(fps_str, "FPS: %d", input_data->fps_display);
-		ImDrawList_AddText_Vec2(draw_list,
-			(ImVec2) {
-				.x = g->icontext->default_frame.resolution.x / 2 - fps_text_size.x / 2, .y = 10
-			}, igColorConvertFloat4ToU32((ImVec4) { 1, 1, 0, 1 }), fps_str, NULL);
-	}
 
 	char mm_labels[4][3] = { {}, {}, {}, {} };
 
@@ -63,49 +66,53 @@ void hud(game* g, const input_data* input_data) {
 		ImVec2 tl_txt_size; igCalcTextSize(&tl_txt_size, mm_labels[2], NULL, false, 0);
 		ImVec2 bl_txt_size; igCalcTextSize(&bl_txt_size, mm_labels[3], NULL, false, 0);
 
-		int mm_x = g->icontext->default_frame.resolution.x - ((g->config.mmsize + 6) + rl_txt_size.x + 2);
-		int mm_y = g->icontext->default_frame.resolution.y - ((g->config.mmsize + 6) + bl_txt_size.y + 2);
+		float mm_scaled = g->config.mmsize * g->settings_instance.mm_scale;
+
+		int mm_x = g->icontext->default_frame.resolution.x - ((mm_scaled + 6) + rl_txt_size.x + 2);
+		int mm_y = g->icontext->default_frame.resolution.y - ((mm_scaled + 6) + bl_txt_size.y + 2);
+
+		renderer_push_sprite(g->renderer, &(sprite_instance) {
+			.rect = { .x = mm_x + mm_scaled / 2, .y = mm_y, .z = 1, .w = mm_scaled },
+			.ratios = { .x = 0, .y = 1 },
+			.uv_rect = { .x = 3 / 64.0f, .y = 3 / 64.0f, .z = 1 / 64.0f, .w = 1 / 64.0f },
+			.color = { .x = 0.6f, .y = 0.6f, .z = 0.6f }
+		});
+		renderer_push_sprite(g->renderer, &(sprite_instance) {
+			.rect = { .x = mm_x + mm_scaled / 2, .y = mm_y, .z = 1, .w = mm_scaled },
+			.ratios = { .x = 1, .y = 0 },
+			.uv_rect = { .x = 3 / 64.0f, .y = 3 / 64.0f, .z = 1 / 64.0f, .w = 1 / 64.0f },
+			.color = { .x = 0.6f, .y = 0.6f, .z = 0.6f }
+		});
 
 		renderer_push_mm(g->renderer, &(mm_instance) {
-			.transform = { .x = mm_x, .y = mm_y, .z = g->config.mmsize },
+			.transform = { .x = mm_x, .y = mm_y, .z = mm_scaled },
 			.color = { .x = 0.4f, .y = 0.3f, .z = 0.3f },
 			.usage = g->config.mmsize / 512.0f
 		}, g->config.mmsize);
 		renderer_set_map_data(g->renderer, g->config.mmdata);
 		ImDrawList_AddText_Vec2(draw_list,
 			(ImVec2) {
-				.x = mm_x - ll_txt_size.x, .y = (mm_y + g->config.mmsize / 2) - ll_txt_size.y / 2
+				.x = mm_x - ll_txt_size.x, .y = (mm_y + mm_scaled / 2) - ll_txt_size.y / 2
 			}, igColorConvertFloat4ToU32((ImVec4) { 1, 1, 0, 1 }), mm_labels[0], NULL);
 		ImDrawList_AddText_Vec2(draw_list,
 			(ImVec2) {
-				.x = mm_x + g->config.mmsize, .y = (mm_y + g->config.mmsize / 2) - ll_txt_size.y / 2
+				.x = mm_x + mm_scaled, .y = (mm_y + mm_scaled / 2) - ll_txt_size.y / 2
 			}, igColorConvertFloat4ToU32((ImVec4) { 1, 1, 0, 1 }), mm_labels[1], NULL);
 		ImDrawList_AddText_Vec2(draw_list,
 			(ImVec2) {
-				.x = (mm_x + g->config.mmsize / 2) - tl_txt_size.x / 2, .y = mm_y - tl_txt_size.y
+				.x = (mm_x + mm_scaled / 2) - tl_txt_size.x / 2, .y = mm_y - tl_txt_size.y
 			}, igColorConvertFloat4ToU32((ImVec4) { 1, 1, 0, 1 }), mm_labels[2], NULL);
 		ImDrawList_AddText_Vec2(draw_list,
 			(ImVec2) {
-				.x = (mm_x + g->config.mmsize / 2) - bl_txt_size.x / 2, .y = mm_y + g->config.mmsize
+				.x = (mm_x + mm_scaled / 2) - bl_txt_size.x / 2, .y = mm_y + mm_scaled
 			}, igColorConvertFloat4ToU32((ImVec4) { 1, 1, 0, 1 }), mm_labels[3], NULL);
 
 		igPopFont();
 
 		if (!g->snake_null) {
-			// crosshair:
-			// float cx = mww2;// + (g->os.snakes[0].sc * 29 * 0.5f * g->config.gsc) * cosf(g->os.snakes[0].ehang);
-			// float cy = mhh2;// + (g->os.snakes[0].sc * 29 * 0.5f * g->config.gsc) * sinf(g->os.snakes[0].ehang);
-			// ig_vec3* head_col = g->config.color_groups + g->os.snakes[0].skin_data[0];
-
-			// renderer_push_circle(g->renderer, &(circle_instance) {
-			// 	.circ = { .x = cx - 3, .y = cy - 3, .z = 6 },
-			// 	.ratios = { .x = 0, .y = 1 },
-			// 	.color = { .x = 1 - head_col->x, .y = 1 - head_col->y, .z = 1 - head_col->z, .w = 1 }
-			// });
-
 			g->config.length_display = floorf((g->config.fpsls[g->os.snakes[0].sct] + g->os.snakes[0].fam / g->config.fmlts[g->os.snakes[0].sct] - 1) * 15 - 5) / 1;
 
-			ig_vec2 player_pos_map = { .x = g->config.mmsize * (g->os.snakes[0].xx / (g->config.grd * 2)), .y = g->config.mmsize * (g->os.snakes[0].yy / (g->config.grd * 2)) };
+			ig_vec2 player_pos_map = { .x = mm_scaled * (g->os.snakes[0].xx / (g->config.grd * 2)), .y = mm_scaled * (g->os.snakes[0].yy / (g->config.grd * 2)) };
 			renderer_push_sprite(g->renderer, &(sprite_instance) {
 				.rect = { .x = player_pos_map.x + mm_x - 3 , player_pos_map.y + mm_y - 3, 6, 6 },
 				.ratios = { .x = 0, .y = 1 },
@@ -146,6 +153,17 @@ void hud(game* g, const input_data* input_data) {
 		igPopFont();
 		igPushFont(g->renderer->fonts[RENDERER_FONT_MED_BOLD]);
 		igTextColored((ImVec4) { 1, 1, 1, 0.8f }, "%d", g->config.kills_display);
+		igPopFont();
+	}
+
+	if (g->settings_instance.show_fps) {
+		igSetCursorPosX(4);
+		igSetCursorPosY(g->icontext->default_frame.resolution.y - fps_text_size.y * 4);
+		igPushFont(g->renderer->fonts[RENDERER_FONT_MED]);
+		igTextColored((ImVec4) { 1, 1, 1, 0.5f }, "FPS: "); igSameLine(0, -1);
+		igPopFont();
+		igPushFont(g->renderer->fonts[RENDERER_FONT_MED_BOLD]);
+		igTextColored((ImVec4) { 1, 1, 0.6f, 0.8f }, "%d", input_data->fps_display);
 		igPopFont();
 	}
 
@@ -201,7 +219,6 @@ void hud(game* g, const input_data* input_data) {
 
 	float bp_mem = g->renderer->bp_renderer->instance_count / (float) MAX_BP_RENDER;
 	float food_mem = g->renderer->food_renderer->instance_count / (float) MAX_FOOD_RENDER;
-	float eye_mem = g->renderer->eye_renderer->instance_count / (float) MAX_EYE_RENDER;
 
     igEndTable();
 	igSetCursorPosX(4);
@@ -215,14 +232,9 @@ void hud(game* g, const input_data* input_data) {
 	igPushStyleColor_Vec4(ImGuiCol_PlotHistogram, bar_col);
 	igProgressBar(food_mem, (ImVec2) { 100, 20 }, NULL);
 	igPopStyleColor(1);
-	igSetCursorPosX(4);
-	igImLerp_Vec4(&bar_col, (ImVec4) { 0, 1, 0, 0.5f }, (ImVec4) { 1, 0, 0, 0.5f }, eye_mem);
-	igPushStyleColor_Vec4(ImGuiCol_PlotHistogram, bar_col);
-	igProgressBar(eye_mem, (ImVec2) { 100, 20 }, NULL);
-	igPopStyleColor(1);
 	igPopFont();
 
-	if (bp_mem >= 0.8f || food_mem >= 0.8f || eye_mem >= 0.8f) {
+	if (bp_mem >= 0.8f || food_mem >= 0.8f) {
 		message msg = {
 			.message = "MEMORY WARNING",
 			.tt = 1,

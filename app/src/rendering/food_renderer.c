@@ -141,8 +141,8 @@ food_renderer* food_renderer_create(ig_context* context, unsigned int max_instan
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
 			.pNext = NULL,
 			.flags = 0,
-			.depthTestEnable = VK_TRUE,
-			.depthWriteEnable = VK_TRUE,
+			.depthTestEnable = VK_FALSE,
+			.depthWriteEnable = VK_FALSE,
 			.depthCompareOp = VK_COMPARE_OP_GREATER_OR_EQUAL
 		},
 		.pColorBlendState = &(VkPipelineColorBlendStateCreateInfo) {

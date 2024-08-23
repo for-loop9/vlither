@@ -11,6 +11,7 @@ void main() {
 	float minimap_col = texture(minimap, in_usage * out_uv).r;
 	float l = length(out_uv * 2.0 - 1.0);
 	float c = step(0.0, 1.0 - l);
-	float o = minimap_col * 0.35;
+	float o = minimap_col * 0.45;
 	color = c * vec4(0.05 + o, 0.05 + o, 0.05 + o, 1);
+	color.a *= 0.7;
 }

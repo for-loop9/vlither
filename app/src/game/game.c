@@ -109,12 +109,16 @@ void create_game(int argc, char** argv) {
 			.enable_zoom = 1,
 			.cv = rand() % 9,
 			.cusk = 0,
+			.hq = false,
 			.nickname = "",
 			.ip = "15.204.212.200:444",
 			.laser_thickness = 2,
+			.hp_size = 3,
 			.laser_color = { .x = 1, .y = 0.6f, .z = 0.6f },
 			.names_color = { .x = 0.9f, .y = 0.9f, .z = 0.9f },
+			.hp_color = { .x = 1, .y = 0.6f, .z = 0.6f },
 			.food_scale = 1,
+			.mm_scale = 1,
 			.names_font = RENDERER_FONT_SMALL
 		},
 		.config = {
@@ -361,7 +365,7 @@ void create_game(int argc, char** argv) {
 	ig_texture* font_sheet = ig_context_texture_create_from_file(g.icontext, "app/res/textures/font_sheet.png");
 	ig_texture* bg_tex = ig_context_texture_create_from_file(g.icontext, "app/res/textures/bg54.jpg");
 
-	g.renderer = renderer_create(&g, g.icontext, g.window, sprite_sheet, MAX_BP_RENDER, MAX_EYE_RENDER, MAX_FOOD_RENDER, 128, font_sheet, bg_tex, 512);
+	g.renderer = renderer_create(&g, g.icontext, g.window, sprite_sheet, MAX_BP_RENDER, MAX_FOOD_RENDER, 128, font_sheet, bg_tex, 512);
 
 	input_data input_data = {};
 
@@ -388,6 +392,8 @@ void create_game(int argc, char** argv) {
 		input_data.p_pressed = ig_keyboard_key_pressed(g.keyboard, GLFW_KEY_P);
 		input_data.s_pressed = ig_keyboard_key_pressed(g.keyboard, GLFW_KEY_S);
 		input_data.h_pressed = ig_keyboard_key_pressed(g.keyboard, GLFW_KEY_H);
+		input_data.nine_pressed = ig_keyboard_key_pressed(g.keyboard, GLFW_KEY_9);
+		input_data.zero_pressed = ig_keyboard_key_pressed(g.keyboard, GLFW_KEY_0);
 		input_data.ctm = glfwGetTime() * 1000;
 		float ct = glfwGetTime();
 		dt = ct - pdt;

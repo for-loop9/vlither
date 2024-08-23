@@ -49,7 +49,7 @@ void oef(game* g, struct mg_connection* c, const input_data* input_data) {
 
 	if (!g->snake_null) {
 		if (input_data->k_pressed) {
-			g->config.laser = !g->config.laser;
+			g->config.assist = !g->config.assist;
 		} else if (input_data->b_pressed) {
 			g->settings_instance.big_food = !g->settings_instance.big_food;
 		} else if (input_data->p_pressed) {
@@ -58,6 +58,11 @@ void oef(game* g, struct mg_connection* c, const input_data* input_data) {
 			g->config.shadow = !g->config.shadow;
 		} else if (input_data->h_pressed) {
 			g->config.show_hud = !g->config.show_hud;
+		} else if (input_data->nine_pressed) {
+			g->network_done = 1;
+		} else if (input_data->zero_pressed) {
+			g->respawn = true;
+			g->network_done = 1;
 		}
 
 		if (g->settings_instance.enable_zoom) {
@@ -128,7 +133,7 @@ void oef(game* g, struct mg_connection* c, const input_data* input_data) {
 				}
 			}
 			if (o->fltg > 0) {
-				int k = g->config.vfrb;
+				int k = g->config.vfrb * 4; // invisible tail fix
 				if (k > o->fltg) k = o->fltg;
 				o->fltg -= k;
 				for (int qq = 0; qq < k; qq++) {

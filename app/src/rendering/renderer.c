@@ -27,7 +27,9 @@ void imgui_init(game* g, ig_context* context, ig_window* window, renderer* rende
 	io->IniFilename = NULL;
 	io->LogFilename = NULL;
 	ImGuiStyle* style = igGetStyle();
-	style->FrameRounding = 10;
+	style->FrameRounding = 15;
+	style->PopupRounding = 10;
+	style->GrabRounding = 15;
 	igStyleColorsClassic(NULL);
 	igImplGlfw_InitForVulkan(window->native_handle, 1);
 	igImplVulkan_Init(&vk_imgui_init_info);
@@ -53,7 +55,7 @@ void imgui_destroy() {
     igDestroyContext(NULL);
 }
 
-renderer* renderer_create(game* g, ig_context* context, ig_window* window, const ig_texture* sprite_sheet, unsigned int max_circles, unsigned int max_eyes, unsigned int max_foods, unsigned int max_sprites, ig_texture* font_sheet, ig_texture* bg_tex, unsigned int max_chars) {
+renderer* renderer_create(game* g, ig_context* context, ig_window* window, const ig_texture* sprite_sheet, unsigned int max_circles, unsigned int max_foods, unsigned int max_sprites, ig_texture* font_sheet, ig_texture* bg_tex, unsigned int max_chars) {
 	renderer* r = malloc(sizeof(renderer));
 	r->context = context;
 
@@ -75,7 +77,6 @@ renderer* renderer_create(game* g, ig_context* context, ig_window* window, const
 	r->bg_renderer = sprite_renderer_create(context, bg_tex, 1);
 	r->food_renderer = food_renderer_create(context, max_foods);
 	r->bp_renderer = bp_renderer_create(context, max_circles);
-	r->eye_renderer = eye_renderer_create(context, max_eyes);
 	r->sprite_renderer = sprite_renderer_create(context, sprite_sheet, max_sprites);
 	r->text_renderer = text_renderer_create(context, font_sheet, max_chars);
 	r->mm_renderer = mm_renderer_create(context, 1);
@@ -123,10 +124,6 @@ void renderer_push_bp(renderer* renderer, const bp_instance* bp_instance) {
 	bp_renderer_push(renderer->bp_renderer, bp_instance);
 }
 
-void renderer_push_eye(renderer* renderer, const eye_instance* eye_instance) {
-	eye_renderer_push(renderer->eye_renderer, eye_instance);
-}
-
 void renderer_push_sprite(renderer* renderer, const sprite_instance* sprite_instance) {
 	sprite_renderer_push(renderer->sprite_renderer, sprite_instance);
 }
@@ -171,7 +168,6 @@ void renderer_flush(renderer* renderer) {
 	vkCmdBindVertexBuffers(frame->cmd_buffer, 0, 1, &renderer->quad_buffer->buffer, (VkDeviceSize[]) { 0 });
 	sprite_renderer_flush(renderer->bg_renderer, renderer->context, frame);
 	food_renderer_flush(renderer->food_renderer, renderer->context, frame);
-	eye_renderer_flush(renderer->eye_renderer, renderer->context, frame);
 	bp_renderer_flush(renderer->bp_renderer, renderer->context, frame);
 	ig_bd_renderer_flush(renderer->bd_renderer, renderer->context, frame);
 	mm_renderer_flush(renderer->mm_renderer, renderer->context, frame);
@@ -187,7 +183,6 @@ void renderer_destroy(renderer* renderer) {
 	mm_renderer_destroy(renderer->mm_renderer, renderer->context);
 	text_renderer_destroy(renderer->text_renderer, renderer->context);
 	sprite_renderer_destroy(renderer->sprite_renderer, renderer->context);
-	eye_renderer_destroy(renderer->eye_renderer, renderer->context);
 	bp_renderer_destroy(renderer->bp_renderer, renderer->context);
 	food_renderer_destroy(renderer->food_renderer, renderer->context);
 	sprite_renderer_destroy(renderer->bg_renderer, renderer->context);

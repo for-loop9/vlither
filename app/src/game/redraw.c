@@ -149,19 +149,19 @@ void redraw(game* g, const input_data* input_data) {
 				}
 			}
 			if (pr->rad == 1) {
-				float fx = px - g->config.gsc * (pr->f2 * 1.5f);
-				float fy = py - g->config.gsc * (pr->f2 * 1.5f);
+				float fx = px - g->config.gsc * (pr->f2 * 1.2f);
+				float fy = py - g->config.gsc * (pr->f2 * 1.2f);
 				renderer_push_food(g->renderer, &(food_instance) {
-					.circ = { .x = fx, .y = fy, .z = g->config.gsc * (pr->f * 1.5f) },
+					.circ = { .x = fx, .y = fy, .z = g->config.gsc * (pr->f * 1.2f) },
 					.ratios = { .x = 0, .y = 1 },
 					.color = { .x = col->x + pr->blink * (1 - col->x), .y = col->y + pr->blink * (1 - col->y), .z = col->z + pr->blink * (1 - col->z), .w = pr->fr }
 				});
 			} else {
-				float fx = px - g->config.gsc * ((pr->f2 * pr->rad) * 1.5f);
-				float fy = py - g->config.gsc * ((pr->f2 * pr->rad) * 1.5f);
+				float fx = px - g->config.gsc * ((pr->f2 * pr->rad) * 1.2f);
+				float fy = py - g->config.gsc * ((pr->f2 * pr->rad) * 1.2f);
 				
 				renderer_push_food(g->renderer, &(food_instance) {
-					.circ = { .x = fx, .y = fy, .z = g->config.gsc * ((pr->f * pr->rad) * 1.5f) },
+					.circ = { .x = fx, .y = fy, .z = g->config.gsc * ((pr->f * pr->rad) * 1.2f) },
 					.ratios = { .x = 0, .y = 1 },
 					.color = { .x = col->x + pr->blink * (1 - col->x), .y = col->y + pr->blink * (1 - col->y), .z = col->z + pr->blink * (1 - col->z), .w = pr->fr }
 				});
@@ -311,17 +311,20 @@ void redraw(game* g, const input_data* input_data) {
 
 			for (int j = bp - 1; j >= 0; j--) {
 				if (g->config.pbu[j] >= 1) {
-					if (j >= 1 && g->config.pbu[j - 1] == 2) {
-						float shsz = (g->config.gsc * lsz * 62.0f / 32.0f);
-						px = (mww2 + ((g->config.pbx[j - 1] - g->config.view_xx) * g->config.gsc));
-						py = (mhh2 + ((g->config.pby[j - 1] - g->config.view_yy) * g->config.gsc));
+					if (j >= 4) {
+						int k = j - 4;
+						if (g->config.pbu[k] == 2) {
+							float shsz = (g->config.gsc * lsz * 62.0f / 32.0f) * 0.75f;
+							px = (mww2 + ((g->config.pbx[k] - g->config.view_xx) * g->config.gsc));
+							py = (mhh2 + ((g->config.pby[k] - g->config.view_yy) * g->config.gsc));
 
-						renderer_push_bp(g->renderer, &(bp_instance) {
-							.circ = { .x = px - shsz, .y = py - shsz, .z = 1 - snake_z, .w = shsz * 2 },
-							.ratios = { .x = 0, .y = 1 },
-							.color = { .x = 0, .y = 0, .z = 0, .w = g->config.shadow * 0.5f * v },
-							.shadow = 1
-						});
+							renderer_push_bp(g->renderer, &(bp_instance) {
+								.circ = { .x = px - shsz, .y = py - shsz, .z = 1 - snake_z, .w = shsz * 2 },
+								.ratios = { .x = 0, .y = 1 },
+								.color = { .x = 0, .y = 0, .z = 0, .w = g->config.shadow * 0.9f * v },
+								.shadow = 1
+							});
+						}
 					}
 
 					ig_vec3* col = g->config.color_groups + o->skin_data[j % o->skin_data_len];
@@ -333,7 +336,7 @@ void redraw(game* g, const input_data* input_data) {
 						.circ = { .x = px + (-g->config.gsc * lsz), .y = py + (-g->config.gsc * lsz), .z = 1 - snake_z, .w = g->config.gsc * 2 * lsz },
 						.ratios = { .x = sinf(g->config.pba[j]), .y = cosf(g->config.pba[j]) },
 						.color = { .x = col->x, .y = col->y, .z = col->z, .w = v },
-						.shadow = 0
+						.shadow = 0,
 					});
 				}
 			}
@@ -356,30 +359,32 @@ void redraw(game* g, const input_data* input_data) {
 
 			float rd2 = (6 * ssc * g->config.gsc) * 2;
 
-			renderer_push_eye(g->renderer, &(eye_instance) {
+			renderer_push_bp(g->renderer, &(bp_instance) {
 				.circ = {
 					.x = (mww2 + (ex + hx - g->config.view_xx) * g->config.gsc) - rd2 / 2,
 					.y = (mhh2 + (ey + hy - g->config.view_yy) * g->config.gsc) - rd2 / 2,
-					.z = (1 - snake_z) + 0.01f,
+					.z = (1 - snake_z),
 					.w = rd2
 				},
 				.ratios = { .x = 0, .y = 1 },
-				.color = { .x = 1, .y = 1, .z = 1, .w = v }
+				.color = { .x = 1, .y = 1, .z = 1, .w = v },
+				.eye = 1
 			});
 
 			ex = cosf(fang) * (ed + 0.5f) + o->rex * ssc + cosf(fang - PI / 2) * esp;
 			ey = sinf(fang) * (ed + 0.5f) + o->rey * ssc + sinf(fang - PI / 2) * esp;
 			rd2 = (3.5f * ssc * g->config.gsc) * 2;
 
-			renderer_push_eye(g->renderer, &(eye_instance) {
+			renderer_push_bp(g->renderer, &(bp_instance) {
 				.circ = {
 					.x = (mww2 + (ex + hx - g->config.view_xx) * g->config.gsc) - rd2 / 2,
 					.y = (mhh2 + (ey + hy - g->config.view_yy) * g->config.gsc) - rd2 / 2,
-					.z = (1 - snake_z) + 0.01f,
+					.z = (1 - snake_z),
 					.w = rd2
 				},
 				.ratios = { .x = 0, .y = 1 },
-				.color = { .x = 0, .y = 0, .z = 0, .w = v }
+				.color = { .x = 0, .y = 0, .z = 0, .w = v },
+				.eye = 1,
 			});
 
 			ex = cosf(fang) * ed + cosf(fang + PI / 2) * (esp + 0.5f);
@@ -389,30 +394,32 @@ void redraw(game* g, const input_data* input_data) {
 			// if (!g->snake_null && o == g->os.snakes)
 			// 	printf("iris size = %d, bp size = %d, pupil size = %d\n", (int) rd2, (int) (g->config.gsc * 2 * lsz), (int) ((3.5f * ssc * g->config.gsc) * 2));
 
-			renderer_push_eye(g->renderer, &(eye_instance) {
+			renderer_push_bp(g->renderer, &(bp_instance) {
 				.circ = {
 					.x = (mww2 + (ex + hx - g->config.view_xx) * g->config.gsc) - rd2 / 2,
 					.y = (mhh2 + (ey + hy - g->config.view_yy) * g->config.gsc) - rd2 / 2,
-					.z = (1 - snake_z) + 0.01f,
+					.z = (1 - snake_z),
 					.w = rd2
 				},
 				.ratios = { .x = 0, .y = 1 },
-				.color = { .x = 1, .y = 1, .z = 1, .w = v }
+				.color = { .x = 1, .y = 1, .z = 1, .w = v },
+				.eye = 1,
 			});
 
 			ex = cosf(fang) * (ed + 0.5f) + o->rex * ssc + cosf(fang + PI / 2) * esp;
 			ey = sinf(fang) * (ed + 0.5f) + o->rey * ssc + sinf(fang + PI / 2) * esp;
 			rd2 = (3.5f * ssc * g->config.gsc) * 2;
 
-			renderer_push_eye(g->renderer, &(eye_instance) {
+			renderer_push_bp(g->renderer, &(bp_instance) {
 				.circ = {
 					.x = (mww2 + (ex + hx - g->config.view_xx) * g->config.gsc) - rd2 / 2,
 					.y = (mhh2 + (ey + hy - g->config.view_yy) * g->config.gsc) - rd2 / 2,
-					.z = (1 - snake_z) + 0.01f,
+					.z = (1 - snake_z),
 					.w = rd2
 				},
 				.ratios = { .x = 0, .y = 1 },
-				.color = { .x = 0, .y = 0, .z = 0, .w = v }
+				.color = { .x = 0, .y = 0, .z = 0, .w = v },
+				.eye = 1,
 			});
 
 			if (g->config.player_names) {

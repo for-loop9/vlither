@@ -154,6 +154,8 @@ void save_settings(game* g) {
 	}
 	fwrite(&g->settings_instance, sizeof(settings), 1, file);
 	fclose(file);
+
+	g->config.qsm = g->settings_instance.hq ? 1.0f : 1.7f;
 }
 
 void load_settings(game* g) {
@@ -163,4 +165,6 @@ void load_settings(game* g) {
 	}
 	fread(&g->settings_instance, sizeof(settings), 1, file);
 	fclose(file);
+
+	g->config.qsm = g->settings_instance.hq ? 1.0f : 1.7f;
 }

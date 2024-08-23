@@ -20,7 +20,7 @@ void set_skin(game* g) {
 	renderer_push_bg(g->renderer, &(sprite_instance) {
 		.rect = { 0, 0, g->icontext->default_frame.resolution.x, g->icontext->default_frame.resolution.y },
 		.ratios = { .x = 0, .y = 1 },
-		.uv_rect = { .x = glfwGetTime() * 0.15f, .y = 0, .z = (g->icontext->default_frame.resolution.x / g->config.bgw2), .w = (g->icontext->default_frame.resolution.y / g->config.bgh2) },
+		.uv_rect = { .x = -1 * glfwGetTime() * 0.15f, .y = 0, .z = (g->icontext->default_frame.resolution.x / g->config.bgw2), .w = (g->icontext->default_frame.resolution.y / g->config.bgh2) },
 		.color = { .x = 1, .y = 1, .z = 1 }
 	});
 
@@ -30,59 +30,64 @@ void set_skin(game* g) {
 
 	uint8_t* skin_data = g->config.default_skins[g->settings_instance.cv] + 1;
 	uint8_t skin_data_len = *(skin_data - 1);
-
-	renderer_push_eye(g->renderer, &(eye_instance) {
-		.circ = { .x = 100 + 3, .y = sy + 2, .z = 1, .w = 13 },
-		.ratios = { .x = 0, .y = 1 },
-		.color = { .x = 1, .y = 1, .z = 1, .w = 1 }
-	});
-	renderer_push_eye(g->renderer, &(eye_instance) {
-		.circ = { .x = 100 + 3, .y = sy + 17, .z = 1, .w = 13 },
-		.ratios = { .x = 0, .y = 1 },
-		.color = { .x = 1, .y = 1, .z = 1, .w = 1 }
-	});
-	renderer_push_eye(g->renderer, &(eye_instance) {
-		.circ = { .x = 100 + 3, .y = sy + 5, .z = 1, .w = 8 },
-		.ratios = { .x = 0, .y = 1 },
-		.color = { .x = 0, .y = 0, .z = 0, .w = 1 }
-	});
-	renderer_push_eye(g->renderer, &(eye_instance) {
-		.circ = { .x = 100 + 3, .y = sy + 19, .z = 1, .w = 8 },
-		.ratios = { .x = 0, .y = 1 },
-		.color = { .x = 0, .y = 0, .z = 0, .w = 1 }
-	});
-
 	int tot_segments = 0;
-	for (int x = 100; (x < g->icontext->default_frame.resolution.x - 133) && (tot_segments < 192); x += 8, tot_segments++) {
+	for (int x = g->icontext->default_frame.resolution.x - 133 - 8; (x >= 96) && (tot_segments < 192); x -= 8, tot_segments++) {
 		renderer_push_bp(g->renderer, &(bp_instance) {
 			.circ = { .x = x - 8, .y = sy - 8, .z = 0, .w = 49 },
 			.ratios = { .x = 0, .y = 1 },
 			.color = { .x = 0, .y = 0, .z = 0, .w = 1 },
 			.shadow = 1
 		});
+	}
 
+	for (int x = g->icontext->default_frame.resolution.x - 133 - 8, seg_ct = 0; (x >= 96) && (seg_ct < 192); x -= 8, seg_ct++) {
 		if (g->settings_instance.cusk) {
-			if (g->settings_instance.cusk_skin_data_exp[tot_segments] != -1) {
-				ig_vec3* cg_grp = g->config.color_groups + g->settings_instance.cusk_skin_data_exp[tot_segments];
+			if (g->settings_instance.cusk_skin_data_exp[(tot_segments - 1 - seg_ct)] != -1) {
+				ig_vec3* cg_grp = g->config.color_groups + g->settings_instance.cusk_skin_data_exp[(tot_segments - 1 - seg_ct)];
 
 				renderer_push_bp(g->renderer, &(bp_instance) {
-					.circ = { .x = x, .y = sy, .z = 0.98f - (tot_segments / 292.0f), .w = 33 },
+					.circ = { .x = x, .y = sy, .z = 0, .w = 33 },
 					.ratios = { .x = 0, .y = 1 },
 					.color = { .x = cg_grp->x, .y = cg_grp->y, .z = cg_grp->z, .w = 1 }
 				});
 			}
 		} else {
-			ig_vec3* col = g->config.color_groups + skin_data[tot_segments % skin_data_len];
+			ig_vec3* col = g->config.color_groups + skin_data[(tot_segments - 1 - seg_ct) % skin_data_len];
 			renderer_push_bp(g->renderer, &(bp_instance) {
-				.circ = { .x = x, .y = sy, .z = 0.98f - (tot_segments / 292.0f), .w = 33 },
+				.circ = { .x = x, .y = sy, .z = 0, .w = 33 },
 				.ratios = { .x = 0, .y = 1 },
 				.color = { .x = col->x, .y = col->y, .z = col->z, .w = 1 }
 			});
 		}
 	}
 
+	renderer_push_bp(g->renderer, &(bp_instance) {
+		.circ = { .x = 100 + 3, .y = sy + 2, .z = 1, .w = 13 },
+		.ratios = { .x = 0, .y = 1 },
+		.color = { .x = 1, .y = 1, .z = 1, .w = 1 },
+		.eye = 1
+	});
+	renderer_push_bp(g->renderer, &(bp_instance) {
+		.circ = { .x = 100 + 3, .y = sy + 17, .z = 1, .w = 13 },
+		.ratios = { .x = 0, .y = 1 },
+		.color = { .x = 1, .y = 1, .z = 1, .w = 1 },
+		.eye = 1
+	});
+	renderer_push_bp(g->renderer, &(bp_instance) {
+		.circ = { .x = 100 + 3, .y = sy + 5, .z = 1, .w = 8 },
+		.ratios = { .x = 0, .y = 1 },
+		.color = { .x = 0, .y = 0, .z = 0, .w = 1 },
+		.eye = 1
+	});
+	renderer_push_bp(g->renderer, &(bp_instance) {
+		.circ = { .x = 100 + 3, .y = sy + 19, .z = 1, .w = 8 },
+		.ratios = { .x = 0, .y = 1 },
+		.color = { .x = 0, .y = 0, .z = 0, .w = 1 },
+		.eye = 1
+	});
+
 	igSetNextWindowPos((ImVec2) { .x = sx + 4, .y = sy + 40 }, ImGuiCond_None, (ImVec2) {});
-	igSetNextWindowSize((ImVec2) { .x = 400, .y = 360 }, ImGuiCond_None);
+	igSetNextWindowSize((ImVec2) { .x = 400, .y = 860 }, ImGuiCond_None);
 	igBegin("setskin", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollbar);
 
 	igSetCursorPosX(igGetWindowWidth() / 2 - igGetFrameHeight());
