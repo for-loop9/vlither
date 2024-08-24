@@ -31,7 +31,7 @@ premake5 --file=build.lua gmake2
 make -C build/makefiles config=debug
 build/bin/app
 ```
-You may also work on the project with VS Code by opening the `.code-workspace` file. All the build tasks (configure first, then build) and launch configurations (debug only) have been set. Make sure you have the required extensions installed:
+You may also work on the project with VS Code by opening the `.code-workspace` file. All the build tasks (`configure` first, then `build`) and launch configurations (`debug` only) have been set. Make sure you have the required extensions installed:
 - [C/C++ tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
 - [Makefile tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.makefile-tools)
 - [Best theme ever](https://monokai.pro/vscode)
