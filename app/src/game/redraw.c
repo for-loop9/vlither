@@ -93,7 +93,7 @@ void redraw(game* g, const input_data* input_data) {
 			.y = (((-mhh / g->config.bgh2) / 2) / g->config.gsc) - g->config.bgy2,
 			.z = (mww / g->config.bgw2) / g->config.gsc,
 			.w = (mhh / g->config.bgh2) / g->config.gsc },
-		.color = { .x = 1 * (1 - g->settings_instance.black_bg), .y = 1 * (1 - g->settings_instance.black_bg), .z = 1 * (1 - g->settings_instance.black_bg) }
+		.color = { .x = 1 * (1 - g->settings_instance.black_bg), .y = 1 * (1 - g->settings_instance.black_bg), .z = 1 * (1 - g->settings_instance.black_bg), .w = 1 }
 	});
 
 	// foods

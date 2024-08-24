@@ -15,9 +15,18 @@ void hud(game* g, const input_data* input_data) {
 
 	if (!g->snake_null && g->config.assist) {
 		// crosshair:
-		float cx = mww2 + (g->os.snakes[0].sc * 29 * 0.5f * g->config.gsc) * cosf(g->os.snakes[0].ang);
-		float cy = mhh2 + (g->os.snakes[0].sc * 29 * 0.5f * g->config.gsc) * sinf(g->os.snakes[0].ang);
-		float extr = g->settings_instance.hp_size * g->config.gsc * g->os.snakes[0].sc;
+		float cx = mww2 + (g->os.snakes[0].sc * 29 * 0.5f * g->config.gsc) * cosf(g->os.snakes[0].ehang);
+		float cy = mhh2 + (g->os.snakes[0].sc * 29 * 0.5f * g->config.gsc) * sinf(g->os.snakes[0].ehang);
+		float extr = g->settings_instance.hp_size * g->config.gsc * g->os.snakes[0].sc * 1.3f;
+
+		renderer_push_bp(g->renderer, &(bp_instance) {
+			.circ = { .x = cx - extr, .y = cy - extr, .z = 1, .w = extr * 2 },
+			.ratios = { .x = 0, .y = 1 },
+			.color = { .x = 0, .y = 0, .z = 0, .w = 1 },
+			.eye = 1
+		});
+
+		extr = g->settings_instance.hp_size * g->config.gsc * g->os.snakes[0].sc;
 
 		renderer_push_bp(g->renderer, &(bp_instance) {
 			.circ = { .x = cx - extr, .y = cy - extr, .z = 1, .w = extr * 2 },
@@ -75,13 +84,13 @@ void hud(game* g, const input_data* input_data) {
 			.rect = { .x = mm_x + mm_scaled / 2, .y = mm_y, .z = 1, .w = mm_scaled },
 			.ratios = { .x = 0, .y = 1 },
 			.uv_rect = { .x = 3 / 64.0f, .y = 3 / 64.0f, .z = 1 / 64.0f, .w = 1 / 64.0f },
-			.color = { .x = 0.6f, .y = 0.6f, .z = 0.6f }
+			.color = { .x = 1, .y = 1, .z = 1, .w = 0.5f }
 		});
 		renderer_push_sprite(g->renderer, &(sprite_instance) {
 			.rect = { .x = mm_x + mm_scaled / 2, .y = mm_y, .z = 1, .w = mm_scaled },
 			.ratios = { .x = 1, .y = 0 },
 			.uv_rect = { .x = 3 / 64.0f, .y = 3 / 64.0f, .z = 1 / 64.0f, .w = 1 / 64.0f },
-			.color = { .x = 0.6f, .y = 0.6f, .z = 0.6f }
+			.color = { .x = 1, .y = 1, .z = 1, .w = 0.5f }
 		});
 
 		renderer_push_mm(g->renderer, &(mm_instance) {
@@ -117,7 +126,7 @@ void hud(game* g, const input_data* input_data) {
 				.rect = { .x = player_pos_map.x + mm_x - 3 , player_pos_map.y + mm_y - 3, 6, 6 },
 				.ratios = { .x = 0, .y = 1 },
 				.uv_rect = { .x = 0, .y = 0, .z = 6 / 64.0f, .w = 6 / 64.0f },
-				.color = { .x = 1, .y = 1, .z = 1 }
+				.color = { .x = 1, .y = 1, .z = 1, .w = 1 }
 			});
 		}
 	}

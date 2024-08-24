@@ -154,11 +154,12 @@ void settings_screen(game* g) {
 	igSetNextItemWidth(igGetColumnWidth(1) - style->WindowPadding.x - 5);
 	igSliderInt("##laser_thickness", &g->settings_instance.laser_thickness, 1, 6, NULL, ImGuiSliderFlags_None);
 	igSetNextItemWidth(igGetColumnWidth(1) - style->WindowPadding.x - 5);
-	float laser_color_ref[3] = { g->settings_instance.laser_color.x, g->settings_instance.laser_color.y, g->settings_instance.laser_color.z };
-	if (igColorEdit3("##laser_color", laser_color_ref, ImGuiColorEditFlags_None)) {
+	float laser_color_ref[4] = { g->settings_instance.laser_color.x, g->settings_instance.laser_color.y, g->settings_instance.laser_color.z, g->settings_instance.laser_color.w };
+	if (igColorEdit4("##laser_color", laser_color_ref, ImGuiColorEditFlags_None)) {
 		g->settings_instance.laser_color.x = laser_color_ref[0];
 		g->settings_instance.laser_color.y = laser_color_ref[1];
 		g->settings_instance.laser_color.z = laser_color_ref[2];
+		g->settings_instance.laser_color.w = laser_color_ref[3];
 	}
 	igSetNextItemWidth(igGetColumnWidth(1) - style->WindowPadding.x - 5);
 	igSliderInt("##hp_thickness", &g->settings_instance.hp_size, 1, 6, NULL, ImGuiSliderFlags_None);

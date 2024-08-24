@@ -45,7 +45,7 @@ void message_queue_render(message_queue* msg_queue, game* g, float dt) {
 			.rect = { .x = msg_x - 20, .y = (g->icontext->default_frame.resolution.y - 60) - msg_queue->y, .z = msg_len + 40, .w = 46  },
 			.ratios = { .x = 0, .y = 1 },
 			.uv_rect = { .x = 3 / 64.0f, .y = 3 / 64.0f, .z = 1 / 64.0f, .w = 1 / 64.0f },
-			.color = { .x = 0.2f, .y = 0.2f, .z = 0.2f },
+			.color = { .x = 0.2f, .y = 0.2f, .z = 0.2f, .w = 1 },
 		});
 		renderer_push_text(g->renderer, msg->message,
 			&(ig_vec3) {

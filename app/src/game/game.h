@@ -61,7 +61,7 @@ typedef struct settings {
 	bool big_food;
 	int laser_thickness;
 	int hp_size;
-	ig_vec3 laser_color;
+	ig_vec4 laser_color;
 	ig_vec3 names_color;
 	ig_vec3 hp_color;
 	float food_scale;

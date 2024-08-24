@@ -21,7 +21,7 @@ void set_skin(game* g) {
 		.rect = { 0, 0, g->icontext->default_frame.resolution.x, g->icontext->default_frame.resolution.y },
 		.ratios = { .x = 0, .y = 1 },
 		.uv_rect = { .x = -1 * glfwGetTime() * 0.15f, .y = 0, .z = (g->icontext->default_frame.resolution.x / g->config.bgw2), .w = (g->icontext->default_frame.resolution.y / g->config.bgh2) },
-		.color = { .x = 1, .y = 1, .z = 1 }
+		.color = { .x = 1, .y = 1, .z = 1, .w = 1 }
 	});
 
 	ImGuiStyle* style = igGetStyle();
@@ -59,32 +59,34 @@ void set_skin(game* g) {
 				.color = { .x = col->x, .y = col->y, .z = col->z, .w = 1 }
 			});
 		}
-	}
 
-	renderer_push_bp(g->renderer, &(bp_instance) {
-		.circ = { .x = 100 + 3, .y = sy + 2, .z = 1, .w = 13 },
-		.ratios = { .x = 0, .y = 1 },
-		.color = { .x = 1, .y = 1, .z = 1, .w = 1 },
-		.eye = 1
-	});
-	renderer_push_bp(g->renderer, &(bp_instance) {
-		.circ = { .x = 100 + 3, .y = sy + 17, .z = 1, .w = 13 },
-		.ratios = { .x = 0, .y = 1 },
-		.color = { .x = 1, .y = 1, .z = 1, .w = 1 },
-		.eye = 1
-	});
-	renderer_push_bp(g->renderer, &(bp_instance) {
-		.circ = { .x = 100 + 3, .y = sy + 5, .z = 1, .w = 8 },
-		.ratios = { .x = 0, .y = 1 },
-		.color = { .x = 0, .y = 0, .z = 0, .w = 1 },
-		.eye = 1
-	});
-	renderer_push_bp(g->renderer, &(bp_instance) {
-		.circ = { .x = 100 + 3, .y = sy + 19, .z = 1, .w = 8 },
-		.ratios = { .x = 0, .y = 1 },
-		.color = { .x = 0, .y = 0, .z = 0, .w = 1 },
-		.eye = 1
-	});
+		if (seg_ct == tot_segments - 1) {
+			renderer_push_bp(g->renderer, &(bp_instance) {
+				.circ = { .x = x + 3, .y = sy + 2, .z = 1, .w = 13 },
+				.ratios = { .x = 0, .y = 1 },
+				.color = { .x = 1, .y = 1, .z = 1, .w = 1 },
+				.eye = 1
+			});
+			renderer_push_bp(g->renderer, &(bp_instance) {
+				.circ = { .x = x + 3, .y = sy + 17, .z = 1, .w = 13 },
+				.ratios = { .x = 0, .y = 1 },
+				.color = { .x = 1, .y = 1, .z = 1, .w = 1 },
+				.eye = 1
+			});
+			renderer_push_bp(g->renderer, &(bp_instance) {
+				.circ = { .x = x + 3, .y = sy + 5, .z = 1, .w = 8 },
+				.ratios = { .x = 0, .y = 1 },
+				.color = { .x = 0, .y = 0, .z = 0, .w = 1 },
+				.eye = 1
+			});
+			renderer_push_bp(g->renderer, &(bp_instance) {
+				.circ = { .x = x + 3, .y = sy + 19, .z = 1, .w = 8 },
+				.ratios = { .x = 0, .y = 1 },
+				.color = { .x = 0, .y = 0, .z = 0, .w = 1 },
+				.eye = 1
+			});
+		}
+	}
 
 	igSetNextWindowPos((ImVec2) { .x = sx + 4, .y = sy + 40 }, ImGuiCond_None, (ImVec2) {});
 	igSetNextWindowSize((ImVec2) { .x = 400, .y = 860 }, ImGuiCond_None);

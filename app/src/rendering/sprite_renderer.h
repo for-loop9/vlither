@@ -11,7 +11,7 @@ typedef struct sprite_instance {
 	ig_vec4 rect;
 	ig_vec2 ratios;
 	ig_vec4 uv_rect;
-	ig_vec3 color;
+	ig_vec4 color;
 } sprite_instance;
 
 typedef struct sprite_renderer {

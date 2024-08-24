@@ -21,22 +21,20 @@ Prerequisites
 
 On Windows, the program is developed using [MSYS2](https://www.msys2.org) to get access to GCC, GDB, and Make with mingw-w64 tool chain. It has **_not_** been tested with MSVC or Cygwin. It will most likely not work with MSVC out of the box due to the use of POSIX Threads API.
 
-Premake5 should be installed and put in path. Make sure `VULKAN_SDK` environment variable is set properly if on Windows.
+Make sure the `VULKAN_SDK` environment variable is set properly if on Windows.
 
 ```bash
 git clone https://github.com/for-loop9/vlither.git
-cd vlither/scripts
-python compile_shaders.py
-cd ..
+cd vlither
+python scripts/compile_shaders.py
 premake5 --file=build.lua gmake2
-cd build/makefiles
-make config=debug
-cd ../..
+make -C build/makefiles config=debug
 build/bin/app
 ```
 You may also work on the project with VS Code by opening the `.code-workspace` file. All the build tasks (configure first, then build) and launch configurations (debug only) have been set. Make sure you have the required extensions installed:
 - [C/C++ tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
 - [Makefile tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.makefile-tools)
+- [Best theme ever](https://monokai.pro/vscode)
 ## Features
 
 - Supports all 66 skins
@@ -66,7 +64,6 @@ The following libraries have been used to develop Vlither:
 - [Cimgui](https://github.com/cimgui/cimgui) - A C wrapper for [Dear ImGui](https://github.com/ocornut/imgui), a wonderful immediate mode UI library.
 
 ## Gallery
-Here are a few screenshots:
 ![Image 0](gallery/ss3.png)
 ![Image 1](gallery/ss0.png)
 ![Image 2](gallery/ss1.png)
@@ -76,4 +73,4 @@ Here are a few screenshots:
 This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](./LICENSE) file for details.
 
 ### Notice
-This project was made entirely by one person - me. It is tested by me and a few people in the official [Slither.io Discord server](https://discord.com/invite/slither). Upon coming across any bugs, I fix them. It is unlikely that you will come across any while using this program. In the off chance that you do, I would really appreciate if you'd let me know by opening up an issue.
+This project was made entirely by one person - me. It is tested by me and a few people in the official [Slither.io Discord server](https://discord.com/invite/slither). Upon coming across any bugs, I fix them. It is possible that you will come across some while using this program. In the off chance that you do, I would really appreciate if you'd let me know by opening up an issue.

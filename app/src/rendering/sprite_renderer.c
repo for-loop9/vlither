@@ -83,7 +83,7 @@ sprite_renderer* sprite_renderer_create(ig_context* context, const ig_texture* s
 				{
 					.location = 4,
 					.binding = 1,
-					.format = VK_FORMAT_R32G32B32_SFLOAT,
+					.format = VK_FORMAT_R32G32B32A32_SFLOAT,
 					.offset = offsetof(sprite_instance, color)
 				}
 			}
