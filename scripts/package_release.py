@@ -56,6 +56,11 @@ def main():
 	shutil.copy2(executable_src, executable_dst)
 	print('copied executable')
 
+	if os.name == 'nt':
+		os.rename("release/app.exe", "release/vlither.exe")
+	else:
+		os.rename("release/app", "release/vlither")
+
 	shutil.copy2('LICENSE', license_dst)
 	print('copied license')
 
