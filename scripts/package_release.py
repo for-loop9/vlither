@@ -45,9 +45,11 @@ def main():
 	print('deleted shader files')
 
 	if os.name == 'nt':
-		executable_name = 'app.exe'
+		os.rename("build/bin/app.exe", "build/bin/vlither.exe")
+		executable_name = 'vlither.exe'
 	else:
-		executable_name = 'app'
+		os.rename("build/bin/app", "build/bin/vlither")
+		executable_name = 'vlither'
 
 	executable_src = os.path.join('build', 'bin', executable_name)
 	executable_dst = os.path.join('release', executable_name)
@@ -55,11 +57,6 @@ def main():
 
 	shutil.copy2(executable_src, executable_dst)
 	print('copied executable')
-
-	if os.name == 'nt':
-		os.rename("release/app.exe", "release/vlither.exe")
-	else:
-		os.rename("release/app", "release/vlither")
 
 	shutil.copy2('LICENSE', license_dst)
 	print('copied license')
