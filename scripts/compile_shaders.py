@@ -19,5 +19,5 @@ def compile_dir(dir):
 			output_path = os.path.join(dir, filename.replace('.frag', 'f.spv'))
 			compile_shader(input_path, output_path)
 
-compile_dir('ignite/res/shaders');
-compile_dir('app/res/shaders');
+compile_dir('ignite/res/shaders')
+compile_dir('app/res/shaders')

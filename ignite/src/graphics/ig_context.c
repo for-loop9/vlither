@@ -7,6 +7,205 @@
 #include "ig_texture.h"
 #include "../math/ig_mat4.h"
 
+void _ig_context_create_frame_data(ig_context* context) {
+	vkGetSwapchainImagesKHR(context->device, context->swapchain, &context->swapchain_frame_count, NULL);
+	VkImage* swapchain_images = malloc(context->swapchain_frame_count * sizeof(VkImage));
+	vkGetSwapchainImagesKHR(context->device, context->swapchain, &context->swapchain_frame_count, swapchain_images);
+
+	context->swapchain_frames = malloc(context->swapchain_frame_count * sizeof(_ig_swapchain_frame));
+
+	for (int i = 0; i < context->swapchain_frame_count; i++) {
+		vkCreateImageView(context->device, &(VkImageViewCreateInfo) {
+			.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+			.pNext = NULL,
+			.flags = 0,
+			.image = swapchain_images[i],
+			.viewType = VK_IMAGE_VIEW_TYPE_2D,
+			.format = context->surface_format.format,
+			.components = {
+				.r = VK_COMPONENT_SWIZZLE_IDENTITY,
+				.g = VK_COMPONENT_SWIZZLE_IDENTITY,
+				.b = VK_COMPONENT_SWIZZLE_IDENTITY,
+				.a = VK_COMPONENT_SWIZZLE_IDENTITY
+			},
+			.subresourceRange = (VkImageSubresourceRange) {
+				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+				.baseMipLevel = 0,
+				.levelCount = 1,
+				.baseArrayLayer = 0,
+				.layerCount = 1
+			}
+		}, NULL, &context->swapchain_frames[i].color_attachment);
+
+		vkCreateFramebuffer(context->device, &(VkFramebufferCreateInfo) {
+			.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
+			.pNext = NULL,
+			.flags = 0,
+			.renderPass = context->swapchain_pass,
+			.attachmentCount = 1,
+			.pAttachments = &context->swapchain_frames[i].color_attachment,
+			.width = context->surface_extent.width,
+			.height = context->surface_extent.height,
+			.layers = 1
+		}, NULL, &context->swapchain_frames[i].framebuffer);
+	}
+	free(swapchain_images);
+
+	vmaCreateImage(context->allocator, &(VkImageCreateInfo) {
+		.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
+		.pNext = NULL,
+		.flags = 0,
+		.imageType = VK_IMAGE_TYPE_2D,
+		.format = context->surface_format.format,
+		.extent = {
+			.width = context->default_frame.resolution.x,
+			.height = context->default_frame.resolution.y,
+			.depth = 1
+		},
+		.mipLevels = 1,
+		.arrayLayers = 1,
+		.samples = VK_SAMPLE_COUNT_1_BIT,
+		.tiling = VK_IMAGE_TILING_OPTIMAL,
+		.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+		.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+		.queueFamilyIndexCount = 0,
+		.pQueueFamilyIndices = NULL,
+		.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED
+	}, &(VmaAllocationCreateInfo) {
+		.flags = VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT,
+		.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE,
+		.requiredFlags = 0,
+		.preferredFlags = 0,
+		.memoryTypeBits = 0,
+		.pool = VK_NULL_HANDLE,
+		.pUserData = NULL,
+		.priority = 0
+	}, &context->default_frame.color_attachment, &context->default_frame.color_attachment_memory, NULL);
+
+	vkCreateImageView(context->device, &(VkImageViewCreateInfo) {
+		.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+		.pNext = NULL,
+		.flags = 0,
+		.image = context->default_frame.color_attachment,
+		.viewType = VK_IMAGE_VIEW_TYPE_2D,
+		.format = context->surface_format.format,
+		.components = {
+			.r = VK_COMPONENT_SWIZZLE_IDENTITY,
+			.g = VK_COMPONENT_SWIZZLE_IDENTITY,
+			.b = VK_COMPONENT_SWIZZLE_IDENTITY,
+			.a = VK_COMPONENT_SWIZZLE_IDENTITY
+		},
+		.subresourceRange = {
+			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+			.baseMipLevel = 0,
+			.levelCount = 1,
+			.baseArrayLayer = 0,
+			.layerCount = 1
+		}
+	}, NULL, &context->default_frame.color_attachment_view);
+
+	vmaCreateImage(context->allocator, &(VkImageCreateInfo) {
+		.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
+		.pNext = NULL,
+		.flags = 0,
+		.imageType = VK_IMAGE_TYPE_2D,
+		.format = VK_FORMAT_D32_SFLOAT,
+		.extent = {
+			.width = context->default_frame.resolution.x,
+			.height = context->default_frame.resolution.y,
+			.depth = 1
+		},
+		.mipLevels = 1,
+		.arrayLayers = 1,
+		.samples = VK_SAMPLE_COUNT_1_BIT,
+		.tiling = VK_IMAGE_TILING_OPTIMAL,
+		.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
+		.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+		.queueFamilyIndexCount = 0,
+		.pQueueFamilyIndices = NULL,
+		.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED
+	}, &(VmaAllocationCreateInfo) {
+		.flags = VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT,
+		.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE,
+		.requiredFlags = 0,
+		.preferredFlags = 0,
+		.memoryTypeBits = 0,
+		.pool = VK_NULL_HANDLE,
+		.pUserData = NULL,
+		.priority = 0
+	}, &context->default_frame.depth_attachment, &context->default_frame.depth_attachment_memory, NULL);
+
+	vkCreateImageView(context->device, &(VkImageViewCreateInfo) {
+		.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+		.pNext = NULL,
+		.flags = 0,
+		.image = context->default_frame.depth_attachment,
+		.viewType = VK_IMAGE_VIEW_TYPE_2D,
+		.format = VK_FORMAT_D32_SFLOAT,
+		.components = {
+			.r = VK_COMPONENT_SWIZZLE_IDENTITY,
+			.g = VK_COMPONENT_SWIZZLE_IDENTITY,
+			.b = VK_COMPONENT_SWIZZLE_IDENTITY,
+			.a = VK_COMPONENT_SWIZZLE_IDENTITY
+		},
+		.subresourceRange = {
+			.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT,
+			.baseMipLevel = 0,
+			.levelCount = 1,
+			.baseArrayLayer = 0,
+			.layerCount = 1
+		}
+	}, NULL, &context->default_frame.depth_attachment_view);
+
+	vkCreateFramebuffer(context->device, &(VkFramebufferCreateInfo) {
+		.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
+		.pNext = NULL,
+		.flags = 0,
+		.renderPass = context->default_frame.render_pass,
+		.attachmentCount = 2,
+		.pAttachments = (VkImageView[]) { context->default_frame.color_attachment_view, context->default_frame.depth_attachment_view },
+		.width = context->default_frame.resolution.x,
+		.height = context->default_frame.resolution.y,
+		.layers = 1
+	}, NULL, &context->default_frame.framebuffer);
+
+	for (int i = 0; i < context->fif; i++) {
+		vkUpdateDescriptorSets(context->device, 1, (VkWriteDescriptorSet[]) {
+			{
+				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+				.pNext = NULL,
+				.dstSet = context->global_set[i],
+				.dstBinding = 0,
+				.dstArrayElement = 0,
+				.descriptorCount = 1,
+				.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+				.pImageInfo = &(VkDescriptorImageInfo) {
+					.sampler = context->nearest_sampler,
+					.imageView = context->default_frame.color_attachment_view,
+					.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+				},
+				.pBufferInfo = NULL,
+				.pTexelBufferView = NULL
+			},
+
+		}, 0, NULL);
+	}
+}
+
+void _ig_context_destroy_frame_data(ig_context* context) {
+	vkDestroyFramebuffer(context->device, context->default_frame.framebuffer, NULL);
+	vkDestroyImageView(context->device, context->default_frame.depth_attachment_view, NULL);
+	vmaDestroyImage(context->allocator, context->default_frame.depth_attachment, context->default_frame.depth_attachment_memory);
+	vkDestroyImageView(context->device, context->default_frame.color_attachment_view, NULL);
+	vmaDestroyImage(context->allocator, context->default_frame.color_attachment, context->default_frame.color_attachment_memory);
+	for (int i = context->swapchain_frame_count - 1; i >= 0; i--) {
+		vkDestroyFramebuffer(context->device, context->swapchain_frames[i].framebuffer, NULL);
+		vkDestroyImageView(context->device, context->swapchain_frames[i].color_attachment, NULL);
+	}
+	free(context->swapchain_frames);
+	vkDestroySwapchainKHR(context->device, context->swapchain, NULL);
+}
+
 VkShaderModule ig_context_create_shader_from_file(ig_context* context, const char* file_name) {
 	FILE* file = fopen(file_name, "rb");
 	if (!file) {
@@ -34,12 +233,14 @@ VkShaderModule ig_context_create_shader_from_file(ig_context* context, const cha
 	return r;
 }
 
-ig_context* ig_context_create(ig_window* window, const ig_ivec2* resolution, int vsync) {
+ig_context* ig_context_create(ig_window* window, float resolution, int vsync) {
 	ig_context* r = malloc(sizeof(ig_context));
 	r->gpu = VK_NULL_HANDLE;
 	r->fif = 2;
 	r->frame_idx = 0;
-	r->default_frame.resolution = *resolution;
+	r->default_frame.resolution.x = window->dim.x * resolution;
+	r->default_frame.resolution.y = window->dim.y * resolution;
+	r->global_set = malloc(r->fif * sizeof(VkDescriptorSet));
 
 	unsigned int extensions_count;
 	const char** instance_extensions = glfwGetRequiredInstanceExtensions(&extensions_count);
@@ -189,27 +390,6 @@ ig_context* ig_context_create(ig_window* window, const ig_ivec2* resolution, int
 
 	vkGetDeviceQueue(r->device, selected_queue, 0, &r->queue);
 
-	vkCreateSwapchainKHR(r->device, &(VkSwapchainCreateInfoKHR) {
-		.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
-		.pNext = NULL,
-		.flags = 0,
-		.surface = r->surface,
-		.minImageCount = capabilities.minImageCount + 1,
-		.imageFormat = r->surface_format.format,
-		.imageColorSpace = r->surface_format.colorSpace,
-		.imageExtent = r->surface_extent,
-		.imageArrayLayers = 1,
-		.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
-		.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,
-		.queueFamilyIndexCount = 1,
-		.pQueueFamilyIndices = &selected_queue,
-		.preTransform = capabilities.currentTransform,
-		.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
-		.presentMode = vsync ? VK_PRESENT_MODE_FIFO_KHR : VK_PRESENT_MODE_IMMEDIATE_KHR,
-		.clipped = VK_FALSE,
-		.oldSwapchain = VK_NULL_HANDLE
-	}, NULL, &r->swapchain);
-
 	vkCreateCommandPool(r->device, &(VkCommandPoolCreateInfo) {
 		.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
 		.pNext = NULL,
@@ -282,49 +462,6 @@ ig_context* ig_context_create(ig_window* window, const ig_ivec2* resolution, int
 		.dependencyCount = 0,
 		.pDependencies = NULL,
 	}, NULL, &r->swapchain_pass);
-
-	vkGetSwapchainImagesKHR(r->device, r->swapchain, &r->swapchain_frame_count, NULL);
-	VkImage* swapchain_images = malloc(r->swapchain_frame_count * sizeof(VkImage));
-	vkGetSwapchainImagesKHR(r->device, r->swapchain, &r->swapchain_frame_count, swapchain_images);
-
-	r->swapchain_frames = malloc(r->swapchain_frame_count * sizeof(_ig_swapchain_frame));
-
-	for (int i = 0; i < r->swapchain_frame_count; i++) {
-		vkCreateImageView(r->device, &(VkImageViewCreateInfo) {
-			.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
-			.pNext = NULL,
-			.flags = 0,
-			.image = swapchain_images[i],
-			.viewType = VK_IMAGE_VIEW_TYPE_2D,
-			.format = r->surface_format.format,
-			.components = {
-				.r = VK_COMPONENT_SWIZZLE_IDENTITY,
-				.g = VK_COMPONENT_SWIZZLE_IDENTITY,
-				.b = VK_COMPONENT_SWIZZLE_IDENTITY,
-				.a = VK_COMPONENT_SWIZZLE_IDENTITY
-			},
-			.subresourceRange = (VkImageSubresourceRange) {
-				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-				.baseMipLevel = 0,
-				.levelCount = 1,
-				.baseArrayLayer = 0,
-				.layerCount = 1
-			}
-		}, NULL, &r->swapchain_frames[i].color_attachment);
-
-		vkCreateFramebuffer(r->device, &(VkFramebufferCreateInfo) {
-			.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
-			.pNext = NULL,
-			.flags = 0,
-			.renderPass = r->swapchain_pass,
-			.attachmentCount = 1,
-			.pAttachments = &r->swapchain_frames[i].color_attachment,
-			.width = r->surface_extent.width,
-			.height = r->surface_extent.height,
-			.layers = 1
-		}, NULL, &r->swapchain_frames[i].framebuffer);
-	}
-	free(swapchain_images);
 
 	vkCreateDescriptorPool(r->device, &(VkDescriptorPoolCreateInfo) {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
@@ -452,19 +589,7 @@ ig_context* ig_context_create(ig_window* window, const ig_ivec2* resolution, int
 			.pNext = NULL,
 			.flags = 0,
 			.viewportCount = 1,
-			.pViewports = &(VkViewport) {
-				.x = 0.0f,
-				.y = 0.0f,
-				.width = (float) r->surface_extent.width,
-				.height = (float) r->surface_extent.height,
-				.minDepth = 0.0f,
-				.maxDepth = 1.0f
-			},
-			.scissorCount = 1,
-			.pScissors = &(VkRect2D) {
-				.offset = { .x = 0, .y = 0 },
-				.extent = r->surface_extent
-			}
+			.scissorCount = 1
 		},
 		.pRasterizationState = &(VkPipelineRasterizationStateCreateInfo) {
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
@@ -512,7 +637,16 @@ ig_context* ig_context_create(ig_window* window, const ig_ivec2* resolution, int
 			},
 			.blendConstants = { 0.0f, 0.0f, 0.0f, 0.0f }
 		},
-		.pDynamicState = NULL,
+		.pDynamicState = &(VkPipelineDynamicStateCreateInfo) {
+			.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
+			.pNext = NULL,
+			.flags = 0,
+			.dynamicStateCount = 2,
+			.pDynamicStates = (VkDynamicState[]) {
+				VK_DYNAMIC_STATE_VIEWPORT,
+				VK_DYNAMIC_STATE_SCISSOR
+			}
+		},
 		.layout = r->standard_layout,
 		.renderPass = r->swapchain_pass,
 		.subpass = 0,
@@ -609,124 +743,6 @@ ig_context* ig_context_create(ig_window* window, const ig_ivec2* resolution, int
 		},
 	}, NULL, &r->default_frame.render_pass);
 
-	vmaCreateImage(r->allocator, &(VkImageCreateInfo) {
-		.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
-		.pNext = NULL,
-		.flags = 0,
-		.imageType = VK_IMAGE_TYPE_2D,
-		.format = r->surface_format.format,
-		.extent = {
-			.width = r->default_frame.resolution.x,
-			.height = r->default_frame.resolution.y,
-			.depth = 1
-		},
-		.mipLevels = 1,
-		.arrayLayers = 1,
-		.samples = VK_SAMPLE_COUNT_1_BIT,
-		.tiling = VK_IMAGE_TILING_OPTIMAL,
-		.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
-		.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
-		.queueFamilyIndexCount = 0,
-		.pQueueFamilyIndices = NULL,
-		.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED
-	}, &(VmaAllocationCreateInfo) {
-		.flags = VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT,
-		.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE,
-		.requiredFlags = 0,
-		.preferredFlags = 0,
-		.memoryTypeBits = 0,
-		.pool = VK_NULL_HANDLE,
-		.pUserData = NULL,
-		.priority = 0
-	}, &r->default_frame.color_attachment, &r->default_frame.color_attachment_memory, NULL);
-
-	vkCreateImageView(r->device, &(VkImageViewCreateInfo) {
-		.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
-		.pNext = NULL,
-		.flags = 0,
-		.image = r->default_frame.color_attachment,
-		.viewType = VK_IMAGE_VIEW_TYPE_2D,
-		.format = r->surface_format.format,
-		.components = {
-			.r = VK_COMPONENT_SWIZZLE_IDENTITY,
-			.g = VK_COMPONENT_SWIZZLE_IDENTITY,
-			.b = VK_COMPONENT_SWIZZLE_IDENTITY,
-			.a = VK_COMPONENT_SWIZZLE_IDENTITY
-		},
-		.subresourceRange = {
-			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-			.baseMipLevel = 0,
-			.levelCount = 1,
-			.baseArrayLayer = 0,
-			.layerCount = 1
-		}
-	}, NULL, &r->default_frame.color_attachment_view);
-
-	vmaCreateImage(r->allocator, &(VkImageCreateInfo) {
-		.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
-		.pNext = NULL,
-		.flags = 0,
-		.imageType = VK_IMAGE_TYPE_2D,
-		.format = VK_FORMAT_D32_SFLOAT,
-		.extent = {
-			.width = r->default_frame.resolution.x,
-			.height = r->default_frame.resolution.y,
-			.depth = 1
-		},
-		.mipLevels = 1,
-		.arrayLayers = 1,
-		.samples = VK_SAMPLE_COUNT_1_BIT,
-		.tiling = VK_IMAGE_TILING_OPTIMAL,
-		.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
-		.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
-		.queueFamilyIndexCount = 0,
-		.pQueueFamilyIndices = NULL,
-		.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED
-	}, &(VmaAllocationCreateInfo) {
-		.flags = VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT,
-		.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE,
-		.requiredFlags = 0,
-		.preferredFlags = 0,
-		.memoryTypeBits = 0,
-		.pool = VK_NULL_HANDLE,
-		.pUserData = NULL,
-		.priority = 0
-	}, &r->default_frame.depth_attachment, &r->default_frame.depth_attachment_memory, NULL);
-
-	vkCreateImageView(r->device, &(VkImageViewCreateInfo) {
-		.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
-		.pNext = NULL,
-		.flags = 0,
-		.image = r->default_frame.depth_attachment,
-		.viewType = VK_IMAGE_VIEW_TYPE_2D,
-		.format = VK_FORMAT_D32_SFLOAT,
-		.components = {
-			.r = VK_COMPONENT_SWIZZLE_IDENTITY,
-			.g = VK_COMPONENT_SWIZZLE_IDENTITY,
-			.b = VK_COMPONENT_SWIZZLE_IDENTITY,
-			.a = VK_COMPONENT_SWIZZLE_IDENTITY
-		},
-		.subresourceRange = {
-			.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT,
-			.baseMipLevel = 0,
-			.levelCount = 1,
-			.baseArrayLayer = 0,
-			.layerCount = 1
-		}
-	}, NULL, &r->default_frame.depth_attachment_view);
-
-	vkCreateFramebuffer(r->device, &(VkFramebufferCreateInfo) {
-		.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
-		.pNext = NULL,
-		.flags = 0,
-		.renderPass = r->default_frame.render_pass,
-		.attachmentCount = 2,
-		.pAttachments = (VkImageView[]) { r->default_frame.color_attachment_view, r->default_frame.depth_attachment_view },
-		.width = r->default_frame.resolution.x,
-		.height = r->default_frame.resolution.y,
-		.layers = 1
-	}, NULL, &r->default_frame.framebuffer);
-
 	vkCreateSampler(r->device, &(VkSamplerCreateInfo) {
 		.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
 		.pNext = NULL,
@@ -773,29 +789,32 @@ ig_context* ig_context_create(ig_window* window, const ig_ivec2* resolution, int
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
 		.pNext = NULL,
 		.descriptorPool = r->descriptor_pool,
-		.descriptorSetCount = 1,
-		.pSetLayouts = &r->global_layout
-	}, &r->global_set);
+		.descriptorSetCount = 2,
+		.pSetLayouts = (VkDescriptorSetLayout[]) { r->global_layout, r->global_layout }
+	}, r->global_set);
 
-	vkUpdateDescriptorSets(r->device, 1, (VkWriteDescriptorSet[]) {
-		{
-			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-			.pNext = NULL,
-			.dstSet = r->global_set,
-			.dstBinding = 0,
-			.dstArrayElement = 0,
-			.descriptorCount = 1,
-			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			.pImageInfo = &(VkDescriptorImageInfo) {
-				.sampler = r->nearest_sampler,
-				.imageView = r->default_frame.color_attachment_view,
-				.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
-			},
-			.pBufferInfo = NULL,
-			.pTexelBufferView = NULL
-		},
+	vkCreateSwapchainKHR(r->device, &(VkSwapchainCreateInfoKHR) {
+		.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
+		.pNext = NULL,
+		.flags = 0,
+		.surface = r->surface,
+		.minImageCount = capabilities.minImageCount + 1,
+		.imageFormat = r->surface_format.format,
+		.imageColorSpace = r->surface_format.colorSpace,
+		.imageExtent = r->surface_extent,
+		.imageArrayLayers = 1,
+		.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+		.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,
+		.queueFamilyIndexCount = 1,
+		.pQueueFamilyIndices = &selected_queue,
+		.preTransform = capabilities.currentTransform,
+		.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
+		.presentMode = vsync ? VK_PRESENT_MODE_FIFO_KHR : VK_PRESENT_MODE_IMMEDIATE_KHR,
+		.clipped = VK_FALSE,
+		.oldSwapchain = VK_NULL_HANDLE
+	}, NULL, &r->swapchain);
 
-	}, 0, NULL);
+	_ig_context_create_frame_data(r);
 	
 	return r;
 }
@@ -813,13 +832,28 @@ void ig_context_begin(ig_context* context) {
 		.flags = 0,
 		.pInheritanceInfo = NULL
 	});
-	vkCmdBindDescriptorSets(current_frame->cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, context->standard_layout, 0, 1, &context->global_set, 0, NULL);
+	vkCmdSetViewport(current_frame->cmd_buffer, 0, 1, &(VkViewport) {
+		.x = 0.0f,
+		.y = 0.0f,
+		.width = (float) (context->default_frame.resolution.x),
+		.height = (float) (context->default_frame.resolution.y),
+		.minDepth = 0.0f,
+		.maxDepth = 1.0f
+	});
+	vkCmdSetScissor(current_frame->cmd_buffer, 0, 1, &(VkRect2D) {
+		.offset = { .x = 0, .y = 0 },
+		.extent = { 
+			.width = context->default_frame.resolution.x,
+			.height = context->default_frame.resolution.y
+		}
+	});
+	vkCmdBindDescriptorSets(current_frame->cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, context->standard_layout, 0, 1, &context->global_set[context->frame_idx], 0, NULL);
 }
 
 void ig_context_end(ig_context* context) {
 	_ig_frame* current_frame = context->frames + context->frame_idx;
 
-	vkCmdBindDescriptorSets(current_frame->cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, context->standard_layout, 0, 1, &context->global_set, 0, NULL);
+	vkCmdBindDescriptorSets(current_frame->cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, context->standard_layout, 0, 1, &context->global_set[context->frame_idx], 0, NULL);
 	vkCmdBindVertexBuffers(current_frame->cmd_buffer, 0, 1, &context->quad_buffer->buffer, (VkDeviceSize[]) { 0 });
 	vkCmdBeginRenderPass(current_frame->cmd_buffer, &(VkRenderPassBeginInfo) {
 		.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
@@ -881,16 +915,50 @@ void ig_context_finish(ig_context * context) {
 		vkWaitForFences(context->device, 1, &context->frames->frame_finished, VK_TRUE, UINT64_MAX);
 }
 
+void ig_context_resize(ig_context* context, ig_window* window, float resolution, int vsync) {
+	VkSurfaceCapabilitiesKHR capabilities;
+	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(context->gpu, context->surface, &capabilities);
+
+	if (capabilities.currentExtent.width == 0 || capabilities.currentExtent.height == 0)
+		return;
+
+	vkWaitForFences(context->device, 1, &context->frames[context->frame_idx].frame_finished, VK_TRUE, UINT64_MAX);
+	_ig_context_destroy_frame_data(context);
+	context->surface_extent = capabilities.currentExtent;
+	context->default_frame.resolution.x = window->dim.x * resolution;
+	context->default_frame.resolution.y = window->dim.y * resolution;
+
+	vkCreateSwapchainKHR(context->device, &(VkSwapchainCreateInfoKHR) {
+		.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
+		.pNext = NULL,
+		.flags = 0,
+		.surface = context->surface,
+		.minImageCount = capabilities.minImageCount + 1,
+		.imageFormat = context->surface_format.format,
+		.imageColorSpace = context->surface_format.colorSpace,
+		.imageExtent = context->surface_extent,
+		.imageArrayLayers = 1,
+		.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+		.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,
+		.queueFamilyIndexCount = 1,
+		.pQueueFamilyIndices = &context->queue_family,
+		.preTransform = capabilities.currentTransform,
+		.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
+		.presentMode = vsync ? VK_PRESENT_MODE_FIFO_KHR : VK_PRESENT_MODE_IMMEDIATE_KHR,
+		.clipped = VK_FALSE,
+		.oldSwapchain = VK_NULL_HANDLE
+	}, NULL, &context->swapchain);
+
+	_ig_context_create_frame_data(context);
+}
+
 void ig_context_destroy(ig_context* context) {
 	vkDestroySampler(context->device, context->linear_sampler, NULL);
 	vkDestroySampler(context->device, context->nearest_sampler, NULL);
 
 	// default frame:
-	vkDestroyFramebuffer(context->device, context->default_frame.framebuffer, NULL);
-	vkDestroyImageView(context->device, context->default_frame.depth_attachment_view, NULL);
-	vmaDestroyImage(context->allocator, context->default_frame.depth_attachment, context->default_frame.depth_attachment_memory);
-	vkDestroyImageView(context->device, context->default_frame.color_attachment_view, NULL);
-	vmaDestroyImage(context->allocator, context->default_frame.color_attachment, context->default_frame.color_attachment_memory);
+	_ig_context_destroy_frame_data(context);
+
 	vkDestroyRenderPass(context->device, context->default_frame.render_pass, NULL);
 	
 	vkDestroyFence(context->device, context->transfer_fence, NULL);
@@ -903,11 +971,7 @@ void ig_context_destroy(ig_context* context) {
 	vkDestroyDescriptorSetLayout(context->device, context->global_layout, NULL);
 	vkDestroyDescriptorPool(context->device, context->descriptor_pool, NULL);
 
-	for (int i = context->swapchain_frame_count - 1; i >= 0; i--) {
-		vkDestroyFramebuffer(context->device, context->swapchain_frames[i].framebuffer, NULL);
-		vkDestroyImageView(context->device, context->swapchain_frames[i].color_attachment, NULL);
-	}
-	free(context->swapchain_frames);
+	free(context->global_set);
 	vkDestroyRenderPass(context->device, context->swapchain_pass, NULL);
 	for (int i = context->fif - 1; i >= 0; i--) {
 		vkDestroyFence(context->device, context->frames[i].frame_finished, NULL);
@@ -916,7 +980,6 @@ void ig_context_destroy(ig_context* context) {
 	}
 	free(context->frames);
 	vkDestroyCommandPool(context->device, context->cmd_pool, NULL);
-	vkDestroySwapchainKHR(context->device, context->swapchain, NULL);
 	vkDestroyDevice(context->device, NULL);
 	vkDestroySurfaceKHR(context->instance, context->surface, NULL);
 	vkDestroyInstance(context->instance, NULL);

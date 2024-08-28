@@ -24,7 +24,7 @@ void title_screen(game* g) {
 
 	// renderer_flush(g->renderer);
 	// return;
-	renderer_start_imgui_frame(g->renderer);
+	// renderer_start_imgui_frame(g->renderer);
 	ImGuiStyle* style = igGetStyle();
 
 	if (g->respawn) {

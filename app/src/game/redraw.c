@@ -8,8 +8,6 @@
 #include "../external/cimgui/cimgui.h"
 
 void redraw(game* g, const input_data* input_data) {
-	renderer_start_imgui_frame(g->renderer);
-
 	float mww = g->icontext->default_frame.resolution.x;
 	float mhh = g->icontext->default_frame.resolution.y;
 	float mww2 = mww / 2;
@@ -102,29 +100,17 @@ void redraw(game* g, const input_data* input_data) {
 		food* fo = g->foods + i;
 		ig_vec3* col = g->config.color_groups + fo->cv;
 
-		if (g->settings_instance.big_food && fo->f < 60) continue;
+		if (g->config.big_food && fo->f < 68) continue;
 
 		if (fo->rx >= g->config.fpx1 && fo->ry >= g->config.fpy1 && fo->rx <= g->config.fpx2 && fo->ry <= g->config.fpy2) {
-			if (fo->rad == 1) {
-				float fx = mww2 + g->config.gsc * (fo->rx - g->config.view_xx) - g->config.gsc * ((fo->rad * fo->f2) * g->settings_instance.food_scale);
-				float fy = mhh2 + g->config.gsc * (fo->ry - g->config.view_yy) - g->config.gsc * ((fo->rad * fo->f2) * g->settings_instance.food_scale);
-				
-				renderer_push_food(g->renderer, &(food_instance) {
-					.circ = { .x = fx, .y = fy, .z = ((fo->rad * fo->f) * g->settings_instance.food_scale) * g->config.gsc },
-					.ratios = { .x = 0, .y = 1 },
-					.color = { .x = col->x, .y = col->y, .z = col->z, .w = 1 }
-				});
-			}
-			else {
-				float fx = mww2 + g->config.gsc * (fo->rx - g->config.view_xx) - g->config.gsc * ((fo->rad * fo->f2) * g->settings_instance.food_scale);
-				float fy = mhh2 + g->config.gsc * (fo->ry - g->config.view_yy) - g->config.gsc * ((fo->rad * fo->f2) * g->settings_instance.food_scale);
+			float fx = mww2 + g->config.gsc * (fo->rx - g->config.view_xx) - g->config.gsc * ((fo->rad * fo->f2) * g->settings_instance.food_scale);
+			float fy = mhh2 + g->config.gsc * (fo->ry - g->config.view_yy) - g->config.gsc * ((fo->rad * fo->f2) * g->settings_instance.food_scale);
 
-				renderer_push_food(g->renderer, &(food_instance) {
-					.circ = { .x = fx, .y = fy, .z = ((fo->rad * fo->f) * g->settings_instance.food_scale) * g->config.gsc },
-					.ratios = { .x = 0, .y = 1 },
-					.color = { .x = col->x, .y = col->y, .z = col->z, .w = 1 }
-				});
-			}
+			renderer_push_food(g->renderer, &(food_instance) {
+				.circ = { .x = fx, .y = fy, .z = ((fo->rad * fo->f) * g->settings_instance.food_scale) * g->config.gsc },
+				.ratios = { .x = 0, .y = 1 },
+				.color = { .x = col->x, .y = col->y, .z = col->z, .w = 1 }
+			});
 		}
 	}
 
@@ -148,24 +134,14 @@ void redraw(game* g, const input_data* input_data) {
 					py = mhh2 + g->config.gsc * (ty - g->config.view_yy);
 				}
 			}
-			if (pr->rad == 1) {
-				float fx = px - g->config.gsc * (pr->f2 * 1.2f);
-				float fy = py - g->config.gsc * (pr->f2 * 1.2f);
-				renderer_push_food(g->renderer, &(food_instance) {
-					.circ = { .x = fx, .y = fy, .z = g->config.gsc * (pr->f * 1.2f) },
-					.ratios = { .x = 0, .y = 1 },
-					.color = { .x = col->x + pr->blink * (1 - col->x), .y = col->y + pr->blink * (1 - col->y), .z = col->z + pr->blink * (1 - col->z), .w = pr->fr }
-				});
-			} else {
-				float fx = px - g->config.gsc * ((pr->f2 * pr->rad) * 1.2f);
-				float fy = py - g->config.gsc * ((pr->f2 * pr->rad) * 1.2f);
-				
-				renderer_push_food(g->renderer, &(food_instance) {
-					.circ = { .x = fx, .y = fy, .z = g->config.gsc * ((pr->f * pr->rad) * 1.2f) },
-					.ratios = { .x = 0, .y = 1 },
-					.color = { .x = col->x + pr->blink * (1 - col->x), .y = col->y + pr->blink * (1 - col->y), .z = col->z + pr->blink * (1 - col->z), .w = pr->fr }
-				});
-			}
+			float fx = px - g->config.gsc * ((pr->f2 * pr->rad) * 1.2f);
+			float fy = py - g->config.gsc * ((pr->f2 * pr->rad) * 1.2f);
+			
+			renderer_push_food(g->renderer, &(food_instance) {
+				.circ = { .x = fx, .y = fy, .z = g->config.gsc * ((pr->f * pr->rad) * 1.2f) },
+				.ratios = { .x = 0, .y = 1 },
+				.color = { .x = col->x + pr->blink * (1 - col->x), .y = col->y + pr->blink * (1 - col->y), .z = col->z + pr->blink * (1 - col->z), .w = pr->fr }
+			});
 		}
 	}
 

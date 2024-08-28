@@ -101,11 +101,11 @@ void hud(game* g, const input_data* input_data) {
 		renderer_set_map_data(g->renderer, g->config.mmdata);
 		ImDrawList_AddText_Vec2(draw_list,
 			(ImVec2) {
-				.x = mm_x - ll_txt_size.x, .y = (mm_y + mm_scaled / 2) - ll_txt_size.y / 2
+				.x = mm_x - ll_txt_size.x - rl_txt_size.x / 2, .y = (mm_y + mm_scaled / 2) - ll_txt_size.y / 2
 			}, igColorConvertFloat4ToU32((ImVec4) { 1, 1, 0, 1 }), mm_labels[0], NULL);
 		ImDrawList_AddText_Vec2(draw_list,
 			(ImVec2) {
-				.x = mm_x + mm_scaled, .y = (mm_y + mm_scaled / 2) - ll_txt_size.y / 2
+				.x = mm_x + mm_scaled + rl_txt_size.x / 2, .y = (mm_y + mm_scaled / 2) - ll_txt_size.y / 2
 			}, igColorConvertFloat4ToU32((ImVec4) { 1, 1, 0, 1 }), mm_labels[1], NULL);
 		ImDrawList_AddText_Vec2(draw_list,
 			(ImVec2) {

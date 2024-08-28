@@ -7,6 +7,7 @@
 #include "sprite_renderer.h"
 #include "text_renderer.h"
 #include "mm_renderer.h"
+#include <math/ig_mat4.h>
 
 typedef struct ImFont ImFont;
 
@@ -19,9 +20,13 @@ typedef enum {
 } renderer_font;
 
 typedef struct renderer {
+	struct {
+		ig_mat4 projection;
+	} global;
+
 	ig_context* context;
 	ig_buffer* quad_buffer;
-	ig_buffer* global_buffer;
+	ig_dbuffer* global_buffer;
 	bd_renderer* bd_renderer;
 	sprite_renderer* bg_renderer;
 	food_renderer* food_renderer;

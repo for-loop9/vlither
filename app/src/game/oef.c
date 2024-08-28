@@ -51,7 +51,7 @@ void oef(game* g, struct mg_connection* c, const input_data* input_data) {
 		if (input_data->k_pressed) {
 			g->config.assist = !g->config.assist;
 		} else if (input_data->b_pressed) {
-			g->settings_instance.big_food = !g->settings_instance.big_food;
+			g->config.big_food = !g->config.big_food;
 		} else if (input_data->p_pressed) {
 			g->config.player_names = !g->config.player_names;
 		} else if (input_data->s_pressed) {

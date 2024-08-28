@@ -2,6 +2,9 @@
 #include <string.h>
 #include "game.h"
 
+#define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
+#include "../external/cimgui/cimgui.h"
+
 message_queue message_queue_create() {
 	return (message_queue) {
 		.messages = ig_darray_create(message),
@@ -38,20 +41,20 @@ void message_queue_render(message_queue* msg_queue, game* g, float dt) {
 			}
 		}
 
-		int msg_len = strlen(msg->message) * 16;
+		ImGuiStyle* style = igGetStyle();
+		ImVec2 msg_txt_sz; igCalcTextSize(&msg_txt_sz, msg->message, NULL, false, 0);
+		int msg_len = msg_txt_sz.x;
 		int msg_x = g->icontext->default_frame.resolution.x / 2 - msg_len / 2;
 
-		renderer_push_sprite(g->renderer, &(sprite_instance) {
-			.rect = { .x = msg_x - 20, .y = (g->icontext->default_frame.resolution.y - 60) - msg_queue->y, .z = msg_len + 40, .w = 46  },
-			.ratios = { .x = 0, .y = 1 },
-			.uv_rect = { .x = 3 / 64.0f, .y = 3 / 64.0f, .z = 1 / 64.0f, .w = 1 / 64.0f },
-			.color = { .x = 0.2f, .y = 0.2f, .z = 0.2f, .w = 1 },
-		});
-		renderer_push_text(g->renderer, msg->message,
-			&(ig_vec3) {
-				.x = msg_x,
-				.y = (g->icontext->default_frame.resolution.y - 45) - msg_queue->y, .z = 14 },
-			&msg->color,
-			&(ig_vec3) {});
+		if (g->connected)
+			igSetNextWindowFocus();
+		
+		igSetNextWindowPos((ImVec2) { msg_x - 10, (g->icontext->default_frame.resolution.y - 60) - msg_queue->y }, ImGuiCond_None, (ImVec2) {});
+		igSetNextWindowSize((ImVec2) { msg_len + 20, 46 }, ImGuiCond_None);
+		igPushStyleColor_Vec4(ImGuiCol_WindowBg, (ImVec4) { .x = 0.2f, .y = 0.2f, .z = 0.2f, .w = 1 });
+		igBegin("message_win", NULL, ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
+		igTextColored((ImVec4) { msg->color.x, msg->color.y, msg->color.z, msg->color.w }, msg->message);
+		igEnd();
+		igPopStyleColor(1);
 	}
 }

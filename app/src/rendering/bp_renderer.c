@@ -106,22 +106,7 @@ bp_renderer* bp_renderer_create(ig_context* context, unsigned int max_instances)
 			.pNext = NULL,
 			.flags = 0,
 			.viewportCount = 1,
-			.pViewports = &(VkViewport) {
-				.x = 0.0f,
-				.y = 0.0f,
-				.width = (float) (context->default_frame.resolution.x),
-				.height = (float) (context->default_frame.resolution.y),
-				.minDepth = 0.0f,
-				.maxDepth = 1.0f
-			},
-			.scissorCount = 1,
-			.pScissors = &(VkRect2D) {
-				.offset = { .x = 0, .y = 0 },
-				.extent = { 
-					.width = context->default_frame.resolution.x,
-					.height = context->default_frame.resolution.y
-				}
-			}
+			.scissorCount = 1
 		},
 		.pRasterizationState = &(VkPipelineRasterizationStateCreateInfo) {
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
@@ -176,7 +161,16 @@ bp_renderer* bp_renderer_create(ig_context* context, unsigned int max_instances)
 			},
 			.blendConstants = { 0.0f, 0.0f, 0.0f, 0.0f }
 		},
-		.pDynamicState = NULL,
+		.pDynamicState = &(VkPipelineDynamicStateCreateInfo) {
+			.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
+			.pNext = NULL,
+			.flags = 0,
+			.dynamicStateCount = 2,
+			.pDynamicStates = (VkDynamicState[]) {
+				VK_DYNAMIC_STATE_VIEWPORT,
+				VK_DYNAMIC_STATE_SCISSOR
+			}
+		},
 		.layout = context->standard_layout,
 		.renderPass = context->default_frame.render_pass,
 		.subpass = 0,

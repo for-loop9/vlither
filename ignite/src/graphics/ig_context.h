@@ -63,14 +63,18 @@ typedef struct ig_context {
 	VkDescriptorPool descriptor_pool;
 	VkDescriptorSetLayout global_layout;
 	VkDescriptorSetLayout texture_layout;
-	VkDescriptorSet global_set;
+	VkDescriptorSet* global_set;
 } ig_context;
 
+void _ig_context_create_frame_data(ig_context* context);
+void _ig_context_destroy_frame_data(ig_context* context);
+
 VkShaderModule ig_context_create_shader_from_file(ig_context* context, const char* file_name);
-ig_context* ig_context_create(ig_window* window, const ig_ivec2* resolution, int vsync);
+ig_context* ig_context_create(ig_window* window, float resolution, int vsync);
 void ig_context_begin(ig_context* context);
 void ig_context_end(ig_context* context);
 void ig_context_finish(ig_context* context);
+void ig_context_resize(ig_context* context, ig_window* window, float resolution, int vsync);
 void ig_context_destroy(ig_context* context);
 
 #endif

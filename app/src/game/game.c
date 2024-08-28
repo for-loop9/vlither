@@ -4,6 +4,44 @@
 #include "prey.h"
 #include "title_screen.h"
 
+#define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
+#include "../external/cimgui/cimgui.h"
+
+bool igSpinner(const char* label, float radius, int thickness, float time, ImU32 color) {
+	ImGuiWindow* window = igGetCurrentWindow();
+	if (window->SkipItems)
+		return false;
+	
+	ImGuiStyle* style = igGetStyle();
+	ImGuiContext* ctx = igGetCurrentContext();
+	const ImGuiID id = ImGuiWindow_GetID_Str(window, label, NULL);
+	
+	ImVec2 pos = window->DC.CursorPos;
+	ImVec2 size = { (radius) * 2, (radius + style->FramePadding.y) * 2 };
+	
+	ImRect bb = { pos, (ImVec2) { pos.x + size.x, pos.y + size.y }};
+	igItemSize_Rect(bb, style->FramePadding.y);
+	if (!igItemAdd(bb, id, NULL, ImGuiItemFlags_None))
+		return false;
+	
+	ImDrawList_PathClear(window->DrawList);
+	
+	int num_segments = 30;
+	int start = abs(sinf(time * 1.8f) * (num_segments - 5));
+	
+	float a_min = PI * 2.0f * ((float) start)  / (float) num_segments;
+	float a_max = PI * 2.0f * ((float) num_segments - 3) / (float) num_segments;
+
+	ImVec2 centre = { pos.x + radius, pos.y + radius + style->FramePadding.y };
+	
+	for (int i = 0; i < num_segments; i++) {
+		const float a = a_min + ((float)i / (float)num_segments) * (a_max - a_min);
+		ImDrawList_PathLineTo(window->DrawList, (ImVec2) { centre.x + cosf(a + time * 8) * radius, centre.y + sinf(a + time * 8) * radius });
+	}
+
+	ImDrawList_PathStroke(window->DrawList, color, ImDrawFlags_None, thickness);
+}
+
 float luminance(ig_vec3 color) {
 	float r = (color.x <= 0.03928f) ? color.x / 12.92f : powf((color.x + 0.055f) / 1.055f, 2.4f);
 	float g = (color.y <= 0.03928f) ? color.y / 12.92f : powf((color.y + 0.055f) / 1.055f, 2.4f);
@@ -356,16 +394,29 @@ void create_game(int argc, char** argv) {
 		i++;
 	}
 
-	g.window = g.settings_instance.fullscreen ? ig_window_create(&(ig_ivec2) { .x = 1280, .y = 832 }, "vlither", 1, 0) : ig_window_create_asp(16.0f / 9.0f, "vlither");
+	
+	if (g.settings_instance.fullscreen) {
+		g.window = ig_window_create(&(ig_ivec2) { .x = 1280, .y = 832 }, "vlither", 1, 0);
+	} else {
+		if (g.settings_instance.window_size.x == 0 || g.settings_instance.window_size.y == 0) {
+			g.window = ig_window_create_asp(16.0f / 9.0f, "vlither");
+		} else {
+			g.window = ig_window_create(&g.settings_instance.window_size, "vlither", 0, 0);
+		}
+	}
+
+	g.window->last_dim.x = g.settings_instance.window_size.x;
+	g.window->last_dim.y = g.settings_instance.window_size.y;
+
 	g.keyboard = ig_keyboard_create(g.window);
 	g.mouse = ig_mouse_create(g.window);
-	g.icontext = ig_context_create(g.window, &(ig_ivec2) { .x = g.window->dim.x, .y = g.window->dim.y }, g.settings_instance.vsync);
+	g.icontext = ig_context_create(g.window, 1, g.settings_instance.vsync);
 
 	ig_texture* sprite_sheet = ig_context_texture_create_from_file(g.icontext, "app/res/textures/sprite_sheet.png");
 	ig_texture* font_sheet = ig_context_texture_create_from_file(g.icontext, "app/res/textures/font_sheet.png");
 	ig_texture* bg_tex = ig_context_texture_create_from_file(g.icontext, "app/res/textures/bg54.jpg");
 
-	g.renderer = renderer_create(&g, g.icontext, g.window, sprite_sheet, MAX_BP_RENDER, MAX_FOOD_RENDER, 128, font_sheet, bg_tex, 512);
+	g.renderer = renderer_create(&g, g.icontext, g.window, sprite_sheet, MAX_BP_RENDER, MAX_FOOD_RENDER, 128, font_sheet, bg_tex, 64);
 
 	input_data input_data = {};
 
@@ -380,6 +431,7 @@ void create_game(int argc, char** argv) {
 
 	while (!ig_window_closed(g.window) && !g.game_quit) {
 		ig_window_input(g.window);
+		renderer_start_imgui_frame(g.renderer);
 
 		input_data.mouse_pos = g.mouse->pos;
 		input_data.mouse_delta = g.mouse->delta;
@@ -394,6 +446,7 @@ void create_game(int argc, char** argv) {
 		input_data.h_pressed = ig_keyboard_key_pressed(g.keyboard, GLFW_KEY_H);
 		input_data.nine_pressed = ig_keyboard_key_pressed(g.keyboard, GLFW_KEY_9);
 		input_data.zero_pressed = ig_keyboard_key_pressed(g.keyboard, GLFW_KEY_0);
+		bool fullscreen_toggle = ig_keyboard_key_pressed(g.keyboard, GLFW_KEY_F11);
 		input_data.ctm = glfwGetTime() * 1000;
 		float ct = glfwGetTime();
 		dt = ct - pdt;
@@ -407,12 +460,12 @@ void create_game(int argc, char** argv) {
 			fps = 0;
 		}
 
+		ig_context_begin(g.icontext);
+		pthread_mutex_lock(&g.connecting_mutex);
 		pthread_mutex_lock(&g.msg_mutex);
 		message_queue_render(&g.msg_queue, &g, dt);
 		pthread_mutex_unlock(&g.msg_mutex);
 
-		ig_context_begin(g.icontext);
-		pthread_mutex_lock(&g.connecting_mutex);
 		if (g.connected) {
 			if (g.connecting) {
 				pthread_mutex_lock(&g.msg_mutex);
@@ -436,7 +489,11 @@ void create_game(int argc, char** argv) {
 			g.frame_write = 0;
 			pthread_mutex_unlock(&g.render_mutex);
 		} else if (g.connecting) {
-			renderer_start_imgui_frame(g.renderer);
+			igSetNextWindowPos((ImVec2) { .x = g.icontext->default_frame.resolution.x / 2 - 40, .y = g.icontext->default_frame.resolution.y / 2 - 40 }, ImGuiCond_None, (ImVec2) {});
+			igSetNextWindowSize((ImVec2) { .x = 80, .y = 80 }, ImGuiCond_None);
+			igBegin("loading_scr", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
+			igSpinner("##loader", 26, 6, glfwGetTime(), igColorConvertFloat4ToU32((ImVec4) { .x = 0, .y = 0.8f, .z = 0.5f, .w = 1 }));
+			igEnd();
 			renderer_flush(g.renderer);
 
 			if (load_et >= time_out) {
@@ -462,6 +519,21 @@ void create_game(int argc, char** argv) {
 		ig_keyboard_update(g.keyboard);
 		ig_mouse_update(g.mouse);
 		ig_context_end(g.icontext);
+
+		if (fullscreen_toggle) {
+			g.settings_instance.fullscreen = !g.settings_instance.fullscreen;
+			ig_window_set_fullscreen(g.window, g.settings_instance.fullscreen);
+		}
+
+		if (g.window->resize_requested) {
+			g.window->resize_requested = false;
+			g.icontext->frame_idx = (g.icontext->frame_idx - 1 + g.icontext->fif) % g.icontext->fif;
+			ig_context_resize(g.icontext, g.window, 1, g.settings_instance.vsync);
+			g.icontext->frame_idx = (g.icontext->frame_idx + 1) % g.icontext->fif;
+			g.settings_instance.window_size.x = g.window->last_dim.x;
+			g.settings_instance.window_size.y = g.window->last_dim.y;
+		}
+
 		fps++;
 	}
 

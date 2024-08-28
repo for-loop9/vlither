@@ -1,6 +1,5 @@
 #include "renderer.h"
 #include <graphics/ig_buffer.h>
-#include <math/ig_mat4.h>
 #include <stdlib.h>
 #include "../game/game.h"
 
@@ -66,13 +65,8 @@ renderer* renderer_create(game* g, ig_context* context, ig_window* window, const
 		1, 1,
 	};
 
-	struct {
-		ig_mat4 projection;
-	} global;
-	ig_mat4_ortho(&global.projection, 0, context->default_frame.resolution.x, context->default_frame.resolution.y, 0, 1, -1);
-
 	r->quad_buffer = ig_context_buffer_create(context, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, quad_data, sizeof(quad_data));
-	r->global_buffer = ig_context_buffer_create(context, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, &global, sizeof(global));
+	r->global_buffer = ig_context_dbuffer_create(context, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, NULL, sizeof(r->global));
 	r->bd_renderer = ig_bd_renderer_create(context, 1);
 	r->bg_renderer = sprite_renderer_create(context, bg_tex, 1);
 	r->food_renderer = food_renderer_create(context, max_foods);
@@ -81,22 +75,24 @@ renderer* renderer_create(game* g, ig_context* context, ig_window* window, const
 	r->text_renderer = text_renderer_create(context, font_sheet, max_chars);
 	r->mm_renderer = mm_renderer_create(context, 1);
 
-	vkUpdateDescriptorSets(context->device, 1, &(VkWriteDescriptorSet) {
-		.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-		.pNext = NULL,
-		.dstSet = context->global_set,
-		.dstBinding = 1,
-		.dstArrayElement = 0,
-		.descriptorCount = 1,
-		.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-		.pImageInfo = NULL,
-		.pBufferInfo = &(VkDescriptorBufferInfo) {
-			.buffer = r->global_buffer->buffer,
-			.offset = 0,
-			.range = VK_WHOLE_SIZE
-		},
-		.pTexelBufferView = NULL
-	}, 0, NULL);
+	for (int i = 0; i < context->fif; i++) {
+		vkUpdateDescriptorSets(context->device, 1, &(VkWriteDescriptorSet) {
+			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+			.pNext = NULL,
+			.dstSet = context->global_set[i],
+			.dstBinding = 1,
+			.dstArrayElement = 0,
+			.descriptorCount = 1,
+			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+			.pImageInfo = NULL,
+			.pBufferInfo = &(VkDescriptorBufferInfo) {
+				.buffer = r->global_buffer[i].buffer,
+				.offset = 0,
+				.range = VK_WHOLE_SIZE
+			},
+			.pTexelBufferView = NULL
+		}, 0, NULL);
+	}
 
 	imgui_init(g, context, window, r);
 	return r;
@@ -143,6 +139,9 @@ void renderer_push_text(renderer* renderer, const char* str, const ig_vec3* tran
 void renderer_flush(renderer* renderer) {
 	_ig_frame* frame = renderer->context->frames + renderer->context->frame_idx;
 
+	ig_mat4_ortho(&renderer->global.projection, 0, renderer->context->default_frame.resolution.x, renderer->context->default_frame.resolution.y, 0, 1, -1);
+	memcpy(renderer->global_buffer[renderer->context->frame_idx].data, &renderer->global, sizeof(renderer->global));
+
 	if (renderer->mm_renderer->curr_sz) {
 		mm_renderer_transfer_map(renderer->mm_renderer, renderer->context, frame);
 	}
@@ -187,7 +186,7 @@ void renderer_destroy(renderer* renderer) {
 	food_renderer_destroy(renderer->food_renderer, renderer->context);
 	sprite_renderer_destroy(renderer->bg_renderer, renderer->context);
 	ig_bd_renderer_destroy(renderer->bd_renderer, renderer->context);
-	ig_context_buffer_destroy(renderer->context, renderer->global_buffer);
+	ig_context_dbuffer_destroy(renderer->context, renderer->global_buffer);
 	ig_context_buffer_destroy(renderer->context, renderer->quad_buffer);	
 	free(renderer);
 }

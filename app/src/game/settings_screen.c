@@ -5,6 +5,13 @@
 #include "../external/cimgui/cimgui.h"
 #include "../networking/util.h"
 
+#define HOTKEY_INFO(key, description)\
+igAlignTextToFramePadding();\
+igPushFont(g->renderer->fonts[RENDERER_FONT_SMALL_BOLD]);\
+igText(key); igSameLine(0, -1);\
+igPopFont();\
+igText(description)\
+
 void settings_screen(game* g) {
 	ImGuiStyle* style = igGetStyle();
 	int sx = g->icontext->default_frame.resolution.x / 2 - 200;
@@ -29,8 +36,6 @@ void settings_screen(game* g) {
 	igText("Kill count");
 	igAlignTextToFramePadding();
 	igText("Zoom");
-	igAlignTextToFramePadding();
-	igText("Fullscreen");
 	igAlignTextToFramePadding();
 	igText("Instant gameover");
 	igNextColumn();
@@ -59,11 +64,7 @@ void settings_screen(game* g) {
 	float cx = igGetCursorPosX();
 	igSetCursorPosX(cx + (igGetColumnWidth(1) - style->WindowPadding.x - 5) - igGetFrameHeight());
 	if (igCheckbox("##vsync", &g->settings_instance.vsync)) {
-		message_queue_push(&g->msg_queue, (&(message) {
-			.message = "Restart program to apply changes.",
-			.tt = 2,
-			.color = { .x = 1, .y = 0.5f, .z = 0.3f, .w = 1 }
-		}));
+		g->window->resize_requested = true;
 	}
 	cx = igGetCursorPosX();
 	igSetCursorPosX(cx + (igGetColumnWidth(1) - style->WindowPadding.x - 5) - igGetFrameHeight());
@@ -85,19 +86,10 @@ void settings_screen(game* g) {
 	}
 	cx = igGetCursorPosX();
 	igSetCursorPosX(cx + (igGetColumnWidth(1) - style->WindowPadding.x - 5) - igGetFrameHeight());
-	if (igCheckbox("##fullscreen", &g->settings_instance.fullscreen)) {
-		message_queue_push(&g->msg_queue, (&(message) {
-			.message = "Restart program to apply changes.",
-			.tt = 2,
-			.color = { .x = 1, .y = 0.5f, .z = 0.3f, .w = 1 }
-		}));
-	}
-	cx = igGetCursorPosX();
-	igSetCursorPosX(cx + (igGetColumnWidth(1) - style->WindowPadding.x - 5) - igGetFrameHeight());
 	igCheckbox("##instant_gameover", &g->settings_instance.instant_gameover);
 
 	igColumns(1, NULL, false);
-	igSeparatorText("Player names (P)");
+	igSeparatorText("Player names");
 	igColumns(2, NULL, false);
 	igAlignTextToFramePadding();
 	igText("Font");
@@ -140,7 +132,7 @@ void settings_screen(game* g) {
 	}
 	igColumns(1, NULL, false);
 
-	igSeparatorText("Assist (K)");
+	igSeparatorText("Assist");
 	igColumns(2, NULL, false);
 	igAlignTextToFramePadding();
 	igText("Laser thickness");
@@ -175,14 +167,9 @@ void settings_screen(game* g) {
 	igColumns(2, NULL, false);
 	igAlignTextToFramePadding();
 	igText("Food scale");
-	igAlignTextToFramePadding();
-	igText("Big food only (B)");
 	igNextColumn();
 	igSetNextItemWidth(igGetColumnWidth(1) - style->WindowPadding.x - 5);
 	igSliderFloat("##food_scale", &g->settings_instance.food_scale, 0.5f, 2, "%.2f", ImGuiSliderFlags_None);
-	cx = igGetCursorPosX();
-	igSetCursorPosX(cx + (igGetColumnWidth(1) - style->WindowPadding.x - 5) - igGetFrameHeight());
-	igCheckbox("##big_food", &g->settings_instance.big_food);
 	igColumns(1, NULL, false);
 	igSeparatorText("Minimap");
 	igColumns(2, NULL, false);
@@ -203,6 +190,24 @@ void settings_screen(game* g) {
 	}
 	igSetNextItemWidth(igGetColumnWidth(1) - style->WindowPadding.x - 5);
 	igSliderFloat("##mm_scale", &g->settings_instance.mm_scale, 1, 3, "%.2f", ImGuiSliderFlags_None);
+	igEnd();
+
+	igSetNextWindowPos((ImVec2) { .x = g->icontext->default_frame.resolution.x / 4, .y = 0 }, ImGuiCond_None, (ImVec2) {});
+	igSetNextWindowSize((ImVec2) { .x = g->icontext->default_frame.resolution.x / 4, .y = g->icontext->default_frame.resolution.y }, ImGuiCond_None);
+	igBegin("hotkeys", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground);
+	igSeparatorText("Hotkeys");
+	
+	HOTKEY_INFO("(M)", "Zoom in");
+	HOTKEY_INFO("(N)", "Zoom out");
+	HOTKEY_INFO("(K)", "Assist");
+	HOTKEY_INFO("(F11)", "Fullscreen");
+	HOTKEY_INFO("(B)", "Big food only");
+	HOTKEY_INFO("(S)", "Shadows");
+	HOTKEY_INFO("(H)", "HUD");
+	HOTKEY_INFO("(P)", "Player names");
+	HOTKEY_INFO("(0)", "Respawn");
+	HOTKEY_INFO("(9)", "Quit");
+	
 	igEnd();
 
 	igSetNextWindowPos((ImVec2) { .x = g->icontext->default_frame.resolution.x - 150, .y = g->icontext->default_frame.resolution.y - 52 }, ImGuiCond_None, (ImVec2) {});

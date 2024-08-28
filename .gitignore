@@ -6,3 +6,9 @@
 
 # ignore build folder
 build/
+
+# ignore release
+release/
+
+# ignore zips
+*.zip

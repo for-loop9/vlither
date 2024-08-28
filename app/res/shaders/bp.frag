@@ -9,7 +9,6 @@ layout (location = 3) in float in_eye;
 void main() {
 	float l = length(out_uv * 2.0 - 1.0);
 	float f = 1.0 - l;
-	float oe = step(0.0, f);
 	float o = smoothstep(0, 0.07, f);
 	if (o == 0) discard;
     float shadow_strength = f * f * f;
@@ -21,7 +20,7 @@ void main() {
 	v *= 1.22 - 0.44 * out_uv.x / 7;
 
 	vec4 eye_col = out_color;
-	eye_col.a *= oe;
+	eye_col.a *= o;
 
 	color = mix(vec4(out_color.rgb * v, out_color.a * o), shadow_col, in_shadow);
 	color = mix(color, eye_col, in_eye);
