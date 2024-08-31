@@ -1,8 +1,6 @@
+![Vlither Logo](app/res/textures/logo.png)
 
-<h1 style="display: flex; align-items: center; margin: 0;">
-  Vlither
-  <img src="app/res/textures/logo.png" alt="Vlither Logo" style="width: 100px; height: 100px; margin-right: 10px; vertical-align: middle;">
-</h1>
+# Vlither
 ## A Desktop Client for Slither.io
 
 Vlither is a client for [Slither.io](https://slither.io) which can run outside the browser. It is written in C and uses Vulkan for rendering all the graphics, thus providing better CPU/GPU utilization and ridiculously fast rendering. A lot of the game-side code (particularly `callback.c`, `oef.c`, and `redraw.c`) is a word-for-word C translation of the original JavaScript client ([protocol version 14](https://slither.io/s/game06112461.js)). I have tested it on Windows (AMD and Intel) and Ubuntu (Intel).
