@@ -1,7 +1,7 @@
 
 <h1 style="display: flex; align-items: center;">
-  <img src="app/res/textures/logo.png" alt="Vlither Logo" style="width: 50px; height: 50px; margin-right: 10px;">
   Vlither
+  <img src="app/res/textures/logo.png" alt="Vlither Logo" style="width: 50px; height: 50px; margin-right: 10px;">
 </h1>
 ## A Desktop Client for Slither.io
 
