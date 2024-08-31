@@ -43,7 +43,7 @@ You may also work on the project with VS Code by opening the `.code-workspace` f
 - Server selection
 - Zoom
 - Low/high quality
-- Leader board
+- Leaderboard
 - Minimap
 - Kill count
 
