@@ -57,7 +57,7 @@ You may also work on the project with VS Code by opening the `.code-workspace` f
 The following libraries have been used to develop Vlither:
 
 - [GLFW](https://www.glfw.org) - For windowing and handling input.
-- Ignite - My own lightweight wrapper (sort of an engine?) over [Vulkan](https://vulkan.lunarg.com) for rendering fast 2D graphics.
+- [Ignite](ignite) - My own lightweight wrapper (sort of an engine?) over [Vulkan](https://vulkan.lunarg.com) for rendering fast 2D graphics.
 - [Mongoose](https://mongoose.ws) - For networking.
 - [Cimgui](https://github.com/cimgui/cimgui) - A C wrapper for [Dear ImGui](https://github.com/ocornut/imgui), a wonderful immediate mode UI library.
 - [STB Image](https://github.com/nothings/stb) - For loading images.
