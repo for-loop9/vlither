@@ -1,4 +1,4 @@
-![Vlither Logo](app/res/textures/logo.png)
+![Vlither Logo](app/res/textures/icon_l.png)
 
 # Vlither
 ## A Desktop Client for Slither.io
