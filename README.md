@@ -48,7 +48,6 @@ You may also work on the project with VS Code by opening the `.code-workspace` f
 - Kill count
 
 ## Planned
-- ~~Better skin rendering~~
 - Android
 - Mac
 
