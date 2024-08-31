@@ -9,7 +9,7 @@ void framebuffer_resize_callback(GLFWwindow* window, int width, int height) {
 	ud->window->resize_requested = true;
 }
 
-ig_window* ig_window_create_asp(float asp_ratio, const char* title) {
+ig_window* ig_window_create_asp(float asp_ratio, const char* title, const GLFWimage* icons, int icons_count) {
 	glfwInit();
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
@@ -33,6 +33,7 @@ ig_window* ig_window_create_asp(float asp_ratio, const char* title) {
 	r->last_dim.y = window_height;
 
 	r->native_handle = glfwCreateWindow(r->dim.x, r->dim.y, title, NULL, NULL);
+	if (icons) glfwSetWindowIcon(r->native_handle, icons_count, icons);
 	glfwSetWindowPos(r->native_handle, (vidmode->width / 2) - (r->dim.x / 2), (vidmode->height / 2) - (r->dim.y / 2));
 	glfwSetFramebufferSizeCallback(r->native_handle, framebuffer_resize_callback);
 	glfwSetWindowUserPointer(r->native_handle, &r->ud);
@@ -40,7 +41,7 @@ ig_window* ig_window_create_asp(float asp_ratio, const char* title) {
 	return r;
 }
 
-ig_window* ig_window_create(const ig_ivec2* dim, const char* title, int full_screen, int monitor) {
+ig_window* ig_window_create(const ig_ivec2* dim, const char* title, int full_screen, int monitor, const GLFWimage* icons, int icons_count) {
 	glfwInit();
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
@@ -56,6 +57,7 @@ ig_window* ig_window_create(const ig_ivec2* dim, const char* title, int full_scr
 	r->last_dim.y = r->dim.y;
 
 	r->native_handle = glfwCreateWindow(r->dim.x, r->dim.y, title, full_screen ? monitors[monitor] : NULL, NULL);
+	if (icons) glfwSetWindowIcon(r->native_handle, icons_count, icons);
 	glfwSetFramebufferSizeCallback(r->native_handle, framebuffer_resize_callback);
 	if (!full_screen)
 		glfwSetWindowPos(r->native_handle, (vidmode->width / 2) - (r->dim.x / 2), (vidmode->height / 2) - (r->dim.y / 2));

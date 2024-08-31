@@ -534,8 +534,8 @@ void client_callback(struct mg_connection* c, int ev, void* ev_data) {
 					float lvy = g->config.view_yy;
 					g->config.view_xx = o->xx + o->fx;
 					g->config.view_yy = o->yy + o->fy;
-					g->config.bgx2 -= (g->config.view_xx - lvx) * 1 / g->config.bgw2;
-					g->config.bgy2 -= (g->config.view_yy - lvy) * 1 / g->config.bgh2;
+					g->config.bgx2 -= (g->config.view_xx - lvx) * 1 / (float) g->bg_tex->dim.x;
+					g->config.bgy2 -= (g->config.view_yy - lvy) * 1 / (float) g->bg_tex->dim.y;
 					// g->config.bgx2 = fmod(g->config.bgx2, 1.0f);
 					// if (g->config.bgx2 < 0) g->config.bgx2 += 1;
 					// g->config.bgy2 = fmodf(g->config.bgy2, 1.0f);

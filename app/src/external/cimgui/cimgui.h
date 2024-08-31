@@ -4599,6 +4599,7 @@ CIMGUI_API void igImplGlfw_Shutdown(void);
 CIMGUI_API void igImplGlfw_NewFrame(void);
 CIMGUI_API bool igImplGlfw_InitForVulkan(GLFWwindow* window, bool install_callbacks);
 CIMGUI_API bool igImplVulkan_Init(ImGui_ImplVulkan_InitInfo* info);
+CIMGUI_API VkDescriptorSet igImplVulkan_AddTexture(VkSampler sampler,VkImageView image_view,VkImageLayout image_layout);
 CIMGUI_API void igImplVulkan_Shutdown(void);
 CIMGUI_API void igImplVulkan_NewFrame(void);
 CIMGUI_API void igImplVulkan_RenderDrawData(ImDrawData* draw_data,VkCommandBuffer command_buffer,VkPipeline pipeline);

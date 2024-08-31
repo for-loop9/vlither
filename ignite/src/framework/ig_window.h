@@ -23,8 +23,8 @@ typedef struct ig_window {
 	bool resize_requested;
 } ig_window;
 
-ig_window* ig_window_create_asp(float asp_ratio, const char* title);
-ig_window* ig_window_create(const ig_ivec2* dim, const char* title, int full_screen, int monitor);
+ig_window* ig_window_create_asp(float asp_ratio, const char* title, const GLFWimage* icons, int icons_count);
+ig_window* ig_window_create(const ig_ivec2* dim, const char* title, int full_screen, int monitor, const GLFWimage* icons, int icons_count);
 
 void ig_window_input(ig_window* window);
 void ig_window_set_fullscreen(ig_window* window, bool fullscreen);

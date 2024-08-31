@@ -9,6 +9,9 @@
 #include "../rendering/renderer.h"
 #include "message.h"
 
+#define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
+#include "../external/cimgui/cimgui.h"
+
 #define PROTOCOL_VERSION 14
 
 typedef struct prey prey;
@@ -16,6 +19,7 @@ typedef struct prey prey;
 #define PREY_SIZES 22
 #define MAX_BP_RENDER (10 * (32768 + 512))
 #define MAX_FOOD_RENDER (10 * 16384)
+#define VERSION_STR "v1.6"
 
 typedef struct input_data {
 	ig_vec2 mouse_pos;
@@ -190,8 +194,6 @@ typedef struct game {
 		float apy2;
 		float bgx2;
 		float bgy2;
-		float bgw2;
-		float bgh2;
 
 		// skin stuff:
 		ig_vec3 color_groups[40];
@@ -218,6 +220,8 @@ typedef struct game {
 	ig_mouse* mouse;
 	ig_context* icontext;
 	renderer* renderer;
+	ig_texture* bg_tex;
+	ImTextureID logo_tex_ptr;
 
 	int setting_skin;
 	int show_settings;

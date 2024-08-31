@@ -5453,6 +5453,9 @@ CIMGUI_API bool igImplGlfw_InitForVulkan(GLFWwindow* window, bool install_callba
 CIMGUI_API bool igImplVulkan_Init(ImGui_ImplVulkan_InitInfo* info) {
 	return ImGui_ImplVulkan_Init(info);
 }
+CIMGUI_API VkDescriptorSet igImplVulkan_AddTexture(VkSampler sampler,VkImageView image_view,VkImageLayout image_layout) {
+	return ImGui_ImplVulkan_AddTexture(sampler, image_view, image_layout);
+}
 CIMGUI_API void igImplVulkan_Shutdown(void) {
 	ImGui_ImplVulkan_Shutdown();
 }

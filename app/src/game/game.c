@@ -3,6 +3,7 @@
 #include "../networking/util.h"
 #include "prey.h"
 #include "title_screen.h"
+#include "external/stb/stb_image.h"
 
 #define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
 #include "../external/cimgui/cimgui.h"
@@ -184,8 +185,6 @@ void create_game(int argc, char** argv) {
 			.lfcv = -1,
 			.zoom = 0.9f * 18.0f / 14.0f,
 			.gsc = 0.9f * 18.0f / 14.0f,
-			.bgw2 = 599,
-			.bgh2 = 519,
 			.lag_mult = 1,
 
 			.color_groups = {
@@ -394,15 +393,27 @@ void create_game(int argc, char** argv) {
 		i++;
 	}
 
-	
-	if (g.settings_instance.fullscreen) {
-		g.window = ig_window_create(&(ig_ivec2) { .x = 1280, .y = 832 }, "vlither", 1, 0);
-	} else {
-		if (g.settings_instance.window_size.x == 0 || g.settings_instance.window_size.y == 0) {
-			g.window = ig_window_create_asp(16.0f / 9.0f, "vlither");
+	{
+		GLFWimage icons[3];
+		int channels;
+
+		icons[0].pixels = stbi_load("app/res/textures/icon_s.png", &icons[0].width, &icons[0].height, &channels, 4);
+		icons[1].pixels = stbi_load("app/res/textures/icon_m.png", &icons[1].width, &icons[1].height, &channels, 4);
+		icons[2].pixels = stbi_load("app/res/textures/icon_l.png", &icons[2].width, &icons[2].height, &channels, 4);
+		
+		if (g.settings_instance.fullscreen) {
+			g.window = ig_window_create(&(ig_ivec2) { .x = 1280, .y = 832 }, "vlither", 1, 0, icons, 3);
 		} else {
-			g.window = ig_window_create(&g.settings_instance.window_size, "vlither", 0, 0);
+			if (g.settings_instance.window_size.x == 0 || g.settings_instance.window_size.y == 0) {
+				g.window = ig_window_create_asp(16.0f / 9.0f, "vlither", icons, 3);
+			} else {
+				g.window = ig_window_create(&g.settings_instance.window_size, "vlither", 0, 0, icons, 3);
+			}
 		}
+
+		stbi_image_free(icons[0].pixels);
+		stbi_image_free(icons[1].pixels);
+		stbi_image_free(icons[2].pixels);
 	}
 
 	g.window->last_dim.x = g.settings_instance.window_size.x;
@@ -414,9 +425,11 @@ void create_game(int argc, char** argv) {
 
 	ig_texture* sprite_sheet = ig_context_texture_create_from_file(g.icontext, "app/res/textures/sprite_sheet.png");
 	ig_texture* font_sheet = ig_context_texture_create_from_file(g.icontext, "app/res/textures/font_sheet.png");
-	ig_texture* bg_tex = ig_context_texture_create_from_file(g.icontext, "app/res/textures/bg54.jpg");
+	g.bg_tex = ig_context_texture_create_from_file(g.icontext, "app/res/textures/background.jpg");
+	ig_texture* logo_tex = ig_context_texture_create_from_file(g.icontext, "app/res/textures/logo.png");
 
-	g.renderer = renderer_create(&g, g.icontext, g.window, sprite_sheet, MAX_BP_RENDER, MAX_FOOD_RENDER, 128, font_sheet, bg_tex, 64);
+	g.renderer = renderer_create(&g, g.icontext, g.window, sprite_sheet, MAX_BP_RENDER, MAX_FOOD_RENDER, 128, font_sheet, g.bg_tex, 64);
+	g.logo_tex_ptr = igImplVulkan_AddTexture(g.icontext->nearest_sampler, logo_tex->view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
 	input_data input_data = {};
 
@@ -552,7 +565,8 @@ void create_game(int argc, char** argv) {
 	ig_context_finish(g.icontext);
 
 	renderer_destroy(g.renderer);
-	ig_context_texture_destroy(g.icontext, bg_tex);
+	ig_context_texture_destroy(g.icontext, logo_tex);
+	ig_context_texture_destroy(g.icontext, g.bg_tex);
 	ig_context_texture_destroy(g.icontext, font_sheet);
 	ig_context_texture_destroy(g.icontext, sprite_sheet);
 	message_queue_destroy(&g.msg_queue);

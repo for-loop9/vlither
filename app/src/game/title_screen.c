@@ -51,14 +51,18 @@ void title_screen(game* g) {
 		} else if (g->show_settings) {
 			settings_screen(g);
 		} else {
-			int logo_len = 7 * 16 * 4;
+			int logo_len = 400;// 7 * 16 * 4;
 			int logo_pos = g->icontext->default_frame.resolution.x / 2 - (logo_len) / 2;
 
-			renderer_push_text(g->renderer, "Vlither", &(ig_vec3) {.x = logo_pos, .y = 100, .z = 14 * 4 }, & (ig_vec4) { .x = 0, .y = 0.8f, .z = 0.5f, .w = 1 }, & (ig_vec3) {});
+			// renderer_push_text(g->renderer, "Vlither", &(ig_vec3) {.x = logo_pos, .y = 100, .z = 14 * 4 }, & (ig_vec4) { .x = 0, .y = 0.8f, .z = 0.5f, .w = 1 }, & (ig_vec3) {});
 
-			igSetNextWindowPos((ImVec2) { .x = logo_pos + 30, .y = g->icontext->default_frame.resolution.y / 2 - 150 }, ImGuiCond_None, (ImVec2) {});
-			igSetNextWindowSize((ImVec2) { .x = logo_len - 60, .y = 300 }, ImGuiCond_None);
+			igSetNextWindowPos((ImVec2) { .x = logo_pos, .y = g->icontext->default_frame.resolution.y / 2 - 300 }, ImGuiCond_None, (ImVec2) {});
+			igSetNextWindowSize((ImVec2) { .x = logo_len, .y = 900 }, ImGuiCond_None);
 			igBegin("login", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoResize);
+			igSetCursorPosX(50);
+			igSetCursorPosY(0);
+			igImage(g->logo_tex_ptr, (ImVec2) { 300, 300 }, (ImVec2) { 0, 0 }, (ImVec2) { 1, 1 }, (ImVec4) { 1, 1, 1, 1 }, (ImVec4) { 0, 0, 0, 0 });
+			igSetCursorPosY(300);
 
 			bool did_play = g->config.length_display != 0;
 			
@@ -68,7 +72,7 @@ void title_screen(game* g) {
 				
 				igPushFont(g->renderer->fonts[RENDERER_FONT_MED]);
 				ImVec2 txt_size; igCalcTextSize(&txt_size, buff, NULL, false, 0);
-				igSetCursorPosX(((logo_len - 60) - txt_size.x) / 2);
+				igSetCursorPosX(((logo_len) - txt_size.x) / 2);
 				// highscore
 				igText("Length:"); igSameLine(0, -1);
 				igPopFont();
@@ -79,7 +83,7 @@ void title_screen(game* g) {
 				igPushFont(g->renderer->fonts[RENDERER_FONT_MED]);
 				sprintf(buff, "Kills: %d", g->config.kills_display);
 				igCalcTextSize(&txt_size, buff, NULL, false, 0);
-				igSetCursorPosX(((logo_len - 60) - txt_size.x) / 2);
+				igSetCursorPosX(((logo_len) - txt_size.x) / 2);
 				// highscore
 				igText("Kills:"); igSameLine(0, -1);
 				igPopFont();
@@ -137,6 +141,17 @@ void title_screen(game* g) {
 			}
 			igPopStyleColor(3);
 			igEnd();
+
+			igPushFont(g->renderer->fonts[RENDERER_FONT_SMALL]);
+			ImVec2 version_txt_size; igCalcTextSize(&version_txt_size, VERSION_STR, NULL, false, 0);
+			igSetNextWindowPos((ImVec2) { g->icontext->default_frame.resolution.x - version_txt_size.x - 4, g->icontext->default_frame.resolution.y - version_txt_size.y }, ImGuiCond_None, (ImVec2) { 0, 0 });
+			igSetNextWindowSize((ImVec2) { version_txt_size.x, version_txt_size.y }, ImGuiCond_None);
+			igBegin("version_win", NULL, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
+			igSetCursorPosX(0);
+			igSetCursorPosY(0);
+			igTextColored((ImVec4) { 0.196f, 0.706f, 0.431f, 1 }, VERSION_STR);
+			igEnd();
+			igPopFont();
 		}
 	}
 

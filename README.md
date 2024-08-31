@@ -6,7 +6,7 @@ Vlither is a client for [Slither.io](https://slither.io) which can run outside t
 
 ### Running Instructions
 No dependencies are required to run the program. If your GPU supports at least Vulkan 1.0 (**no** features or extensions are used), you're good to go.
-- Download the latest [release](https://github.com/for-loop9/vlither/releases/tag/1.5).
+- Download the latest [release](https://github.com/for-loop9/vlither/releases/tag/1.6).
 - Enjoy!
 
 ### Build Instructions

@@ -20,7 +20,7 @@ void set_skin(game* g) {
 	renderer_push_bg(g->renderer, &(sprite_instance) {
 		.rect = { 0, 0, g->icontext->default_frame.resolution.x, g->icontext->default_frame.resolution.y },
 		.ratios = { .x = 0, .y = 1 },
-		.uv_rect = { .x = -1 * glfwGetTime() * 0.15f, .y = 0, .z = (g->icontext->default_frame.resolution.x / g->config.bgw2), .w = (g->icontext->default_frame.resolution.y / g->config.bgh2) },
+		.uv_rect = { .x = -1 * glfwGetTime() * 0.15f, .y = 0, .z = (g->icontext->default_frame.resolution.x / (float) g->bg_tex->dim.x), .w = (g->icontext->default_frame.resolution.y / (float) g->bg_tex->dim.y) },
 		.color = { .x = 1, .y = 1, .z = 1, .w = 1 }
 	});
 

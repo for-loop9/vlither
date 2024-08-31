@@ -12,7 +12,8 @@
 		"makefile.configureOnOpen": true,
 		"files.associations": {
 			"random": "c",
-			"title_screen.h": "c"
+			"title_screen.h": "c",
+			"cimgui.h": "c"
 		},
 	},
 	"tasks": {

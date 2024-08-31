@@ -65,8 +65,8 @@ void redraw(game* g, const input_data* input_data) {
 		g->config.apy2 = g->config.view_yy + (mhh2 / g->config.gsc + 210);
 	}
 
-	g->config.bgx2 -= (g->config.view_xx - lvx) * 1 / g->config.bgw2;
-	g->config.bgy2 -= (g->config.view_yy - lvy) * 1 / g->config.bgh2;
+	g->config.bgx2 -= (g->config.view_xx - lvx) * 1 / (float) g->bg_tex->dim.x;
+	g->config.bgy2 -= (g->config.view_yy - lvy) * 1 / (float) g->bg_tex->dim.y;
 
 	float grd = g->config.grd;
 	
@@ -87,10 +87,10 @@ void redraw(game* g, const input_data* input_data) {
 		},
 		.ratios = { .x = 0, .y = 1 },
 		.uv_rect = {
-			.x = (((-mww / g->config.bgw2) / 2) / g->config.gsc) - g->config.bgx2,
-			.y = (((-mhh / g->config.bgh2) / 2) / g->config.gsc) - g->config.bgy2,
-			.z = (mww / g->config.bgw2) / g->config.gsc,
-			.w = (mhh / g->config.bgh2) / g->config.gsc },
+			.x = (((-mww / g->bg_tex->dim.x) / 2) / g->config.gsc) - g->config.bgx2,
+			.y = (((-mhh / g->bg_tex->dim.y) / 2) / g->config.gsc) - g->config.bgy2,
+			.z = (mww / g->bg_tex->dim.x) / g->config.gsc,
+			.w = (mhh / g->bg_tex->dim.y) / g->config.gsc },
 		.color = { .x = 1 * (1 - g->settings_instance.black_bg), .y = 1 * (1 - g->settings_instance.black_bg), .z = 1 * (1 - g->settings_instance.black_bg), .w = 1 }
 	});
 
