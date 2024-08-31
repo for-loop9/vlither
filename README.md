@@ -1,4 +1,4 @@
-![Vlither Logo](app/res/textures/icon_l.png)
+<img src="app/res/textures/logo.png" alt="Vlither Logo" width="50" height="50">
 
 # Vlither
 ## A Desktop Client for Slither.io
