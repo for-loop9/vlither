@@ -39,7 +39,7 @@ You may also work on the project with VS Code by opening the `.code-workspace` f
 ## Features
 
 - Supports all 66 skins
-- Custom skins
+- Custom skin
 - Server selection
 - Zoom
 - Low/high quality
@@ -48,25 +48,25 @@ You may also work on the project with VS Code by opening the `.code-workspace` f
 - Kill count
 
 ## Planned
-- Android
 - Mac
+- Android
 
 ## Tools Used
 
 The following libraries have been used to develop Vlither:
 
 - [GLFW](https://www.glfw.org) - For windowing and handling input.
-- [Ignite](ignite) - My own lightweight wrapper (sort of an engine?) over [Vulkan](https://vulkan.lunarg.com) for rendering fast 2D graphics.
+- [Ignite](./ignite) - My own lightweight wrapper (sort of an engine?) over [Vulkan](https://vulkan.lunarg.com) for rendering fast 2D graphics.
 - [Mongoose](https://mongoose.ws) - For networking.
 - [Cimgui](https://github.com/cimgui/cimgui) - A C wrapper for [Dear ImGui](https://github.com/ocornut/imgui), a wonderful immediate mode UI library.
 - [STB Image](https://github.com/nothings/stb) - For loading images.
 - [VMA (Vulkan Memory Allocator)](https://gpuopen.com/vulkan-memory-allocator) - For memory management in Vulkan.
 
 ## Gallery
-![Image 0](gallery/ss3.png)
-![Image 1](gallery/ss0.png)
-![Image 2](gallery/ss1.png)
-![Image 3](gallery/ss2.png)
+![Image 0](./gallery/ss3.png)
+![Image 1](./gallery/ss0.png)
+![Image 2](./gallery/ss1.png)
+![Image 3](./gallery/ss2.png)
 
 ## License
 This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](./LICENSE) file for details.
