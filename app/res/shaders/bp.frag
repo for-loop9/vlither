@@ -8,11 +8,11 @@ layout (location = 3) in float in_eye;
 
 void main() {
 	float l = length(out_uv * 2.0 - 1.0);
-	float f = 1.0 - l;
+	float f = (1.0 - l);
 	float o = smoothstep(0, 0.07, f);
 	if (o == 0) discard;
     float shadow_strength = f * f * f;
-	vec4 shadow_col = vec4(0, 0, 0, out_color.a) * (f + shadow_strength);
+	vec4 shadow_col = out_color * (f + shadow_strength);
 
 	float v = pow(max(0, min(1, 1 - abs(out_uv.y - 0.5) / 0.5)), .35);
 	float v2 = 1 - (l / 2);

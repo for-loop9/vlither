@@ -40,6 +40,8 @@ void redraw(game* g, const input_data* input_data) {
 	float lvy = g->config.view_yy;
 
 	if (!g->snake_null) { // snake != NULL
+		g->config.snake_lx = g->os.snakes[0].xx + g->os.snakes[0].fx;
+		g->config.snake_ly = g->os.snakes[0].yy + g->os.snakes[0].fy;
 		if (g->config.fvtg > 0) {
 			g->config.fvtg--;
 			g->config.fvx = g->config.fvxs[g->config.fvpos];
@@ -49,21 +51,22 @@ void redraw(game* g, const input_data* input_data) {
 			g->config.fvpos++;
 			if (g->config.fvpos >= VFC) g->config.fvpos = 0;
 		}
-		g->config.view_xx = g->os.snakes[0].xx + g->os.snakes[0].fx + g->config.fvx;
-		g->config.view_yy = g->os.snakes[0].yy + g->os.snakes[0].fy + g->config.fvy;
-		g->config.bpx1 = g->config.view_xx - (mww2 / g->config.gsc + 84);
-		g->config.bpy1 = g->config.view_yy - (mhh2 / g->config.gsc + 84);
-		g->config.bpx2 = g->config.view_xx + (mww2 / g->config.gsc + 84);
-		g->config.bpy2 = g->config.view_yy + (mhh2 / g->config.gsc + 84);
-		g->config.fpx1 = g->config.view_xx - (mww2 / g->config.gsc + 24);
-		g->config.fpy1 = g->config.view_yy - (mhh2 / g->config.gsc + 24);
-		g->config.fpx2 = g->config.view_xx + (mww2 / g->config.gsc + 24);
-		g->config.fpy2 = g->config.view_yy + (mhh2 / g->config.gsc + 24);
-		g->config.apx1 = g->config.view_xx - (mww2 / g->config.gsc + 210);
-		g->config.apy1 = g->config.view_yy - (mhh2 / g->config.gsc + 210);
-		g->config.apx2 = g->config.view_xx + (mww2 / g->config.gsc + 210);
-		g->config.apy2 = g->config.view_yy + (mhh2 / g->config.gsc + 210);
 	}
+	
+	g->config.view_xx = g->config.snake_lx + g->config.fvx;
+	g->config.view_yy = g->config.snake_ly + g->config.fvy;
+	g->config.bpx1 = g->config.view_xx - (mww2 / g->config.gsc + 84);
+	g->config.bpy1 = g->config.view_yy - (mhh2 / g->config.gsc + 84);
+	g->config.bpx2 = g->config.view_xx + (mww2 / g->config.gsc + 84);
+	g->config.bpy2 = g->config.view_yy + (mhh2 / g->config.gsc + 84);
+	g->config.fpx1 = g->config.view_xx - (mww2 / g->config.gsc + 24);
+	g->config.fpy1 = g->config.view_yy - (mhh2 / g->config.gsc + 24);
+	g->config.fpx2 = g->config.view_xx + (mww2 / g->config.gsc + 24);
+	g->config.fpy2 = g->config.view_yy + (mhh2 / g->config.gsc + 24);
+	g->config.apx1 = g->config.view_xx - (mww2 / g->config.gsc + 210);
+	g->config.apy1 = g->config.view_yy - (mhh2 / g->config.gsc + 210);
+	g->config.apx2 = g->config.view_xx + (mww2 / g->config.gsc + 210);
+	g->config.apy2 = g->config.view_yy + (mhh2 / g->config.gsc + 210);
 
 	g->config.bgx2 -= (g->config.view_xx - lvx) * 1 / (float) g->bg_tex->dim.x;
 	g->config.bgy2 -= (g->config.view_yy - lvy) * 1 / (float) g->bg_tex->dim.y;
@@ -282,25 +285,44 @@ void redraw(game* g, const input_data* input_data) {
 			} else g->config.pbu[bp] = 0;
 			bp++;
 
-			float v = (1 - o->dead_amt) * o->alive_amt;
-			float snake_z = 1 - (i / (float) snakes_len);
+			float v = o->alive_amt * (1 - o->dead_amt);
+			v *= v;
+
+			if (o->tsp > o->fsp && g->config.show_boost) {
+				float m = o->alive_amt * (1 - o->dead_amt) * fmaxf(0, fminf(1, (o->tsp - o->ssp) / (g->config.nsp3 - o->ssp)));
+				float om = m * 0.37f;
+				float mr = powf(m, 0.5f);
+				float glsz = (1.5f * g->config.gsc * lsz * (1 + (62.0f / 32 - 1) * mr)) * 0.9f;
+				float dj = 4;
+
+				for (int j = bp - 1; j >= 0; j--) {
+					if (g->config.pbu[j] == 2) {
+						px = (mww2 + ((g->config.pbx[j] - g->config.view_xx) * g->config.gsc));
+						py = (mhh2 + ((g->config.pby[j] - g->config.view_yy) * g->config.gsc));
+						float a = v * mr * .38 * (.6 + .4 * cosf(j / dj - 1.15f * o->sfr));
+						renderer_push_bp(g->renderer, &(bp_instance) {
+							.circ = { .x = px - glsz, .y = py - glsz, .z = 0, .w = glsz * 2 },
+							.ratios = { .x = 0, .y = 1 },
+							.color = { .x = 1, .y = 1, .z = 1, .w = a },
+							.shadow = 1
+						});
+					}
+				}
+			}
 
 			for (int j = bp - 1; j >= 0; j--) {
 				if (g->config.pbu[j] >= 1) {
-					if (j >= 4) {
-						int k = j - 4;
-						if (g->config.pbu[k] == 2) {
-							float shsz = (g->config.gsc * lsz * 62.0f / 32.0f) * 0.75f;
-							px = (mww2 + ((g->config.pbx[k] - g->config.view_xx) * g->config.gsc));
-							py = (mhh2 + ((g->config.pby[k] - g->config.view_yy) * g->config.gsc));
+					if (j >= 1 && g->config.pbu[j - 1] == 2) {
+						float shsz = (g->config.gsc * lsz * 62.0f / 32.0f) * 0.75f;
+						px = (mww2 + ((g->config.pbx[j - 1] - g->config.view_xx) * g->config.gsc));
+						py = (mhh2 + ((g->config.pby[j - 1] - g->config.view_yy) * g->config.gsc));
 
-							renderer_push_bp(g->renderer, &(bp_instance) {
-								.circ = { .x = px - shsz, .y = py - shsz, .z = 1 - snake_z, .w = shsz * 2 },
-								.ratios = { .x = 0, .y = 1 },
-								.color = { .x = 0, .y = 0, .z = 0, .w = g->config.shadow * 0.9f * v },
-								.shadow = 1
-							});
-						}
+						renderer_push_bp(g->renderer, &(bp_instance) {
+							.circ = { .x = px - shsz, .y = py - shsz, .z = 1 - 0, .w = shsz * 2 },
+							.ratios = { .x = 0, .y = 1 },
+							.color = { .x = 0, .y = 0, .z = 0, .w = g->config.shadow * 0.9f * v },
+							.shadow = 1
+						});
 					}
 
 					ig_vec3* col = g->config.color_groups + o->skin_data[j % o->skin_data_len];
@@ -309,7 +331,7 @@ void redraw(game* g, const input_data* input_data) {
 					py = mhh2 + ((g->config.pby[j] - g->config.view_yy) * g->config.gsc);
 
 					renderer_push_bp(g->renderer, &(bp_instance) {
-						.circ = { .x = px + (-g->config.gsc * lsz), .y = py + (-g->config.gsc * lsz), .z = 1 - snake_z, .w = g->config.gsc * 2 * lsz },
+						.circ = { .x = px + (-g->config.gsc * lsz), .y = py + (-g->config.gsc * lsz), .z = 1 - 0, .w = g->config.gsc * 2 * lsz },
 						.ratios = { .x = sinf(g->config.pba[j]), .y = cosf(g->config.pba[j]) },
 						.color = { .x = col->x, .y = col->y, .z = col->z, .w = v },
 						.shadow = 0,
@@ -339,7 +361,7 @@ void redraw(game* g, const input_data* input_data) {
 				.circ = {
 					.x = (mww2 + (ex + hx - g->config.view_xx) * g->config.gsc) - rd2 / 2,
 					.y = (mhh2 + (ey + hy - g->config.view_yy) * g->config.gsc) - rd2 / 2,
-					.z = (1 - snake_z),
+					.z = (1 - 0),
 					.w = rd2
 				},
 				.ratios = { .x = 0, .y = 1 },
@@ -355,7 +377,7 @@ void redraw(game* g, const input_data* input_data) {
 				.circ = {
 					.x = (mww2 + (ex + hx - g->config.view_xx) * g->config.gsc) - rd2 / 2,
 					.y = (mhh2 + (ey + hy - g->config.view_yy) * g->config.gsc) - rd2 / 2,
-					.z = (1 - snake_z),
+					.z = (1 - 0),
 					.w = rd2
 				},
 				.ratios = { .x = 0, .y = 1 },
@@ -374,7 +396,7 @@ void redraw(game* g, const input_data* input_data) {
 				.circ = {
 					.x = (mww2 + (ex + hx - g->config.view_xx) * g->config.gsc) - rd2 / 2,
 					.y = (mhh2 + (ey + hy - g->config.view_yy) * g->config.gsc) - rd2 / 2,
-					.z = (1 - snake_z),
+					.z = (1 - 0),
 					.w = rd2
 				},
 				.ratios = { .x = 0, .y = 1 },
@@ -390,7 +412,7 @@ void redraw(game* g, const input_data* input_data) {
 				.circ = {
 					.x = (mww2 + (ex + hx - g->config.view_xx) * g->config.gsc) - rd2 / 2,
 					.y = (mhh2 + (ey + hy - g->config.view_yy) * g->config.gsc) - rd2 / 2,
-					.z = (1 - snake_z),
+					.z = (1 - 0),
 					.w = rd2
 				},
 				.ratios = { .x = 0, .y = 1 },

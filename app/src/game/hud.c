@@ -119,16 +119,17 @@ void hud(game* g, const input_data* input_data) {
 		igPopFont();
 
 		if (!g->snake_null) {
+			g->config.mmlx = mm_scaled * (g->os.snakes[0].xx / (g->config.grd * 2));
+			g->config.mmly = mm_scaled * (g->os.snakes[0].yy / (g->config.grd * 2));
 			g->config.length_display = floorf((g->config.fpsls[g->os.snakes[0].sct] + g->os.snakes[0].fam / g->config.fmlts[g->os.snakes[0].sct] - 1) * 15 - 5) / 1;
-
-			ig_vec2 player_pos_map = { .x = mm_scaled * (g->os.snakes[0].xx / (g->config.grd * 2)), .y = mm_scaled * (g->os.snakes[0].yy / (g->config.grd * 2)) };
-			renderer_push_sprite(g->renderer, &(sprite_instance) {
-				.rect = { .x = player_pos_map.x + mm_x - 3 , player_pos_map.y + mm_y - 3, 6, 6 },
-				.ratios = { .x = 0, .y = 1 },
-				.uv_rect = { .x = 0, .y = 0, .z = 6 / 64.0f, .w = 6 / 64.0f },
-				.color = { .x = 1, .y = 1, .z = 1, .w = 1 }
-			});
+			
 		}
+		renderer_push_sprite(g->renderer, &(sprite_instance) {
+			.rect = { .x = g->config.mmlx + mm_x - 3 , g->config.mmly + mm_y - 3, 6, 6 },
+			.ratios = { .x = 0, .y = 1 },
+			.uv_rect = { .x = 0, .y = 0, .z = 6 / 64.0f, .w = 6 / 64.0f },
+			.color = { .x = 1, .y = 1, .z = 1, .w = 1 }
+		});
 	}
 
 	char stats_buff[64] = {};

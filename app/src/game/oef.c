@@ -47,6 +47,19 @@ void oef(game* g, struct mg_connection* c, const input_data* input_data) {
 		}
 	}
 
+	if (g->settings_instance.enable_zoom) {
+		if (input_data->m_pressed) {
+			g->config.zoom -= 2 * 0.1f * g->config.gsc;
+		} else if (input_data->n_pressed) {
+			g->config.zoom += 2 * 0.1f * g->config.gsc;
+		}
+
+		g->config.zoom += input_data->mouse_dwheel * 0.1f * g->config.gsc;
+		g->config.zoom = fmaxf(0.1f, fminf(g->config.zoom, 8));
+
+		g->config.gsc += (g->config.zoom - g->config.gsc) * 0.09f * g->config.vfr;
+	}
+
 	if (!g->snake_null) {
 		if (input_data->k_pressed) {
 			g->config.assist = !g->config.assist;
@@ -58,24 +71,13 @@ void oef(game* g, struct mg_connection* c, const input_data* input_data) {
 			g->config.shadow = !g->config.shadow;
 		} else if (input_data->h_pressed) {
 			g->config.show_hud = !g->config.show_hud;
+		} else if (input_data->g_pressed) {
+			g->config.show_boost = !g->config.show_boost;
 		} else if (input_data->nine_pressed) {
 			g->network_done = 1;
 		} else if (input_data->zero_pressed) {
 			g->respawn = true;
 			g->network_done = 1;
-		}
-
-		if (g->settings_instance.enable_zoom) {
-			if (input_data->m_pressed) {
-				g->config.zoom -= 2 * 0.1f * g->config.gsc;
-			} else if (input_data->n_pressed) {
-				g->config.zoom += 2 * 0.1f * g->config.gsc;
-			}
-
-			g->config.zoom += input_data->mouse_dwheel * 0.1f * g->config.gsc;
-			g->config.zoom = fmaxf(0.1f, fminf(g->config.zoom, 8));
-
-			g->config.gsc += (g->config.zoom - g->config.gsc) * 0.09f * g->config.vfr;
 		}
 
 		g->config.wmd = input_data->btn_down;
@@ -132,6 +134,8 @@ void oef(game* g, struct mg_connection* c, const input_data* input_data) {
 					if (o->tsp < o->sp) o->tsp = o->sp;
 				}
 			}
+			if (o->tsp > o->fsp) o->sfr += (o->tsp - o->fsp) * g->config.vfr * 0.021f;
+			else o->sfr = 0;
 			if (o->fltg > 0) {
 				int k = g->config.vfrb * 4; // invisible tail fix
 				if (k > o->fltg) k = o->fltg;

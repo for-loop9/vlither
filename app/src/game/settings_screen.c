@@ -199,12 +199,13 @@ void settings_screen(game* g) {
 	
 	HOTKEY_INFO("(M)", "Zoom out");
 	HOTKEY_INFO("(N)", "Zoom in");
-	HOTKEY_INFO("(K)", "Assist");
-	HOTKEY_INFO("(F11)", "Fullscreen");
-	HOTKEY_INFO("(B)", "Big food only");
-	HOTKEY_INFO("(S)", "Shadows");
-	HOTKEY_INFO("(H)", "HUD");
-	HOTKEY_INFO("(P)", "Player names");
+	HOTKEY_INFO("(K)", "Toggle assist");
+	HOTKEY_INFO("(F11)", "Toggle fullscreen");
+	HOTKEY_INFO("(B)", "Toggle big food");
+	HOTKEY_INFO("(S)", "Toggle shadows");
+	HOTKEY_INFO("(H)", "Toggle HUD");
+	HOTKEY_INFO("(G)", "Toggle boost effect");
+	HOTKEY_INFO("(P)", "Toggle player names");
 	HOTKEY_INFO("(0)", "Respawn");
 	HOTKEY_INFO("(9)", "Quit");
 	

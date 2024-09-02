@@ -19,7 +19,7 @@ typedef struct prey prey;
 #define PREY_SIZES 22
 #define MAX_BP_RENDER (10 * (32768 + 512))
 #define MAX_FOOD_RENDER (10 * 16384)
-#define VERSION_STR "v1.6"
+#define VERSION_STR "v1.7"
 
 typedef struct input_data {
 	ig_vec2 mouse_pos;
@@ -33,6 +33,7 @@ typedef struct input_data {
 	bool p_pressed;
 	bool s_pressed;
 	bool h_pressed;
+	bool g_pressed;
 	bool nine_pressed;
 	bool zero_pressed;
 	float ctm;
@@ -194,6 +195,10 @@ typedef struct game {
 		float apy2;
 		float bgx2;
 		float bgy2;
+		float snake_lx;
+		float snake_ly;
+		float mmlx;
+		float mmly;
 
 		// skin stuff:
 		ig_vec3 color_groups[40];
@@ -210,6 +215,7 @@ typedef struct game {
 		bool shadow;
 		bool big_food;
 		bool show_hud;
+		bool show_boost;
 	} config;
 	
 	settings settings_instance;

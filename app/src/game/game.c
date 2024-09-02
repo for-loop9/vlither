@@ -164,6 +164,7 @@ void create_game(int argc, char** argv) {
 			.player_names = true,
 			.shadow = true,
 			.show_hud = true,
+			.show_boost = true,
 
 			.grd = -1,
 			.mscps = -1,
@@ -457,6 +458,7 @@ void create_game(int argc, char** argv) {
 		input_data.p_pressed = ig_keyboard_key_pressed(g.keyboard, GLFW_KEY_P);
 		input_data.s_pressed = ig_keyboard_key_pressed(g.keyboard, GLFW_KEY_S);
 		input_data.h_pressed = ig_keyboard_key_pressed(g.keyboard, GLFW_KEY_H);
+		input_data.g_pressed = ig_keyboard_key_pressed(g.keyboard, GLFW_KEY_G);
 		input_data.nine_pressed = ig_keyboard_key_pressed(g.keyboard, GLFW_KEY_9);
 		input_data.zero_pressed = ig_keyboard_key_pressed(g.keyboard, GLFW_KEY_0);
 		bool fullscreen_toggle = ig_keyboard_key_pressed(g.keyboard, GLFW_KEY_F11);
