@@ -1,0 +1,6 @@
+build/
+app/res/shaders/bin
+*.dat
+*.zip
+*.ini
+*.cache
