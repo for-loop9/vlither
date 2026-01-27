@@ -18,10 +18,48 @@ void input(tenv* env) {
   }
 
   if (gdata->data.follow_view) {
+    if (twindow_key_down(env->wnd, GLFW_KEY_LEFT))
+      gdata->data.kd_l_frb += gdata->data.vfrb;
+    if (twindow_key_down(env->wnd, GLFW_KEY_RIGHT))
+      gdata->data.kd_r_frb += gdata->data.vfrb;
+
     int snakes_len = tdarray_length(gdata->data.snakes);
     snake* me = gdata->data.snakes + (snakes_len - 1);
 
-    gdata->data.wmd = twindow_button_down(env->wnd, GLFW_MOUSE_BUTTON_LEFT) || twindow_key_down(env->wnd, BOOST_HKEY);
+    if (gdata->data.kd_l_frb > 0 || gdata->data.kd_r_frb > 0)
+      if (gdata->data.ctm - gdata->data.lkstm > 150) {
+        gdata->data.lkstm = gdata->data.ctm;
+        if (gdata->data.kd_r_frb > 0)
+          if (gdata->data.kd_l_frb > gdata->data.kd_r_frb) {
+            gdata->data.kd_l_frb -= gdata->data.kd_r_frb;
+            gdata->data.kd_r_frb = 0;
+          }
+        if (gdata->data.kd_l_frb > 0)
+          if (gdata->data.kd_r_frb > gdata->data.kd_l_frb) {
+            gdata->data.kd_r_frb -= gdata->data.kd_l_frb;
+            gdata->data.kd_l_frb = 0;
+          }
+        if (gdata->data.kd_l_frb > 0) {
+          int v = gdata->data.kd_l_frb;
+          if (v > 127) v = 127;
+          gdata->data.kd_l_frb -= v;
+          me->eang -= gdata->data.mamu * v * me->scang * me->spang;
+          mg_ws_send(connection, (uint8_t[]){252, (uint8_t)v}, 2,
+                     WEBSOCKET_OP_BINARY);
+        } else if (gdata->data.kd_r_frb > 0) {
+          int v = gdata->data.kd_r_frb;
+          if (v > 127) v = 127;
+          gdata->data.kd_r_frb -= v;
+          me->eang += gdata->data.mamu * v * me->scang * me->spang;
+          v += 128;
+          mg_ws_send(connection, (uint8_t[]){252, (uint8_t)v}, 2,
+                     WEBSOCKET_OP_BINARY);
+        }
+      }
+
+    gdata->data.wmd = twindow_button_down(env->wnd, GLFW_MOUSE_BUTTON_LEFT) ||
+                      twindow_key_down(env->wnd, BOOST_HKEY) ||
+                      twindow_key_down(env->wnd, GLFW_KEY_UP);
 
     if (gdata->data.md != gdata->data.wmd &&
         gdata->data.ctm - gdata->data.last_accel_mtm > 150) {
@@ -59,21 +97,25 @@ void input(tenv* env) {
     }
   }
 
-  gdata->data.gsc *= expf(env->ms->dwheel * usrs->zoom_step);
+  gdata->data.ms_zoom *= expf(env->ms->dwheel * usrs->zoom_step);
 
   if (tkeyboard_key_pressed(env->kb, ZOOM_IN_HKEY))
-    gdata->data.gsc *= expf(1 * usrs->zoom_step);
+    gdata->data.ms_zoom *= expf(1 * usrs->zoom_step);
   else if (tkeyboard_key_pressed(env->kb, ZOOM_OUT_HKEY))
-    gdata->data.gsc *= expf(-1 * usrs->zoom_step);
+    gdata->data.ms_zoom *= expf(-1 * usrs->zoom_step);
 
-  gdata->data.gsc = GLM_MAX(MAX_ZOOM_OUT, GLM_MIN(gdata->data.gsc, MAX_ZOOM_IN)),
+  gdata->data.ms_zoom =
+      GLM_MAX(MAX_ZOOM_OUT, GLM_MIN(gdata->data.ms_zoom, MAX_ZOOM_IN)),
 
   // hotkeys
-  usrs->hotkeys.shadow ^= tkeyboard_key_pressed(env->kb, SHADOW_HKEY);
+      usrs->hotkeys.shadow ^= tkeyboard_key_pressed(env->kb, SHADOW_HKEY);
   usrs->hotkeys.boost ^= tkeyboard_key_pressed(env->kb, BOOST_EFFECT_HKEY);
   usrs->hotkeys.hud ^= tkeyboard_key_pressed(env->kb, HUD_HKEY);
   usrs->hotkeys.background ^= tkeyboard_key_pressed(env->kb, BACKGROUND_HKEY);
   usrs->hotkeys.big_food ^= tkeyboard_key_pressed(env->kb, BIG_FOOD_HKEY);
   usrs->hotkeys.peek_names ^= tkeyboard_key_pressed(env->kb, PEEK_NAMES_HKEY);
   usrs->hotkeys.toggle_hotkeys ^= tkeyboard_key_pressed(env->kb, HOTKEYS_HKEY);
+  usrs->hotkeys.crosshair ^= tkeyboard_key_pressed(env->kb, CROSSHAIR_HKEY);
+
+  if (usrs->hotkeys.crosshair) igSetMouseCursor(ImGuiMouseCursor_None);
 }

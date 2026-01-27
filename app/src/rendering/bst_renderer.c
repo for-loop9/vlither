@@ -1,8 +1,9 @@
 #include "bst_renderer.h"
+
 #include <string.h>
 
 bst_renderer* bst_renderer_create(tcontext* ctx, int max_instances,
-                                VkPipelineLayout layout, VkRenderPass pass) {
+                                  VkPipelineLayout layout, VkRenderPass pass) {
   bst_renderer* r = malloc(sizeof(bst_renderer));
 
   VkShaderModule vertex_shader =
@@ -130,8 +131,7 @@ bst_renderer* bst_renderer_create(tcontext* ctx, int max_instances,
                       &(VkPipelineColorBlendAttachmentState){
                           .blendEnable = VK_TRUE,
                           .srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
-                          .dstColorBlendFactor =
-                              VK_BLEND_FACTOR_ONE,
+                          .dstColorBlendFactor = VK_BLEND_FACTOR_ONE,
                           .colorBlendOp = VK_BLEND_OP_ADD,
                           .srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE,
                           .dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO,
@@ -158,24 +158,33 @@ bst_renderer* bst_renderer_create(tcontext* ctx, int max_instances,
       NULL, &r->pipeline);
 
   vkDestroyShaderModule(ctx->device, fragment_shader, NULL);
-	vkDestroyShaderModule(ctx->device, vertex_shader, NULL);
+  vkDestroyShaderModule(ctx->device, vertex_shader, NULL);
 
-	r->instance_buffer = tdbuffer_create(ctx, NULL, max_instances * sizeof(bst_instance), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+  r->instance_buffer =
+      tdbuffer_create(ctx, NULL, max_instances * sizeof(bst_instance),
+                      VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
   r->instances = malloc(max_instances * sizeof(bst_instance));
+  r->max_instances = max_instances;
   r->num_instances = 0;
 
   return r;
 }
 
 void bst_renderer_push(bst_renderer* r, const bst_instance* instance) {
+  if (r->num_instances >= r->max_instances) {
+    return;
+  }
   r->instances[r->num_instances++] = *instance;
 }
 
 void bst_renderer_render(bst_renderer* r, tcontext* ctx) {
   tcontext_frame* fr = ctx->frames + ctx->current_frame;
-  memcpy(r->instance_buffer[ctx->current_frame].data, r->instances, r->num_instances * sizeof(bst_instance));
+  memcpy(r->instance_buffer[ctx->current_frame].data, r->instances,
+         r->num_instances * sizeof(bst_instance));
   vkCmdBindPipeline(fr->cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, r->pipeline);
-  vkCmdBindVertexBuffers(fr->cmd, 1, 1, &r->instance_buffer[ctx->current_frame].handle, (VkDeviceSize[]){0});
+  vkCmdBindVertexBuffers(fr->cmd, 1, 1,
+                         &r->instance_buffer[ctx->current_frame].handle,
+                         (VkDeviceSize[]){0});
   vkCmdDraw(fr->cmd, 4, r->num_instances, 0, 0);
 }
 

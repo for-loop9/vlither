@@ -94,6 +94,7 @@ workspace "vlither"
 			symbols "off"
 
     filter { "configurations:debug" }
+      defines { "TDEBUG" }
       symbols "on"
       optimize "off"
   

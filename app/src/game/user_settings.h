@@ -21,6 +21,7 @@ typedef struct user_settings {
   font_size stats_font_size;
 
   vec3 bd_color;
+  vec3 food_color;
 
   int cursor_size;
   int minimap_size;
@@ -30,10 +31,15 @@ typedef struct user_settings {
   int food_type;
   bool boost_effect;
   bool snake_scores;
+  bool restart_rc;
+  bool quit_mc;
+  bool smooth_zoom;
 
   float food_scale;
   float qsm;
   float zoom_step;
+  float bg_scale;
+  bool uniform_food_color;
 
   struct {
     bool shadow;
@@ -44,6 +50,7 @@ typedef struct user_settings {
     bool peek_names;
     bool toggle_hotkeys;
     bool fullscreen;
+    bool crosshair;
   } hotkeys;
 } user_settings;
 

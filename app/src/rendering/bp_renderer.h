@@ -13,6 +13,7 @@ typedef struct bp_renderer {
   VkPipeline pipeline;
   tdbuffer* instance_buffer;
   bp_instance* instances;
+  int max_instances;
   int num_instances;
 } bp_renderer;
 

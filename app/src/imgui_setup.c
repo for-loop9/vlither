@@ -73,7 +73,7 @@ void imgui_init(tenv* env) {
   }
   
   io->ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-  io->IniFilename = "state.ini";
+  io->IniFilename = NULL;
 
   ImGuiStyle* style = igGetStyle();
   style->DockingNodeHasCloseButton = false;

@@ -10,7 +10,7 @@ void tinput(tenv* env) {
   user_settings* usrs = &usr->usrs;
 
   if (twindow_closed(env->wnd)) env->config.running = false;
-  if (tkeyboard_key_pressed(env->kb, HOTKEYS_FULLSCREEN_KEY)) {
+  if (tkeyboard_key_pressed(env->kb, FULLSCREEN_HKEY)) {
     usrs->hotkeys.fullscreen = !usrs->hotkeys.fullscreen;
     twindow_toggle_fullscreen(env->wnd);
   }
@@ -19,16 +19,18 @@ void tinput(tenv* env) {
 void tlaunch(tenv* env) {
   tuser_data* usr = env->usr;
   user_settings* usrs = &usr->usrs;
+  srand(time(NULL));
 
   memset(usrs, 0, sizeof(user_settings));
   strcpy(usrs->ipv4, "15.204.212.200:444");
   strcpy(usrs->nickname, "");
   usrs->custom_skin = false;
-  usrs->default_skin = 0;
+  usrs->default_skin = rand() % 9;
 
   read_user_settings(usrs);
   env->config.vsync = false;
   env->config.fullscreen = usrs->hotkeys.fullscreen;
+
 }
 
 void tinit(tenv* env) {

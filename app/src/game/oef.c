@@ -49,6 +49,8 @@ void oef(tenv* env) {
   user_settings* usrs = &usr->usrs;
   struct mg_connection* connection = gdata->connection;
 
+  gdata->data.gsc = usrs->smooth_zoom ? glm_lerp(gdata->data.gsc, gdata->data.ms_zoom, 0.25f * gdata->data.vfr) : gdata->data.ms_zoom;
+
   // update flux:
   if (gdata->data.vfrb > 0) {
     if (gdata->data.flx_tg > 0) {

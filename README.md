@@ -4,7 +4,7 @@
 Vlither is a client for [Slither.io](https://slither.io) which can run outside the browser. It is written in C and uses Vulkan for rendering all the graphics, resulting in faster rendering. This implementation is based on [protocol version 19](./game1107241958.js), which was the latest version in January 2026. It has been tested on Windows 11, Debian 13, Ubuntu 24.04, and LMDE7 (AMD and Intel).
 
 ### Running Instructions
-No dependencies are required to run the program. If your GPU supports at least Vulkan 1.0, you're good to go. Download the [latest release](https://github.com/for-loop9/vlither/releases/tag/1.8).
+No dependencies are required to run the program. If your GPU supports at least Vulkan 1.0, you're good to go. Download the [latest release](https://github.com/for-loop9/vlither/releases/latest).
 
 ### Build Instructions
 Prerequisites

@@ -13,6 +13,7 @@ typedef struct spr_renderer {
   VkPipeline pipeline;
   tdbuffer* instance_buffer;
   spr_instance* instances;
+  int max_instances;
   int num_instances;
 } spr_renderer;
 

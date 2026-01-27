@@ -92,6 +92,8 @@ typedef struct game_data {
     float fpx2;
     float fpy2;
     float ping_follow;
+    float ms_zoom;
+    float lkstm;
 
     double play_etm;
 
@@ -117,6 +119,8 @@ typedef struct game_data {
     int slither_count;
     int kills;
     int snake_id;
+    int kd_l_frb;
+    int kd_r_frb;
 
     float* fmlts;
     float* fpsls;
@@ -150,6 +154,7 @@ typedef struct game_data {
     bool dead;
     bool follow_view;
     bool mmgad;
+    bool gotlb;
 
     leaderboard lb;
   } data;

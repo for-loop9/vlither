@@ -30,6 +30,7 @@ typedef struct renderer {
     alignas(8) vec2 view;
     alignas(4) float zoom;
     alignas(4) float bg_opacity;
+    alignas(4) float bg_scale;
     alignas(4) float bd_opacity;
     alignas(4) float bd_radius;
     alignas(4) float grd;

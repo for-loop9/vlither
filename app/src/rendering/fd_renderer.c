@@ -1,4 +1,5 @@
 #include "fd_renderer.h"
+
 #include <string.h>
 
 fd_renderer* fd_renderer_create(tcontext* ctx, int max_instances,
@@ -135,8 +136,7 @@ fd_renderer* fd_renderer_create(tcontext* ctx, int max_instances,
                       &(VkPipelineColorBlendAttachmentState){
                           .blendEnable = VK_TRUE,
                           .srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
-                          .dstColorBlendFactor =
-                              VK_BLEND_FACTOR_ONE,
+                          .dstColorBlendFactor = VK_BLEND_FACTOR_ONE,
                           .colorBlendOp = VK_BLEND_OP_ADD,
                           .srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE,
                           .dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO,
@@ -163,12 +163,10 @@ fd_renderer* fd_renderer_create(tcontext* ctx, int max_instances,
       NULL, &r->pipelines[0]);
 
   vkDestroyShaderModule(ctx->device, fragment_shader, NULL);
-	vkDestroyShaderModule(ctx->device, vertex_shader, NULL);
+  vkDestroyShaderModule(ctx->device, vertex_shader, NULL);
 
-  vertex_shader =
-      tcontext_create_shader(ctx, "app/res/shaders/bin/fdrv.spv");
-  fragment_shader =
-      tcontext_create_shader(ctx, "app/res/shaders/bin/fdrf.spv");
+  vertex_shader = tcontext_create_shader(ctx, "app/res/shaders/bin/fdrv.spv");
+  fragment_shader = tcontext_create_shader(ctx, "app/res/shaders/bin/fdrf.spv");
 
   vkCreateGraphicsPipelines(
       ctx->device, NULL, 1,
@@ -294,8 +292,7 @@ fd_renderer* fd_renderer_create(tcontext* ctx, int max_instances,
                       &(VkPipelineColorBlendAttachmentState){
                           .blendEnable = VK_TRUE,
                           .srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
-                          .dstColorBlendFactor =
-                              VK_BLEND_FACTOR_ONE,
+                          .dstColorBlendFactor = VK_BLEND_FACTOR_ONE,
                           .colorBlendOp = VK_BLEND_OP_ADD,
                           .srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE,
                           .dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO,
@@ -322,24 +319,34 @@ fd_renderer* fd_renderer_create(tcontext* ctx, int max_instances,
       NULL, &r->pipelines[1]);
 
   vkDestroyShaderModule(ctx->device, fragment_shader, NULL);
-	vkDestroyShaderModule(ctx->device, vertex_shader, NULL);
+  vkDestroyShaderModule(ctx->device, vertex_shader, NULL);
 
-	r->instance_buffer = tdbuffer_create(ctx, NULL, max_instances * sizeof(fd_instance), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+  r->instance_buffer =
+      tdbuffer_create(ctx, NULL, max_instances * sizeof(fd_instance),
+                      VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
   r->instances = malloc(max_instances * sizeof(fd_instance));
+  r->max_instances = max_instances;
   r->num_instances = 0;
 
   return r;
 }
 
 void fd_renderer_push(fd_renderer* r, const fd_instance* instance) {
+  if (r->num_instances >= r->max_instances) {
+    return;
+  }
   r->instances[r->num_instances++] = *instance;
 }
 
 void fd_renderer_render(fd_renderer* r, tcontext* ctx) {
   tcontext_frame* fr = ctx->frames + ctx->current_frame;
-  memcpy(r->instance_buffer[ctx->current_frame].data, r->instances, r->num_instances * sizeof(fd_instance));
-  vkCmdBindPipeline(fr->cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, r->pipelines[r->pipeline_idx]);
-  vkCmdBindVertexBuffers(fr->cmd, 1, 1, &r->instance_buffer[ctx->current_frame].handle, (VkDeviceSize[]){0});
+  memcpy(r->instance_buffer[ctx->current_frame].data, r->instances,
+         r->num_instances * sizeof(fd_instance));
+  vkCmdBindPipeline(fr->cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+                    r->pipelines[r->pipeline_idx]);
+  vkCmdBindVertexBuffers(fr->cmd, 1, 1,
+                         &r->instance_buffer[ctx->current_frame].handle,
+                         (VkDeviceSize[]){0});
   vkCmdDraw(fr->cmd, 4, r->num_instances, 0, 0);
 }
 

@@ -24,7 +24,7 @@
 #define PI2 6.2831853f
 #define PI 3.1415926f
 
-#define USER_SETTINGS_FILE "settings.dat"
+#define USER_SETTINGS_FILE "user.dat"
 
 // game data constants:
 #define PROTOCOL_VERSION 19
@@ -39,13 +39,14 @@
 #define GD_NSEP 4.5f
 
 // render constants:
-#define MAX_BOOST_INSTANCES 32768
-#define MAX_FOOD_INSTANCES 16384
-#define MAX_BP_SHADOW_INSTANCES 32768
+#define MAX_BOOST_INSTANCES 65536
+#define MAX_FOOD_INSTANCES 65536
+#define MAX_BP_SHADOW_INSTANCES 65536
 
 // hotkeys:
 #define RESTART_HKEY GLFW_KEY_R
 #define QUIT_HKEY GLFW_KEY_Q
+#define CROSSHAIR_HKEY GLFW_KEY_C
 #define ZOOM_IN_HKEY GLFW_KEY_N
 #define ZOOM_OUT_HKEY GLFW_KEY_M
 #define BOOST_HKEY GLFW_KEY_SPACE
@@ -56,7 +57,7 @@
 #define BIG_FOOD_HKEY GLFW_KEY_F
 #define PEEK_NAMES_HKEY GLFW_KEY_P
 #define HOTKEYS_HKEY GLFW_KEY_Z
-#define HOTKEYS_FULLSCREEN_KEY GLFW_KEY_F11
+#define FULLSCREEN_HKEY GLFW_KEY_F11
 
 typedef enum conn_status {
   DISCONNECTED = 0,

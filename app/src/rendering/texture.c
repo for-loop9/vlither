@@ -1,5 +1,5 @@
 #include "texture.h"
-#include "../external/stb_image.h"
+#include <external/stb/stb_image.h>
 #include <string.h>
 
 texture* create_mipmap_texture(tcontext* ctx, const char* filename) {

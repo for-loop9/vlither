@@ -92,14 +92,6 @@
 		"clangd.arguments": [
 			"--header-insertion=never"
     ],
-    "files.associations": {
-      "renderer.h": "c",
-      "blitter.h": "c",
-      "tiktaalik.h": "c",
-      "tdbuffer.h": "c",
-      "tentry.h": "c",
-      "tcontext.h": "c"
-    },
     "editor.detectIndentation": false,
     "editor.tabSize": 2
 	}

@@ -1,6 +1,8 @@
 build/
 app/res/shaders/bin
+thermite/res/shaders/bin
 *.dat
 *.zip
 *.ini
 *.cache
+compile_commands.json

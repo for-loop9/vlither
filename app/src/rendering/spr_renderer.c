@@ -2,8 +2,8 @@
 
 #include <string.h>
 
-spr_renderer* spr_renderer_create(tcontext* ctx, int max_instances, VkPipelineLayout layout,
-                                VkRenderPass pass) {
+spr_renderer* spr_renderer_create(tcontext* ctx, int max_instances,
+                                  VkPipelineLayout layout, VkRenderPass pass) {
   spr_renderer* r = malloc(sizeof(spr_renderer));
 
   VkShaderModule vertex_shader =
@@ -165,22 +165,31 @@ spr_renderer* spr_renderer_create(tcontext* ctx, int max_instances, VkPipelineLa
   vkDestroyShaderModule(ctx->device, fragment_shader, NULL);
   vkDestroyShaderModule(ctx->device, vertex_shader, NULL);
 
-  r->instance_buffer = tdbuffer_create(ctx, NULL, max_instances * sizeof(spr_instance), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+  r->instance_buffer =
+      tdbuffer_create(ctx, NULL, max_instances * sizeof(spr_instance),
+                      VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
   r->instances = malloc(max_instances * sizeof(spr_instance));
+  r->max_instances = max_instances;
   r->num_instances = 0;
 
   return r;
 }
 
 void spr_renderer_push(spr_renderer* r, const spr_instance* instance) {
+  if (r->num_instances >= r->max_instances) {
+    return;
+  }
   r->instances[r->num_instances++] = *instance;
 }
 
 void spr_renderer_render(spr_renderer* r, tcontext* ctx) {
   tcontext_frame* fr = ctx->frames + ctx->current_frame;
-  memcpy(r->instance_buffer[ctx->current_frame].data, r->instances, r->num_instances * sizeof(spr_instance));
+  memcpy(r->instance_buffer[ctx->current_frame].data, r->instances,
+         r->num_instances * sizeof(spr_instance));
   vkCmdBindPipeline(fr->cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, r->pipeline);
-  vkCmdBindVertexBuffers(fr->cmd, 1, 1, &r->instance_buffer[ctx->current_frame].handle, (VkDeviceSize[]){0});
+  vkCmdBindVertexBuffers(fr->cmd, 1, 1,
+                         &r->instance_buffer[ctx->current_frame].handle,
+                         (VkDeviceSize[]){0});
   vkCmdDraw(fr->cmd, 4, r->num_instances, 0, 0);
 }
 

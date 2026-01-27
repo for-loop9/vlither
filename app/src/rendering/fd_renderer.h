@@ -13,6 +13,7 @@ typedef struct fd_renderer {
   VkPipeline pipelines[2];
   tdbuffer* instance_buffer;
   fd_instance* instances;
+  int max_instances;
   int num_instances;
   int pipeline_idx;
 } fd_renderer;

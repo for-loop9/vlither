@@ -23,7 +23,7 @@ float4 fs_main(vs_output input) {
   float2 sx = input.uv * global.viewport;
   float2 c = global.viewport * 0.5;
   float2 wp = (sx - c) / (global.zoom) + global.view;
-  float2 uv = wp / (global.bg_size * (599 / global.bg_size.x));
+  float2 uv = wp / (global.bg_size * global.bg_scale);
   float4 bg_col = bg_tex.Sample(uv);
   return float4(bg_col.rgb * global.bg_color, global.bg_opacity);
 }

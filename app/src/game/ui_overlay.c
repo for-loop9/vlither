@@ -24,29 +24,38 @@ void ui_overlay(tenv* env) {
                           1;
     }
 
-
     igPushFont(usr->imgui_data.mono_font[usrs->stats_font_size],
                usr->imgui_data.mono_font[usrs->stats_font_size]->LegacySize);
     float line_height = igGetCursorPosY();
-    ImVec2 icon_sz; igCalcTextSize(&icon_sz, "\ue971", NULL, false, -1);
-    ImVec2 char_sz; igCalcTextSize(&char_sz, "-", NULL, false, -1);
+    ImVec2 icon_sz;
+    igCalcTextSize(&icon_sz, "\ue971", NULL, false, -1);
+    ImVec2 char_sz;
+    igCalcTextSize(&char_sz, "-", NULL, false, -1);
     igTextColored((ImVec4){1, 1, 1, 0.3}, "\ue971");
     igSameLine(0, -1);
     igTextColored((ImVec4){1, 1, 1, 0.5}, usrs->nickname);
     line_height = igGetCursorPosY() - line_height;
-    
+
     igTextColored((ImVec4){1, 1, 1, 0.3}, "\ueaec");
     igSameLine(0, -1);
     igTextColored((ImVec4){1, 1, 1, 0.5}, usrs->ipv4);
 
-    float ping_norm = (gdata->data.ping_follow - GOOD_PING) / (BAD_PING - GOOD_PING);
+    float ping_norm =
+        (gdata->data.ping_follow - GOOD_PING) / (BAD_PING - GOOD_PING);
     float lag_norm = (gdata->data.lag_mult - 0.2f) / (1 - 0.2f);
-    vec3 ping_col; glm_vec3_lerp((vec3){0.5f, 1, 0.5f}, (vec3){1, 0.5f, 0.5f}, ping_norm, ping_col);
-    vec3 ic_col; glm_vec3_lerp((vec3){1, 0.5f, 0.5f}, (vec3){1, 1, 1}, lag_norm, ic_col);
+    vec3 ping_col;
+    glm_vec3_lerp((vec3){0.5f, 1, 0.5f}, (vec3){1, 0.5f, 0.5f}, ping_norm,
+                  ping_col);
+    vec3 ic_col;
+    glm_vec3_lerp((vec3){1, 0.5f, 0.5f}, (vec3){1, 1, 1}, lag_norm, ic_col);
 
-    igTextColored((ImVec4){ic_col[0], ic_col[1], ic_col[2], glm_lerp(0.8, 0.3, lag_norm)}, "\ue91b");
+    igTextColored(
+        (ImVec4){ic_col[0], ic_col[1], ic_col[2], glm_lerp(0.8, 0.3, lag_norm)},
+        "\ue91b");
     igSameLine(0, -1);
-    igTextColored((ImVec4){ping_col[0], ping_col[1], ping_col[2], 0.6 * lag_norm}, "%d ms", gdata->data.ping);
+    igTextColored(
+        (ImVec4){ping_col[0], ping_col[1], ping_col[2], 0.6 * lag_norm},
+        "%d ms", gdata->data.ping);
 
     igTextColored((ImVec4){1, 1, 1, 0.3}, "\ue99c");
     igSameLine(0, -1);
@@ -65,7 +74,8 @@ void ui_overlay(tenv* env) {
     igText("");
 
     if (usrs->hotkeys.toggle_hotkeys) {
-      display_hotkeys(usr, (icon_sz.x - char_sz.x) * 0.5f, usrs->stats_font_size);
+      display_hotkeys(usr, (icon_sz.x - char_sz.x) * 0.5f,
+                      usrs->stats_font_size);
     }
 
     float px = (((gdata->data.view_xx - gdata->data.grd) * 2) /
@@ -77,7 +87,7 @@ void ui_overlay(tenv* env) {
     int dst = (int)roundf(sqrtf(px * px + py * py) * 100.0f);
 
     igSetCursorPosY(ctx->size[1] - (line_height * 3) - style->WindowPadding.y);
-    
+
     igTextColored((ImVec4){1, 1, 1, 0.3}, "\ueaeb");
     igSameLine(0, -1);
     igTextColored((ImVec4){1, 1, 1, 0.7}, "%d", gdata->data.kills);
@@ -102,7 +112,7 @@ void ui_overlay(tenv* env) {
 
     igPopFont();
 
-    if (gdata->data.rank) {
+    if (gdata->data.gotlb) {
       igPushFont(usr->imgui_data.mono_font[usrs->lb_font_size],
                  usr->imgui_data.mono_font[usrs->lb_font_size]->LegacySize);
       ImVec2 psize;
@@ -122,8 +132,8 @@ void ui_overlay(tenv* env) {
       igSetCursorPosX(ctx->size[0] - tb_width - style->WindowPadding.x);
       igSetCursorPosY(style->WindowPadding.y);
 
-      if (igBeginTable("leaderboard_table", 3, ImGuiTableFlags_NoHostExtendX, (ImVec2){},
-                       0)) {
+      if (igBeginTable("leaderboard_table", 3, ImGuiTableFlags_NoHostExtendX,
+                       (ImVec2){}, 0)) {
         igTableSetupColumn("##position", ImGuiTableColumnFlags_WidthFixed,
                            psize.x, 0);
         igTableSetupColumn("##nickname", ImGuiTableColumnFlags_WidthFixed,
@@ -145,7 +155,7 @@ void ui_overlay(tenv* env) {
             igPushFont(
                 usr->imgui_data.mono_font[usrs->lb_font_size],
                 usr->imgui_data.mono_font[usrs->lb_font_size]->LegacySize);
-            itcolor.w = .7f * (.3f + .7f * (1 - (1 + row) / 10.0f));
+            itcolor.w = 0.6f; // .7f * (.3f + .7f * (1 - (1 + row) / 10.0f));
           }
 
           igTableNextRow(ImGuiTableRowFlags_None, 0);
@@ -165,15 +175,20 @@ void ui_overlay(tenv* env) {
     usr->r->global.minimap_circ[2] = usrs->minimap_size;
     usr->r->global.minimap_circ[0] =
         ctx->size[0] - usr->r->global.minimap_circ[2] - style->WindowPadding.x;
-    usr->r->global.minimap_circ[1] =
-        ctx->size[1] - usr->r->global.minimap_circ[2] - style->WindowPadding.y - line_height;
+    usr->r->global.minimap_circ[1] = ctx->size[1] -
+                                     usr->r->global.minimap_circ[2] -
+                                     style->WindowPadding.y - line_height;
     usr->r->global.minimap_opacity = 1;
 
     igPushFont(usr->imgui_data.mono_font[usrs->stats_font_size],
                usr->imgui_data.mono_font[usrs->stats_font_size]->LegacySize);
-    ImVec2 lctxtsz; igCalcTextSize(&lctxtsz, "--360° 100%", NULL, false, -1);
+    ImVec2 lctxtsz;
+    igCalcTextSize(&lctxtsz, "--360° 100%", NULL, false, -1);
 
-    igSetCursorPosX(ctx->size[0] - (usr->r->global.minimap_circ[2] * 0.5 + style->WindowPadding.x) - lctxtsz.x * 0.5f);
+    igSetCursorPosX(
+        ctx->size[0] -
+        (usr->r->global.minimap_circ[2] * 0.5 + style->WindowPadding.x) -
+        lctxtsz.x * 0.5f);
     igSetCursorPosY(ctx->size[1] - style->WindowPadding.y - line_height);
 
     igTextColored((ImVec4){1, 1, 1, 0.3f}, "\ue947");

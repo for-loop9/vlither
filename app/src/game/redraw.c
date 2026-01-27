@@ -83,65 +83,126 @@ void redraw(tenv* env) {
     gdata->data.fpy2 = gdata->data.view_yy + (mhh2 / gdata->data.gsc + 24);
   }
 
-  // draw foods:
+  // draw foods and preys:
   int foods_len = tdarray_length(gdata->data.foods);
-  for (int i = foods_len - 1; i >= 0; i--) {
-    food* fo = gdata->data.foods + i;
-
-    if (usrs->hotkeys.big_food && fo->sz < 10) continue;
-
-    if (fo->rx >= gdata->data.fpx1 && fo->ry >= gdata->data.fpy1 &&
-        fo->rx <= gdata->data.fpx2 && fo->ry <= gdata->data.fpy2) {
-      float d =
-          gdata->fsz[fo->cv2] * gdata->data.gsc * fo->rad * usrs->food_scale;
-      vec3s c = gdata->cg_colors[fo->cv];
-
-      float fx =
-          mww2 + gdata->data.gsc * (fo->rx - gdata->data.view_xx) - d * 0.5;
-      float fy =
-          mhh2 + gdata->data.gsc * (fo->ry - gdata->data.view_yy) - d * 0.5;
-
-      fd_renderer_push(
-          usr->r->fdr,
-          &(fd_instance){{fx, fy, d},
-                         (vec4s){c.r, c.g, c.b, fo->fr},
-                         usrs->food_flicker * (.5 + .5 * cosf(fo->gfr / 13))});
-    }
-  }
-
-  // draw preys:
   int preys_len = tdarray_length(gdata->data.preys);
-  for (int i = preys_len - 1; i >= 0; i--) {
-    prey* pr = gdata->data.preys + i;
-    float tx = pr->xx + pr->fx;
-    float ty = pr->yy + pr->fy;
-    float px = mww2 + gdata->data.gsc * (tx - gdata->data.view_xx);
-    float py = mhh2 + gdata->data.gsc * (ty - gdata->data.view_yy);
-    if (px >= -50 && py >= -50 && px <= mwwp50 && py <= mhhp50) {
-      if (pr->eaten) {
-        snake* o = get_snake(gdata, pr->ebid);
-        float k = powf(pr->eaten_fr, 2);
-        tx += (o->xx + o->fx + cosf(o->ang + o->fa) * (43 - k * 24) * (1 - k) -
-               tx) *
-              k;
-        ty += (o->yy + o->fy + sinf(o->ang + o->fa) * (43 - k * 24) * (1 - k) -
-               ty) *
-              k;
-        px = mww2 + gdata->data.gsc * (tx - gdata->data.view_xx);
-        py = mhh2 + gdata->data.gsc * (ty - gdata->data.view_yy);
+  if (usrs->uniform_food_color) {
+    for (int i = foods_len - 1; i >= 0; i--) {
+      food* fo = gdata->data.foods + i;
+
+      if (usrs->hotkeys.big_food && fo->sz < 10) continue;
+
+      if (fo->rx >= gdata->data.fpx1 && fo->ry >= gdata->data.fpy1 &&
+          fo->rx <= gdata->data.fpx2 && fo->ry <= gdata->data.fpy2) {
+        float d =
+            gdata->fsz[fo->cv2] * gdata->data.gsc * fo->rad * usrs->food_scale;
+        vec3s c = {usrs->food_color[0], usrs->food_color[1],
+                   usrs->food_color[2]};
+
+        float fx =
+            mww2 + gdata->data.gsc * (fo->rx - gdata->data.view_xx) - d * 0.5;
+        float fy =
+            mhh2 + gdata->data.gsc * (fo->ry - gdata->data.view_yy) - d * 0.5;
+
+        fd_renderer_push(usr->r->fdr,
+                         &(fd_instance){{fx, fy, d},
+                                        (vec4s){c.r, c.g, c.b, fo->fr},
+                                        usrs->food_flicker *
+                                            (.5 + .5 * cosf(fo->gfr / 13))});
       }
+    }
 
-      float d =
-          gdata->psz[pr->cv2] * gdata->data.gsc * pr->rad * usrs->food_scale;
-      vec3s c = gdata->cg_colors[pr->cv];
-      float fx = px - d * 0.5f;
-      float fy = py - d * 0.5f;
+    for (int i = preys_len - 1; i >= 0; i--) {
+      prey* pr = gdata->data.preys + i;
+      float tx = pr->xx + pr->fx;
+      float ty = pr->yy + pr->fy;
+      float px = mww2 + gdata->data.gsc * (tx - gdata->data.view_xx);
+      float py = mhh2 + gdata->data.gsc * (ty - gdata->data.view_yy);
+      if (px >= -50 && py >= -50 && px <= mwwp50 && py <= mhhp50) {
+        if (pr->eaten) {
+          snake* o = get_snake(gdata, pr->ebid);
+          float k = powf(pr->eaten_fr, 2);
+          tx += (o->xx + o->fx +
+                 cosf(o->ang + o->fa) * (43 - k * 24) * (1 - k) - tx) *
+                k;
+          ty += (o->yy + o->fy +
+                 sinf(o->ang + o->fa) * (43 - k * 24) * (1 - k) - ty) *
+                k;
+          px = mww2 + gdata->data.gsc * (tx - gdata->data.view_xx);
+          py = mhh2 + gdata->data.gsc * (ty - gdata->data.view_yy);
+        }
 
-      fd_renderer_push(
-          usr->r->fdr,
-          &(fd_instance){{fx, fy, d},
-                         (vec4s){c.r, c.g, c.b, pr->fr * 0.75f},
-                         usrs->food_flicker * (.5 + .5 * cosf(pr->gfr / 13))});
+        float d =
+            gdata->psz[pr->cv2] * gdata->data.gsc * pr->rad * usrs->food_scale;
+        vec3s c = {usrs->food_color[0], usrs->food_color[1],
+                   usrs->food_color[2]};
+        float fx = px - d * 0.5f;
+        float fy = py - d * 0.5f;
+
+        fd_renderer_push(usr->r->fdr,
+                         &(fd_instance){{fx, fy, d},
+                                        (vec4s){c.r, c.g, c.b, pr->fr * 0.75f},
+                                        usrs->food_flicker *
+                                            (.5 + .5 * cosf(pr->gfr / 13))});
+      }
+    }
+  } else {
+    for (int i = foods_len - 1; i >= 0; i--) {
+      food* fo = gdata->data.foods + i;
+
+      if (usrs->hotkeys.big_food && fo->sz < 10) continue;
+
+      if (fo->rx >= gdata->data.fpx1 && fo->ry >= gdata->data.fpy1 &&
+          fo->rx <= gdata->data.fpx2 && fo->ry <= gdata->data.fpy2) {
+        float d =
+            gdata->fsz[fo->cv2] * gdata->data.gsc * fo->rad * usrs->food_scale;
+        vec3s c = gdata->cg_colors[fo->cv];
+
+        float fx =
+            mww2 + gdata->data.gsc * (fo->rx - gdata->data.view_xx) - d * 0.5;
+        float fy =
+            mhh2 + gdata->data.gsc * (fo->ry - gdata->data.view_yy) - d * 0.5;
+
+        fd_renderer_push(usr->r->fdr,
+                         &(fd_instance){{fx, fy, d},
+                                        (vec4s){c.r, c.g, c.b, fo->fr},
+                                        usrs->food_flicker *
+                                            (.5 + .5 * cosf(fo->gfr / 13))});
+      }
+    }
+
+    for (int i = preys_len - 1; i >= 0; i--) {
+      prey* pr = gdata->data.preys + i;
+      float tx = pr->xx + pr->fx;
+      float ty = pr->yy + pr->fy;
+      float px = mww2 + gdata->data.gsc * (tx - gdata->data.view_xx);
+      float py = mhh2 + gdata->data.gsc * (ty - gdata->data.view_yy);
+      if (px >= -50 && py >= -50 && px <= mwwp50 && py <= mhhp50) {
+        if (pr->eaten) {
+          snake* o = get_snake(gdata, pr->ebid);
+          float k = powf(pr->eaten_fr, 2);
+          tx += (o->xx + o->fx +
+                 cosf(o->ang + o->fa) * (43 - k * 24) * (1 - k) - tx) *
+                k;
+          ty += (o->yy + o->fy +
+                 sinf(o->ang + o->fa) * (43 - k * 24) * (1 - k) - ty) *
+                k;
+          px = mww2 + gdata->data.gsc * (tx - gdata->data.view_xx);
+          py = mhh2 + gdata->data.gsc * (ty - gdata->data.view_yy);
+        }
+
+        float d =
+            gdata->psz[pr->cv2] * gdata->data.gsc * pr->rad * usrs->food_scale;
+        vec3s c = gdata->cg_colors[pr->cv];
+        float fx = px - d * 0.5f;
+        float fy = py - d * 0.5f;
+
+        fd_renderer_push(usr->r->fdr,
+                         &(fd_instance){{fx, fy, d},
+                                        (vec4s){c.r, c.g, c.b, pr->fr * 0.75f},
+                                        usrs->food_flicker *
+                                            (.5 + .5 * cosf(pr->gfr / 13))});
+      }
     }
   }
 
@@ -173,15 +234,15 @@ void redraw(tenv* env) {
       usr->imgui_data.mono_font[usrs->snake_names_font_size]->LegacySize);
   for (int i = snakes_len - 1; i >= 0; i--) {
     snake* o = gdata->data.snakes + i;
+    int sct = o->sct + o->rsc;
 
-    if (o->iiv) {
+    if (o->iiv && sct >= 2) {
       float hx = o->xx + o->fx;
       float hy = o->yy + o->fy;
       float px = hx;
       float py = hy;
       float a = o->alive_amt * (1 - o->dead_amt);
 
-      int sct = o->sct + o->rsc;
       if (usrs->hotkeys.peek_names) {
         int score = (int)floorf((gdata->data.fpsls[sct] +
                                  o->fam / gdata->data.fmlts[sct] - 1) *
@@ -1071,15 +1132,17 @@ void redraw(tenv* env) {
   usr->r->global.bd_color[0] = usrs->bd_color[0];
   usr->r->global.bd_color[1] = usrs->bd_color[1];
   usr->r->global.bd_color[2] = usrs->bd_color[2];
+  usr->r->global.bg_scale = usrs->bg_scale;
   usr->r->global.bg_opacity = 1;
   usr->r->global.bd_opacity = 0.8f;
   usr->r->global.minimap_data_size = gdata->data.mmsz;
 
-  spr_renderer_push(usr->r->cr,
-                    &(spr_instance){{env->ms->pos[0], env->ms->pos[1],
-                                     usrs->cursor_size, usrs->cursor_size},
-                                    gdata->CURSOR_UV,
-                                    {2, 2, 2, 1}});
+  if (usrs->hotkeys.crosshair)
+    spr_renderer_push(usr->r->cr,
+                      &(spr_instance){{env->ms->pos[0], env->ms->pos[1],
+                                       usrs->cursor_size, usrs->cursor_size},
+                                      gdata->CURSOR_UV,
+                                      {2, 2, 2, 1}});
 
   usr->r->global.bg_color[0] = usr->r->global.bg_color[1] =
       usr->r->global.bg_color[2] = usrs->hotkeys.background;

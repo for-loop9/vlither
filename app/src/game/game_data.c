@@ -36,6 +36,7 @@ void display_hotkeys(tuser_data* usr, float offset, font_size sz) {
 
   show_hot_key(usr, RESTART_HKEY, (vec3){1, 0.7f, 0.7f}, "Restart", offset, sz);
   show_hot_key(usr, QUIT_HKEY, (vec3){1, 0.7f, 0.7f}, "Quit", offset, sz);
+  show_hot_key(usr, CROSSHAIR_HKEY, (vec3){1, 0.7f, 0.7f}, "Crosshair", offset, sz);
   show_hot_key_str(usr, "F11", (vec3){1, 0.7f, 0.7f}, " Fullscreen", offset, sz);
 
   show_hot_key(usr, ZOOM_IN_HKEY, (vec3){0.7f, 1, 0.7f}, "Zoom in", offset, sz);
@@ -385,7 +386,7 @@ void game_data_init(tenv* env) {
   gdata->data.mamu2 = .028;
   gdata->data.cst = .43;
   gdata->data.default_msl = 42;
-  gdata->data.gsc = 1.5f;
+  gdata->data.ms_zoom = gdata->data.gsc = 1.5f;
   gdata->data.mmsz = -1;
 
   gdata->data.snakes = tdarray_create(snake);
@@ -460,6 +461,7 @@ void game_data_reset(tenv* env) {
   gdata->data.dead = true;
   gdata->data.follow_view = false;
   gdata->data.mmgad = false;
+  gdata->data.gotlb = false;
   gdata->data.lsxm = 0;
   gdata->data.lsym = 0;
   gdata->data.fvx = 0;
@@ -478,6 +480,10 @@ void game_data_reset(tenv* env) {
   gdata->data.slither_count = 0;
   gdata->data.snake_id = -1;
   gdata->data.ping_follow = GOOD_PING;
+  gdata->data.kd_l_frb = 0;
+  gdata->data.kd_r_frb = 0;
+  gdata->data.lkstm = 0;
+  gdata->data.gsc = gdata->data.ms_zoom;
   
   memset(gdata->data.lb.entries, 0, NUM_LEADERBOARD_ENTRIES * sizeof(gdata->data.lb.entries[0]));
   memset(gdata->data.pings, 0, sizeof(int) * PING_SAMPLE_COUNT);

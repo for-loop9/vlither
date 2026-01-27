@@ -17,10 +17,14 @@ void _tcontext_create_instance(tcontext* context) {
                                    .pNext = NULL,
                                    .pApplicationName = "app",
                                    .applicationVersion = 1,
-                                   .pEngineName = "tiktaalik",
+                                   .pEngineName = "thermite",
                                    .engineVersion = 1,
                                    .apiVersion = VK_API_VERSION_1_0},
+#ifdef TDEBUG
+          .enabledLayerCount = 1,
+#else
           .enabledLayerCount = 0,
+#endif
           .ppEnabledLayerNames = (const char*[]){"VK_LAYER_KHRONOS_validation"},
           .enabledExtensionCount = instance_ext_count,
           .ppEnabledExtensionNames = instance_ext_names},

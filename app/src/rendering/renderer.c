@@ -236,6 +236,7 @@ renderer* renderer_create(tenv* env) {
   r->global.bg_size[1] = r->bg_tex->size[1];
   r->global.bg_color[0] = 1;
   r->global.bg_color[1] = 1;
+  r->global.bg_scale = 1;
   r->global.bg_color[2] = 1;
   r->global.bd_color[0] = 1;
   r->global.bd_color[1] = 1;

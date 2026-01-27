@@ -846,7 +846,7 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
       tdarray_push(
           &gdata->data.foods,
           (&(food){.id = id,
-                   .cv = cv > 9 ? cv % 9 : cv,
+                   .cv = cv % NUM_COLOR_GROUPS,
                    .cv2 = GLM_MIN(NUM_FOOD_SIZES - 1, GLM_MAX(0, (int)floorf(NUM_FOOD_SIZES * rad / 16.5f))),
                    .xx = xx,
                    .yy = yy,
@@ -891,7 +891,7 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
     m++;
     tdarray_push(&gdata->data.foods,
                  (&(food){.id = id,
-                          .cv = cv > 9 ? cv % 9 : cv,
+                          .cv = cv % NUM_COLOR_GROUPS,
                           .cv2 = GLM_MIN(NUM_FOOD_SIZES - 1, GLM_MAX(0, (int)floorf(NUM_FOOD_SIZES * rad / 16.5f))),
                           .xx = xx,
                           .yy = yy,
@@ -1115,7 +1115,7 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
         .sp = speed,
         .gfr = rand() % 64,
         .gr = 0.5f + ((float)rand() / (float)RAND_MAX) * 0.15f + 0.1f * rad,
-        .cv2 = GLM_MIN(NUM_PREY_SIZES - 1, GLM_MAX(0, (int)floorf(NUM_PREY_SIZES * gdata->data.gsc * rad / 9)))
+        .cv2 = GLM_MIN(NUM_PREY_SIZES - 1, GLM_MAX(0, (int)floorf(NUM_PREY_SIZES * rad / 9)))
       }));
     }
   } else if (cmd == 'M') {
@@ -1204,6 +1204,8 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
         }
     }
   } else if (cmd == 'l') {
+    gdata->data.gotlb = true;
+
     gdata->data.lb_pos = a[m];
     int pos = 0;
     m++;

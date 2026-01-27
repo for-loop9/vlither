@@ -19,6 +19,7 @@ void ui_settings(tenv* env) {
     igTableNextRow(ImGuiTableRowFlags_None, 0);
     igTableSetColumnIndex(0);
 
+    igBeginChild_Str("settings_child_holder", (ImVec2){-1, -1}, ImGuiChildFlags_None, ImGuiWindowFlags_None);
     if (igCollapsingHeader_BoolPtr("General", NULL, ImGuiTreeNodeFlags_DefaultOpen)) {
       if (igBeginTable("field:value", 2, ImGuiTableFlags_None, (ImVec2){}, 0)) {
         igTableNextRow(ImGuiTableRowFlags_None, 0);
@@ -39,11 +40,19 @@ void ui_settings(tenv* env) {
         igAlignTextToFramePadding();
         igText("Body parts separation");
         igAlignTextToFramePadding();
+        igText("Background scale");
+        igAlignTextToFramePadding();
+        igText("Smooth zoom");
+        igAlignTextToFramePadding();
         igText("Zoom step");
         igAlignTextToFramePadding();
         igText("Border color");
         igAlignTextToFramePadding();
         igText("Minimap size");
+        igAlignTextToFramePadding();
+        igText("Restart with right click");
+        igAlignTextToFramePadding();
+        igText("Quit with middle click");
 
         igTableSetColumnIndex(1);
         igSetNextItemWidth(-1);
@@ -67,6 +76,10 @@ void ui_settings(tenv* env) {
         igSliderFloat("##bps", &usrs->qsm, 1, 4, "%.2f",
                       ImGuiSliderFlags_AlwaysClamp);
         igSetNextItemWidth(-1);
+        igSliderFloat("##bg scale", &usrs->bg_scale, 0.05f, 4, "%.2f",
+                      ImGuiSliderFlags_AlwaysClamp);
+        igCheckbox("##smooth zoom", &usrs->smooth_zoom);
+        igSetNextItemWidth(-1);
         igSliderFloat("##zoom step", &usrs->zoom_step, 0.05f, 0.5f, "%.2f",
                       ImGuiSliderFlags_AlwaysClamp);
         igSetNextItemWidth(-1);
@@ -75,7 +88,8 @@ void ui_settings(tenv* env) {
         igSetNextItemWidth(-1);
         igSliderInt("##minimap size", &usrs->minimap_size, 128, 512, "%d px",
                     ImGuiSliderFlags_AlwaysClamp);
-
+        igCheckbox("##restart rc", &usrs->restart_rc);
+        igCheckbox("##quit mc", &usrs->quit_mc);
         igIndent(-style->WindowPadding.x);
         igEndTable();
       }
@@ -93,6 +107,8 @@ void ui_settings(tenv* env) {
         igText("Float");
         igAlignTextToFramePadding();
         igText("Flicker");
+        igAlignTextToFramePadding();
+        igText("Uniform color");
 
         igTableSetColumnIndex(1);
         igSetNextItemWidth(-1);
@@ -103,6 +119,12 @@ void ui_settings(tenv* env) {
                       ImGuiSliderFlags_AlwaysClamp);
         igCheckbox("##food float", &usrs->food_float);
         igCheckbox("##food flicker", &usrs->food_flicker);
+        igCheckbox("##uniform food color", &usrs->uniform_food_color);
+        igSameLine(0, -1);
+        igBeginDisabled(!usrs->uniform_food_color);
+        igSetNextItemWidth(-1);
+        igColorEdit3("##fdcolor", usrs->food_color, ImGuiColorEditFlags_None);
+        igEndDisabled();
         igIndent(-style->WindowPadding.x);
 
         igEndTable();
@@ -128,6 +150,7 @@ void ui_settings(tenv* env) {
       }
     }
 
+    igEndChild();
     igEndTable();
   }
 

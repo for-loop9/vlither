@@ -12,6 +12,7 @@ public struct Global {
   public float2 view;
   public float zoom;
   public float bg_opacity;
+  public float bg_scale;
   public float bd_opacity;
   public float bd_radius; 
   public float grd;

@@ -166,12 +166,16 @@ bp_renderer* bp_renderer_create(tcontext* ctx, int max_instances,
 
 	r->instance_buffer = tdbuffer_create(ctx, NULL, max_instances * sizeof(bp_instance), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
   r->instances = malloc(max_instances * sizeof(bp_instance));
+  r->max_instances = max_instances;
   r->num_instances = 0;
 
   return r;
 }
 
 void bp_renderer_push(bp_renderer* r, const bp_instance* instance) {
+  if (r->num_instances >= r->max_instances) {
+    return;
+  }
   r->instances[r->num_instances++] = *instance;
 }
 

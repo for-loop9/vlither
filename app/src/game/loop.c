@@ -39,8 +39,6 @@ void game_loop(tenv* env) {
       break;
     }
     case CONNECTED:
-      igSetMouseCursor(ImGuiMouseCursor_None);
-
       time_step(env);
       input(env);
       server_poll(env);
@@ -49,11 +47,9 @@ void game_loop(tenv* env) {
       ui_overlay(env);
 
       // special hotkeys
-      if (tkeyboard_key_pressed(env->kb, QUIT_HKEY) || tmouse_button_pressed(env->ms, GLFW_MOUSE_BUTTON_MIDDLE)) {
+      if (tkeyboard_key_pressed(env->kb, QUIT_HKEY) || (usrs->quit_mc && tmouse_button_pressed(env->ms, GLFW_MOUSE_BUTTON_MIDDLE))) {
         gdata->conn = DISCONNECTED;
-      }
-
-      if (tkeyboard_key_pressed(env->kb, RESTART_HKEY) || tmouse_button_pressed(env->ms, GLFW_MOUSE_BUTTON_RIGHT)) {
+      } else if (tkeyboard_key_pressed(env->kb, RESTART_HKEY) || (usrs->restart_rc && tmouse_button_pressed(env->ms, GLFW_MOUSE_BUTTON_RIGHT))) {
         game_data_reset(env);
         server_disconnect(env);
         usr->gdata.conn = CONNECTING;
