@@ -53,9 +53,9 @@ void ui_settings(tenv* env) {
       igAlignTextToFramePadding();
       igText("Quit with middle click");
       igAlignTextToFramePadding();
-      igText("Laser thickness");
-      igAlignTextToFramePadding();
       igText("Laser color");
+      igAlignTextToFramePadding();
+      igText("Laser thickness");
 
       igTableSetColumnIndex(1);
       if (igCheckbox("##vsync", &usrs->vsync)) {
