@@ -115,7 +115,7 @@ workspace "vlither"
       links { "thermite", "glfw", "vulkan", "stdc++", "m" }
 
     filter { "platforms:windows" }
-      links { "thermite", "glfw", "vulkan-1", "stdc++", "m", "gdi32", "wsock32" }
+      links { "thermite", "glfw", "vulkan-1", "stdc++", "m", "gdi32", "ws2_32" }
 
     filter { "configurations:release" }
 			optimize "speed"

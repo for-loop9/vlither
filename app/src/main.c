@@ -29,7 +29,7 @@ void tlaunch(tenv* env) {
   usrs->accessory = NO_ACCESSORY;
 
   read_user_settings(usrs);
-  env->config.vsync = false;
+  env->config.vsync = usrs->vsync;
   env->config.fullscreen = usrs->hotkeys.fullscreen;
   env->config.title = "Vlither";
 }
