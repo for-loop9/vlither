@@ -238,7 +238,7 @@ void redraw(tenv* env) {
     snake* o = gdata->data.snakes + i;
     int sct = o->sct + o->rsc;
 
-    if (o->iiv && sct >= 2) {
+    if (o->iiv) {
       float hx = o->xx + o->fx;
       float hy = o->yy + o->fy;
       float px = hx;
@@ -321,192 +321,127 @@ void redraw(tenv* env) {
         }
       }
 
-      float fang = o->ehang;
-      float ssc = o->sc;
-      float lsz = 29 * ssc;
-      float rl = o->cfl;
-      int pts_len = tdarray_length(o->pts);
-      int po_i = pts_len - 1;
+      if (sct >= 2) {
+        float fang = o->ehang;
+        float ssc = o->sc;
+        float lsz = 29 * ssc;
+        float rl = o->cfl;
+        int pts_len = tdarray_length(o->pts);
+        int po_i = pts_len - 1;
 
-      // render_mode 2:
-      lsz *= .5;
-      float ix1 = 0, iy1 = 0, ix2 = 0, iy2 = 0, ax1 = 0, ay1 = 0, ax2 = 0,
-            ay2 = 0, cx2 = 0, cy2 = 0, pax1 = 0, pay1 = 0;
-      int bp = 0;
-      px = hx;
-      py = hy;
-      ax2 = px;
-      ay2 = py;
-      float ax = px;
-      float ay = py;
-      bp = 0;
-      float px2 = 0, py2 = 0;
-      float px3 = 0, py3 = 0;
-      int po2_i = 0, po3_i = 0;
-      int lpo_i = 0;
-      float d = 0, d2 = 0;
-      float dx = 0, dy = 0;
-      float d3 = 0;
-      float tx = 0, ty = 0;
-      float ox = 0, oy = 0;
-      float rx = 0, ry = 0;
-      tx = 0;
-      ty = 0;
-      float j = 0, k = 0, l = 0, m = 0;
-      float j2 = 0;
-      float k2 = 0;
-      float irl = 0;
-      float wk = 0;
-      float wwk = 0;
-      float nkr = 0;
-      float msl = o->msl;
-      float mct = 6 / (mode->qsm * o->sep / 6.0f);
+        // render_mode 2:
+        lsz *= .5;
+        float ix1 = 0, iy1 = 0, ix2 = 0, iy2 = 0, ax1 = 0, ay1 = 0, ax2 = 0,
+              ay2 = 0, cx2 = 0, cy2 = 0, pax1 = 0, pay1 = 0;
+        int bp = 0;
+        px = hx;
+        py = hy;
+        ax2 = px;
+        ay2 = py;
+        float ax = px;
+        float ay = py;
+        bp = 0;
+        float px2 = 0, py2 = 0;
+        float px3 = 0, py3 = 0;
+        int po2_i = 0, po3_i = 0;
+        int lpo_i = 0;
+        float d = 0, d2 = 0;
+        float dx = 0, dy = 0;
+        float d3 = 0;
+        float tx = 0, ty = 0;
+        float ox = 0, oy = 0;
+        float rx = 0, ry = 0;
+        tx = 0;
+        ty = 0;
+        float j = 0, k = 0, l = 0, m = 0;
+        float j2 = 0;
+        float k2 = 0;
+        float irl = 0;
+        float wk = 0;
+        float wwk = 0;
+        float nkr = 0;
+        float msl = o->msl;
+        float mct = 6 / (mode->qsm * o->sep / 6.0f);
 
-      float omct = mct;
-      float rmct = 1 / mct;
-      float sep = msl / mct;
-      int ll = 0;
-      po_i = pts_len - 1;
-      px = o->pts[po_i].xx + o->pts[po_i].fx;
-      py = o->pts[po_i].yy + o->pts[po_i].fy;
-      d = sqrtf(powf(hx - px, 2) + powf(hy - py, 2));
-      dx = (hx - px) / d;
-      dy = (hy - py) / d;
-      nkr = d / msl;
-      int gpt_i, lgpt_i;
-      int gpt2_i, lgpt2_i;
-      int gpo_i;
-      int q = 0;
-      po3_i = pts_len - 2;
-      po2_i = pts_len - 1;
-      px = hx;
-      py = hy;
-      px2 = o->pts[po2_i].xx + o->pts[po2_i].fx;
-      py2 = o->pts[po2_i].yy + o->pts[po2_i].fy;
+        float omct = mct;
+        float rmct = 1 / mct;
+        float sep = msl / mct;
+        int ll = 0;
+        po_i = pts_len - 1;
+        px = o->pts[po_i].xx + o->pts[po_i].fx;
+        py = o->pts[po_i].yy + o->pts[po_i].fy;
+        d = sqrtf(powf(hx - px, 2) + powf(hy - py, 2));
+        dx = (hx - px) / d;
+        dy = (hy - py) / d;
+        nkr = d / msl;
+        int gpt_i, lgpt_i;
+        int gpt2_i, lgpt2_i;
+        int gpo_i;
+        int q = 0;
+        po3_i = pts_len - 2;
+        po2_i = pts_len - 1;
+        px = hx;
+        py = hy;
+        px2 = o->pts[po2_i].xx + o->pts[po2_i].fx;
+        py2 = o->pts[po2_i].yy + o->pts[po2_i].fy;
 
-      if (po3_i >= 0) {
-        px3 = o->pts[po3_i].xx + o->pts[po3_i].fx;
-        py3 = o->pts[po3_i].yy + o->pts[po3_i].fy;
-      }
-      if (d > msl) {
-        px = px2 + dx * msl;
-        py = py2 + dy * msl;
-      }
-      ax1 = px + (px2 - px) * .5;
-      ay1 = py + (py2 - py) * .5;
-      if (nkr < 1) {
-        ax1 += (px - ax1) * (1 - nkr);
-        ay1 += (py - ay1) * (1 - nkr);
-      }
-      ax2 = px3 + (px2 - px3) * .5;
-      ay2 = py3 + (py2 - py3) * .5;
-      d2 = sqrtf(powf(hx - ax1, 2) + powf(hy - ay1, 2));
-      k = sep;
-      m = 1;
-      gpt_i = arp(o, q, hx, hy);
-      q++;
-      o->gptz[gpt_i].d = 0;
-      lgpt_i = gpt_i;
-      wk++;
-      while (k < d2) {
-        tx = hx - m * dx * sep;
-        ty = hy - m * dy * sep;
-        gpt_i = arp(o, q, tx, ty);
+        if (po3_i >= 0) {
+          px3 = o->pts[po3_i].xx + o->pts[po3_i].fx;
+          py3 = o->pts[po3_i].yy + o->pts[po3_i].fy;
+        }
+        if (d > msl) {
+          px = px2 + dx * msl;
+          py = py2 + dy * msl;
+        }
+        ax1 = px + (px2 - px) * .5;
+        ay1 = py + (py2 - py) * .5;
+        if (nkr < 1) {
+          ax1 += (px - ax1) * (1 - nkr);
+          ay1 += (py - ay1) * (1 - nkr);
+        }
+        ax2 = px3 + (px2 - px3) * .5;
+        ay2 = py3 + (py2 - py3) * .5;
+        d2 = sqrtf(powf(hx - ax1, 2) + powf(hy - ay1, 2));
+        k = sep;
+        m = 1;
+        gpt_i = arp(o, q, hx, hy);
         q++;
-        d = sep;
-        o->gptz[gpt_i].d = d;
+        o->gptz[gpt_i].d = 0;
         lgpt_i = gpt_i;
         wk++;
-        if (ll == 1) {
-          ll = 2;
-          break;
-        }
-        rl -= rmct;
-        if (rl <= 0) {
-          ll = 1;
-          m += (rmct + rl) / rmct;
-          k += sep * (rmct + rl) / rmct;
-        } else {
-          m++;
-          k += sep;
-        }
-      }
-      irl = (k - d2) / msl;
-      if (ll <= 1) {
-        if (rl >= -1E-4 && rl <= 0) rl = 0;
-        if (rl >= 0 || ll == 1) {
-          if (nkr < 1) {
-            px2 += (ax2 - px2) * .5 * (1 - nkr);
-            py2 += (ay2 - py2) * .5 * (1 - nkr);
+        while (k < d2) {
+          tx = hx - m * dx * sep;
+          ty = hy - m * dy * sep;
+          gpt_i = arp(o, q, tx, ty);
+          q++;
+          d = sep;
+          o->gptz[gpt_i].d = d;
+          lgpt_i = gpt_i;
+          wk++;
+          if (ll == 1) {
+            ll = 2;
+            break;
           }
-          m = .5 + nkr - d2 / msl;
-          while (irl >= 0 && irl < m) {
-            k = irl / m;
-            ix1 = ax1 + (px2 - ax1) * k;
-            iy1 = ay1 + (py2 - ay1) * k;
-            ix2 = px2 + (ax2 - px2) * k;
-            iy2 = py2 + (ay2 - py2) * k;
-            rx = ix1 + (ix2 - ix1) * k;
-            ry = iy1 + (iy2 - iy1) * k;
-            gpt_i = arp(o, q, rx, ry);
-            q++;
-            d = sqrtf(powf(o->gptz[gpt_i].xx - o->gptz[lgpt_i].xx, 2) +
-                      powf(o->gptz[gpt_i].yy - o->gptz[lgpt_i].yy, 2));
-            o->gptz[gpt_i].d = d;
-            lgpt_i = gpt_i;
-            wk++;
-            if (ll == 1) {
-              ll = 2;
-              break;
-            }
-            rl -= rmct;
-            if (rl <= 0) {
-              ll = 1;
-              irl += rmct + rl;
-              rl = 0;
-            } else
-              irl += rmct;
+          rl -= rmct;
+          if (rl <= 0) {
+            ll = 1;
+            m += (rmct + rl) / rmct;
+            k += sep * (rmct + rl) / rmct;
+          } else {
+            m++;
+            k += sep;
           }
-          irl -= m;
         }
-        if (rl >= -1E-4 && rl <= 0) rl = 0;
-      }
-      int lj = tdarray_length(o->pts);
-      pts_len = tdarray_length(o->pts);
-      bool wsirl = false;
-      if (ll <= 1) {
-        wsirl = false;
-        if (rl >= 0 || ll == 1) {
-          float rmr = 0;
-          po_i = lj - 1;
-          for (j = pts_len - 1; j >= 2; j--) {
-            lj = j;
-            lpo_i = po_i;
-            po3_i = (int)(j - 2);
-            po2_i = (int)(j - 1);
-            po_i = (int)j;
-            px = o->pts[po_i].xx + o->pts[po_i].fx;
-            py = o->pts[po_i].yy + o->pts[po_i].fy;
-            px2 = o->pts[po2_i].xx + o->pts[po2_i].fx;
-            py2 = o->pts[po2_i].yy + o->pts[po2_i].fy;
-            px3 = o->pts[po3_i].xx + o->pts[po3_i].fx;
-            py3 = o->pts[po3_i].yy + o->pts[po3_i].fy;
-            ax1 = px + (px2 - px) * .5;
-            ay1 = py + (py2 - py) * .5;
-            ax2 = px2 + (px3 - px2) * .5;
-            ay2 = py2 + (py3 - py2) * .5;
-            m = o->pts[po_i].ltn + o->pts[po_i].fltn;
-            wwk = omct * 2 + 2;
-            if (o->pts[po_i].smu != o->pts[lpo_i].smu ||
-                o->pts[po_i].fsmu != o->pts[lpo_i].fsmu) {
-              irl *= (o->pts[lpo_i].smu + o->pts[lpo_i].fsmu) /
-                     (o->pts[po_i].smu + o->pts[po_i].fsmu);
-              mct = omct * (o->pts[po_i].smu + o->pts[po_i].fsmu);
-              rmct = 1 / mct;
-              sep = msl / mct;
+        irl = (k - d2) / msl;
+        if (ll <= 1) {
+          if (rl >= -1E-4 && rl <= 0) rl = 0;
+          if (rl >= 0 || ll == 1) {
+            if (nkr < 1) {
+              px2 += (ax2 - px2) * .5 * (1 - nkr);
+              py2 += (ay2 - py2) * .5 * (1 - nkr);
             }
-            rl -= rmr * rmct;
-            while (irl < m) {
+            m = .5 + nkr - d2 / msl;
+            while (irl >= 0 && irl < m) {
               k = irl / m;
               ix1 = ax1 + (px2 - ax1) * k;
               iy1 = ay1 + (py2 - ay1) * k;
@@ -514,6 +449,115 @@ void redraw(tenv* env) {
               iy2 = py2 + (ay2 - py2) * k;
               rx = ix1 + (ix2 - ix1) * k;
               ry = iy1 + (iy2 - iy1) * k;
+              gpt_i = arp(o, q, rx, ry);
+              q++;
+              d = sqrtf(powf(o->gptz[gpt_i].xx - o->gptz[lgpt_i].xx, 2) +
+                        powf(o->gptz[gpt_i].yy - o->gptz[lgpt_i].yy, 2));
+              o->gptz[gpt_i].d = d;
+              lgpt_i = gpt_i;
+              wk++;
+              if (ll == 1) {
+                ll = 2;
+                break;
+              }
+              rl -= rmct;
+              if (rl <= 0) {
+                ll = 1;
+                irl += rmct + rl;
+                rl = 0;
+              } else
+                irl += rmct;
+            }
+            irl -= m;
+          }
+          if (rl >= -1E-4 && rl <= 0) rl = 0;
+        }
+        int lj = tdarray_length(o->pts);
+        pts_len = tdarray_length(o->pts);
+        bool wsirl = false;
+        if (ll <= 1) {
+          wsirl = false;
+          if (rl >= 0 || ll == 1) {
+            float rmr = 0;
+            po_i = lj - 1;
+            for (j = pts_len - 1; j >= 2; j--) {
+              lj = j;
+              lpo_i = po_i;
+              po3_i = (int)(j - 2);
+              po2_i = (int)(j - 1);
+              po_i = (int)j;
+              px = o->pts[po_i].xx + o->pts[po_i].fx;
+              py = o->pts[po_i].yy + o->pts[po_i].fy;
+              px2 = o->pts[po2_i].xx + o->pts[po2_i].fx;
+              py2 = o->pts[po2_i].yy + o->pts[po2_i].fy;
+              px3 = o->pts[po3_i].xx + o->pts[po3_i].fx;
+              py3 = o->pts[po3_i].yy + o->pts[po3_i].fy;
+              ax1 = px + (px2 - px) * .5;
+              ay1 = py + (py2 - py) * .5;
+              ax2 = px2 + (px3 - px2) * .5;
+              ay2 = py2 + (py3 - py2) * .5;
+              m = o->pts[po_i].ltn + o->pts[po_i].fltn;
+              wwk = omct * 2 + 2;
+              if (o->pts[po_i].smu != o->pts[lpo_i].smu ||
+                  o->pts[po_i].fsmu != o->pts[lpo_i].fsmu) {
+                irl *= (o->pts[lpo_i].smu + o->pts[lpo_i].fsmu) /
+                       (o->pts[po_i].smu + o->pts[po_i].fsmu);
+                mct = omct * (o->pts[po_i].smu + o->pts[po_i].fsmu);
+                rmct = 1 / mct;
+                sep = msl / mct;
+              }
+              rl -= rmr * rmct;
+              while (irl < m) {
+                k = irl / m;
+                ix1 = ax1 + (px2 - ax1) * k;
+                iy1 = ay1 + (py2 - ay1) * k;
+                ix2 = px2 + (ax2 - px2) * k;
+                iy2 = py2 + (ay2 - py2) * k;
+                rx = ix1 + (ix2 - ix1) * k;
+                ry = iy1 + (iy2 - iy1) * k;
+                gpt_i = arp(o, q, rx, ry);
+                q++;
+                if (wk <= wwk) {
+                  d = sqrtf(powf(o->gptz[gpt_i].xx - o->gptz[lgpt_i].xx, 2) +
+                            powf(o->gptz[gpt_i].yy - o->gptz[lgpt_i].yy, 2));
+                  o->gptz[gpt_i].d = d;
+                  lgpt_i = gpt_i;
+                  wk++;
+                }
+                if (ll == 1) {
+                  ll = 2;
+                  j = -9999;
+                  break;
+                }
+                rl -= rmct;
+                if (rl <= 0) {
+                  ll = 1;
+                  irl += rmct + rl;
+                } else
+                  irl += rmct;
+              }
+              irl -= m;
+              rmr = irl / rmct;
+              rl += irl;
+              wsirl = true;
+            }
+          }
+          if (wsirl) rl -= irl;
+        }
+        if (ll <= 1) {
+          if (rl >= -1E-4 && rl <= 0) rl = 0;
+          if (rl >= 0 || ll == 1) {
+            po_i = (int)(lj - 1);
+            po2_i = (int)(lj - 2);
+            if (po_i >= 0) {
+              px = o->pts[po_i].xx + o->pts[po_i].fx;
+              py = o->pts[po_i].yy + o->pts[po_i].fy;
+            }
+            px2 = o->pts[po2_i].xx + o->pts[po2_i].fx;
+            py2 = o->pts[po2_i].yy + o->pts[po2_i].fy;
+            while (rl >= 0 || ll == 1) {
+              rx = px2 - (px - px2) * (irl - .5);
+              ry = py2 - (py - py2) * (irl - .5);
               gpt_i = arp(o, q, rx, ry);
               q++;
               if (wk <= wwk) {
@@ -534,748 +578,738 @@ void redraw(tenv* env) {
                 irl += rmct + rl;
               } else
                 irl += rmct;
+              if (rl >= -1E-4 && rl <= 0) rl = 0;
             }
-            irl -= m;
-            rmr = irl / rmct;
-            rl += irl;
-            wsirl = true;
           }
         }
-        if (wsirl) rl -= irl;
-      }
-      if (ll <= 1) {
-        if (rl >= -1E-4 && rl <= 0) rl = 0;
-        if (rl >= 0 || ll == 1) {
-          po_i = (int)(lj - 1);
-          po2_i = (int)(lj - 2);
-          if (po_i >= 0) {
-            px = o->pts[po_i].xx + o->pts[po_i].fx;
-            py = o->pts[po_i].yy + o->pts[po_i].fy;
-          }
-          px2 = o->pts[po2_i].xx + o->pts[po2_i].fx;
-          py2 = o->pts[po2_i].yy + o->pts[po2_i].fy;
-          while (rl >= 0 || ll == 1) {
-            rx = px2 - (px - px2) * (irl - .5);
-            ry = py2 - (py - py2) * (irl - .5);
-            gpt_i = arp(o, q, rx, ry);
-            q++;
-            if (wk <= wwk) {
-              d = sqrtf(powf(o->gptz[gpt_i].xx - o->gptz[lgpt_i].xx, 2) +
-                        powf(o->gptz[gpt_i].yy - o->gptz[lgpt_i].yy, 2));
-              o->gptz[gpt_i].d = d;
-              lgpt_i = gpt_i;
-              wk++;
-            }
-            if (ll == 1) {
-              ll = 2;
-              j = -9999;
-              break;
-            }
-            rl -= rmct;
-            if (rl <= 0) {
-              ll = 1;
-              irl += rmct + rl;
-            } else
-              irl += rmct;
-            if (rl >= -1E-4 && rl <= 0) rl = 0;
-          }
-        }
-      }
-      k = wk - 1;
-      int gptz_len = tdarray_length(o->gptz);
-      if (k >= gptz_len) k = gptz_len;
+        k = wk - 1;
+        int gptz_len = tdarray_length(o->gptz);
+        if (k >= gptz_len) k = gptz_len;
 
-      if (k >= 3) {
-        d3 = 0;
-        for (j = 0; j < k - 1; j++) {
-          gpt_i = j;
-          d3 += o->gptz[gpt_i].d;
-        }
-        lgpt_i = 0;
-        lgpt2_i = 0;
-        m = d3 / (k - 2);
-        j = 1;
-        j2 = 1;
-        float v = m;
-        for (j = 0; j < k; j++) {
-          o->gptz[(int)j].ox = o->gptz[(int)j].xx;
-          o->gptz[(int)j].oy = o->gptz[(int)j].yy;
-        }
-        for (j = 1; j < k; j++) {
-          gpt_i = j;
-          while (true) {
-            gpt2_i = j2;
-            if (v < o->gptz[gpt2_i].d) {
-              o->gptz[gpt_i].xx = o->gptz[lgpt2_i].ox +
-                                  (o->gptz[gpt2_i].ox - o->gptz[lgpt2_i].ox) *
-                                      v / o->gptz[gpt2_i].d;
-              o->gptz[gpt_i].yy = o->gptz[lgpt2_i].oy +
-                                  (o->gptz[gpt2_i].oy - o->gptz[lgpt2_i].oy) *
-                                      v / o->gptz[gpt2_i].d;
-              o->gptz[gpt_i].xx +=
-                  (o->gptz[gpt_i].ox - o->gptz[gpt_i].xx) * powf(j / k, 2);
-              o->gptz[gpt_i].yy +=
-                  (o->gptz[gpt_i].oy - o->gptz[gpt_i].yy) * powf(j / k, 2);
-              v += m;
-              break;
-            } else {
-              v -= o->gptz[gpt2_i].d;
-              lgpt2_i = gpt2_i;
-              j2++;
-              if (j2 >= k) {
-                j = k + 1;
+        if (k >= 3) {
+          d3 = 0;
+          for (j = 0; j < k - 1; j++) {
+            gpt_i = j;
+            d3 += o->gptz[gpt_i].d;
+          }
+          lgpt_i = 0;
+          lgpt2_i = 0;
+          m = d3 / (k - 2);
+          j = 1;
+          j2 = 1;
+          float v = m;
+          for (j = 0; j < k; j++) {
+            o->gptz[(int)j].ox = o->gptz[(int)j].xx;
+            o->gptz[(int)j].oy = o->gptz[(int)j].yy;
+          }
+          for (j = 1; j < k; j++) {
+            gpt_i = j;
+            while (true) {
+              gpt2_i = j2;
+              if (v < o->gptz[gpt2_i].d) {
+                o->gptz[gpt_i].xx = o->gptz[lgpt2_i].ox +
+                                    (o->gptz[gpt2_i].ox - o->gptz[lgpt2_i].ox) *
+                                        v / o->gptz[gpt2_i].d;
+                o->gptz[gpt_i].yy = o->gptz[lgpt2_i].oy +
+                                    (o->gptz[gpt2_i].oy - o->gptz[lgpt2_i].oy) *
+                                        v / o->gptz[gpt2_i].d;
+                o->gptz[gpt_i].xx +=
+                    (o->gptz[gpt_i].ox - o->gptz[gpt_i].xx) * powf(j / k, 2);
+                o->gptz[gpt_i].yy +=
+                    (o->gptz[gpt_i].oy - o->gptz[gpt_i].yy) * powf(j / k, 2);
+                v += m;
                 break;
+              } else {
+                v -= o->gptz[gpt2_i].d;
+                lgpt2_i = gpt2_i;
+                j2++;
+                if (j2 >= k) {
+                  j = k + 1;
+                  break;
+                }
               }
             }
-          }
-          lgpt_i = gpt_i;
-        }
-      }
-
-      float lpx = 0, lpy = 0;
-      for (j = 0; j < q; j++) {
-        px = o->gptz[(int)j].xx;
-        py = o->gptz[(int)j].yy;
-        gdata->data.pbx[bp] = px;
-        gdata->data.pby[bp] = py;
-        gdata->data.pba[bp] = 0;
-
-        if (px >= gdata->data.bpx1 && py >= gdata->data.bpy1 &&
-            px <= gdata->data.bpx2 && py <= gdata->data.bpy2)
-          gdata->data.pbu[bp] = 2;
-
-        if (bp >= 1) {
-          tx = px - lpx;
-          ty = py - lpy;
-          gdata->data.pba[bp] = atan2f(ty, tx);
-        }
-        lpx = px;
-        lpy = py;
-        bp++;
-      }
-
-      if (q >= 2) {
-        gdata->data.pba[0] = gdata->data.pba[1];
-        o->wehang = gdata->data.pba[1] + PI;
-      } else
-        o->wehang = o->ang;
-
-      float shsz = gdata->data.gsc * lsz * 1.5f;
-      a *= a;
-
-      float om = 0;
-      float mr = 0;
-
-      if (mode->render_mode == 0) {
-        float shadow_strength = 0.25f;
-
-        if (mode->show_shadows) {
-          // draw last 4 body parts' shadow:
-          int start = bp >= 4 ? bp - 4 : 0;
-          for (j = start; j < bp; j++) {
-            if (gdata->data.pbu[(int)j] >= 1) {
-              px = gdata->data.pbx[(int)j];
-              py = gdata->data.pby[(int)j];
-
-              float fix = ((px - gdata->data.view_xx) * gdata->data.gsc) + mww2;
-              float fiy = ((py - gdata->data.view_yy) * gdata->data.gsc) + mhh2;
-
-              bp_renderer_push(usr->r->bpr,
-                               &(bp_instance){{fix - shsz, fiy - shsz, 2 * shsz,
-                                               gdata->data.pba[(int)j]},
-                                              gdata->SHADOW_UV,
-                                              {0, 0, 0, shadow_strength * a}});
-            }
+            lgpt_i = gpt_i;
           }
         }
 
-        // draw body parts:
-        if (o->cusk) {
-          for (j = bp - 1; j >= 0; j--)
-            if (gdata->data.pbu[(int)j] >= 1) {
-              px = gdata->data.pbx[(int)j];
-              py = gdata->data.pby[(int)j];
+        float lpx = 0, lpy = 0;
+        for (j = 0; j < q; j++) {
+          px = o->gptz[(int)j].xx;
+          py = o->gptz[(int)j].yy;
+          gdata->data.pbx[bp] = px;
+          gdata->data.pby[bp] = py;
+          gdata->data.pba[bp] = 0;
 
-              if (j >= 4 && mode->show_shadows) {
-                k = j - 4;
-                if (gdata->data.pbu[(int)k] == 2) {
-                  ox = tx;
-                  oy = ty;
-                  tx = gdata->data.pbx[(int)k];
-                  ty = gdata->data.pby[(int)k];
-                  float fix =
-                      ((tx - gdata->data.view_xx) * gdata->data.gsc) + mww2;
-                  float fiy =
-                      ((ty - gdata->data.view_yy) * gdata->data.gsc) + mhh2;
+          if (px >= gdata->data.bpx1 && py >= gdata->data.bpy1 &&
+              px <= gdata->data.bpx2 && py <= gdata->data.bpy2)
+            gdata->data.pbu[bp] = 2;
 
-                  bp_renderer_push(
-                      usr->r->bpr,
-                      &(bp_instance){{fix - shsz, fiy - shsz, 2 * shsz,
-                                      gdata->data.pba[(int)j]},
-                                     gdata->SHADOW_UV,
-                                     {0, 0, 0, shadow_strength * a}});
-                }
-              }
-
-              float fix = ((px - gdata->data.view_xx) * gdata->data.gsc) + mww2;
-              float fiy = ((py - gdata->data.view_yy) * gdata->data.gsc) + mhh2;
-
-              int cg_id = o->cusk_data[(int)j % o->cusk_len];
-
-              bp_renderer_push(usr->r->bpr,
-                               &(bp_instance){{fix - (gdata->data.gsc * lsz),
-                                               fiy - (gdata->data.gsc * lsz),
-                                               gdata->data.gsc * 2 * lsz,
-                                               gdata->data.pba[(int)j]},
-                                              gdata->cg_uvs[cg_id],
-                                              {1, 1, 1, a}});
-            }
-        } else {
-          for (j = bp - 1; j >= 0; j--)
-            if (gdata->data.pbu[(int)j] >= 1) {
-              px = gdata->data.pbx[(int)j];
-              py = gdata->data.pby[(int)j];
-
-              if (j >= 4 && mode->show_shadows) {
-                k = j - 4;
-                if (gdata->data.pbu[(int)k] == 2) {
-                  ox = tx;
-                  oy = ty;
-                  tx = gdata->data.pbx[(int)k];
-                  ty = gdata->data.pby[(int)k];
-                  float fix =
-                      ((tx - gdata->data.view_xx) * gdata->data.gsc) + mww2;
-                  float fiy =
-                      ((ty - gdata->data.view_yy) * gdata->data.gsc) + mhh2;
-
-                  bp_renderer_push(
-                      usr->r->bpr,
-                      &(bp_instance){{fix - shsz, fiy - shsz, 2 * shsz,
-                                      gdata->data.pba[(int)j]},
-                                     gdata->SHADOW_UV,
-                                     {0, 0, 0, shadow_strength * a}});
-                }
-              }
-
-              float fix = ((px - gdata->data.view_xx) * gdata->data.gsc) + mww2;
-              float fiy = ((py - gdata->data.view_yy) * gdata->data.gsc) + mhh2;
-
-              int default_skin_len = gdata->default_skins[o->cv][0];
-              int cg_id =
-                  gdata->default_skins[o->cv][1 + ((int)j % default_skin_len)];
-              float se = gdata->worm_effect[(int)j % WORM_EFFECT_LEN];
-
-              bp_renderer_push(usr->r->bpr,
-                               &(bp_instance){{fix - (gdata->data.gsc * lsz),
-                                               fiy - (gdata->data.gsc * lsz),
-                                               gdata->data.gsc * 2 * lsz,
-                                               gdata->data.pba[(int)j]},
-                                              gdata->cg_uvs[cg_id],
-                                              {se, se, se, a}});
-            }
+          if (bp >= 1) {
+            tx = px - lpx;
+            ty = py - lpy;
+            gdata->data.pba[bp] = atan2f(ty, tx);
+          }
+          lpx = px;
+          lpy = py;
+          bp++;
         }
-      } else if (mode->render_mode == 1) {
-        if (mode->show_shadows) {
-          // draw last 4 body parts' shadow:
-          int start = bp >= 4 ? bp - 4 : 0;
-          for (j = start; j < bp; j++) {
-            if (gdata->data.pbu[(int)j] >= 1) {
-              px = gdata->data.pbx[(int)j];
-              py = gdata->data.pby[(int)j];
 
-              float fix = ((px - gdata->data.view_xx) * gdata->data.gsc) + mww2;
-              float fiy = ((py - gdata->data.view_yy) * gdata->data.gsc) + mhh2;
+        if (q >= 2) {
+          gdata->data.pba[0] = gdata->data.pba[1];
+          o->wehang = gdata->data.pba[1] + PI;
+        } else
+          o->wehang = o->ang;
 
-              bp_renderer_push(
-                  usr->r->bpr,
-                  &(bp_instance){{fix - (lsz * gdata->data.gsc + 1),
-                                  fiy - (lsz * gdata->data.gsc + 1),
-                                  (lsz * gdata->data.gsc + 1) * 2,
-                                  gdata->data.pba[(int)j]},
-                                 gdata->cg_uvs[BLANK_UV],
-                                 {0, 0, 0, a}});
+        float shsz = gdata->data.gsc * lsz * 1.5f;
+        a *= a;
+
+        float om = 0;
+        float mr = 0;
+
+        if (mode->render_mode == 0) {
+          float shadow_strength = 0.25f;
+
+          if (mode->show_shadows) {
+            // draw last 4 body parts' shadow:
+            int start = bp >= 4 ? bp - 4 : 0;
+            for (j = start; j < bp; j++) {
+              if (gdata->data.pbu[(int)j] >= 1) {
+                px = gdata->data.pbx[(int)j];
+                py = gdata->data.pby[(int)j];
+
+                float fix =
+                    ((px - gdata->data.view_xx) * gdata->data.gsc) + mww2;
+                float fiy =
+                    ((py - gdata->data.view_yy) * gdata->data.gsc) + mhh2;
+
+                bp_renderer_push(
+                    usr->r->bpr,
+                    &(bp_instance){{fix - shsz, fiy - shsz, 2 * shsz,
+                                    gdata->data.pba[(int)j]},
+                                   gdata->SHADOW_UV,
+                                   {0, 0, 0, shadow_strength * a}});
+              }
             }
           }
-        }
 
-        // draw body parts:
-        if (o->cusk) {
-          for (j = bp - 1; j >= 0; j--)
-            if (gdata->data.pbu[(int)j] >= 1) {
-              px = gdata->data.pbx[(int)j];
-              py = gdata->data.pby[(int)j];
-
-              if (j >= 4 && mode->show_shadows) {
-                k = j - 4;
-                if (gdata->data.pbu[(int)k] == 2) {
-                  ox = tx;
-                  oy = ty;
-                  tx = gdata->data.pbx[(int)k];
-                  ty = gdata->data.pby[(int)k];
-                  float fix =
-                      ((tx - gdata->data.view_xx) * gdata->data.gsc) + mww2;
-                  float fiy =
-                      ((ty - gdata->data.view_yy) * gdata->data.gsc) + mhh2;
-
-                  bp_renderer_push(
-                      usr->r->bpr,
-                      &(bp_instance){{fix - (lsz * gdata->data.gsc + 1),
-                                      fiy - (lsz * gdata->data.gsc + 1),
-                                      (lsz * gdata->data.gsc + 1) * 2,
-                                      gdata->data.pba[(int)j]},
-                                     gdata->cg_uvs[BLANK_UV],
-                                     {0, 0, 0, a}});
-                }
-              }
-
-              float fix = ((px - gdata->data.view_xx) * gdata->data.gsc) + mww2;
-              float fiy = ((py - gdata->data.view_yy) * gdata->data.gsc) + mhh2;
-
-              int cg_id = o->cusk_data[(int)j % o->cusk_len];
-              vec3s* cg_col = gdata->cg_colors + cg_id;
-
-              bp_renderer_push(
-                  usr->r->bpr,
-                  &(bp_instance){
-                      {fix - (gdata->data.gsc * lsz),
-                       fiy - (gdata->data.gsc * lsz), gdata->data.gsc * 2 * lsz,
-                       gdata->data.pba[(int)j]},
-                      gdata->cg_uvs[BLANK_UV],
-                      {cg_col->r, cg_col->g, cg_col->b, a}});
-            }
-        } else {
-          for (j = bp - 1; j >= 0; j--)
-            if (gdata->data.pbu[(int)j] >= 1) {
-              px = gdata->data.pbx[(int)j];
-              py = gdata->data.pby[(int)j];
-
-              if (j >= 4 && mode->show_shadows) {
-                k = j - 4;
-                if (gdata->data.pbu[(int)k] == 2) {
-                  ox = tx;
-                  oy = ty;
-                  tx = gdata->data.pbx[(int)k];
-                  ty = gdata->data.pby[(int)k];
-                  float fix =
-                      ((tx - gdata->data.view_xx) * gdata->data.gsc) + mww2;
-                  float fiy =
-                      ((ty - gdata->data.view_yy) * gdata->data.gsc) + mhh2;
-
-                  bp_renderer_push(
-                      usr->r->bpr,
-                      &(bp_instance){{fix - (lsz * gdata->data.gsc + 1),
-                                      fiy - (lsz * gdata->data.gsc + 1),
-                                      (lsz * gdata->data.gsc + 1) * 2,
-                                      gdata->data.pba[(int)j]},
-                                     gdata->cg_uvs[BLANK_UV],
-                                     {0, 0, 0, a}});
-                }
-              }
-
-              float fix = ((px - gdata->data.view_xx) * gdata->data.gsc) + mww2;
-              float fiy = ((py - gdata->data.view_yy) * gdata->data.gsc) + mhh2;
-
-              int default_skin_len = gdata->default_skins[o->cv][0];
-              int cg_id =
-                  gdata->default_skins[o->cv][1 + ((int)j % default_skin_len)];
-              vec3s* cg_col = gdata->cg_colors + cg_id;
-
-              bp_renderer_push(
-                  usr->r->bpr,
-                  &(bp_instance){
-                      {fix - (gdata->data.gsc * lsz),
-                       fiy - (gdata->data.gsc * lsz), gdata->data.gsc * 2 * lsz,
-                       gdata->data.pba[(int)j]},
-                      gdata->cg_uvs[BLANK_UV],
-                      {cg_col->r, cg_col->g, cg_col->b, a}});
-            }
-        }
-      } else if (mode->render_mode == 2) {
-        if (mode->show_shadows) {
-          // draw last 4 body parts' shadow:
-          int start = bp >= 4 ? bp - 4 : 0;
-          for (j = start; j < bp; j++) {
-            if (gdata->data.pbu[(int)j] >= 1) {
-              px = gdata->data.pbx[(int)j];
-              py = gdata->data.pby[(int)j];
-
-              float fix = ((px - gdata->data.view_xx) * gdata->data.gsc) + mww2;
-              float fiy = ((py - gdata->data.view_yy) * gdata->data.gsc) + mhh2;
-
-              bp_renderer_push(
-                  usr->r->bpr,
-                  &(bp_instance){{fix - (lsz * gdata->data.gsc + 1),
-                                  fiy - (lsz * gdata->data.gsc + 1),
-                                  (lsz * gdata->data.gsc + 1) * 2,
-                                  gdata->data.pba[(int)j]},
-                                 gdata->cg_uvs[BLANK_UV],
-                                 {0, 0, 0, a}});
-            }
-          }
-        }
-
-        // draw body parts:
-        if (o->cusk) {
-          for (j = bp - 1; j >= 0; j--)
-            if (gdata->data.pbu[(int)j] >= 1) {
-              px = gdata->data.pbx[(int)j];
-              py = gdata->data.pby[(int)j];
-
-              if (j >= 4 && mode->show_shadows) {
-                k = j - 4;
-                if (gdata->data.pbu[(int)k] == 2) {
-                  ox = tx;
-                  oy = ty;
-                  tx = gdata->data.pbx[(int)k];
-                  ty = gdata->data.pby[(int)k];
-                  float fix =
-                      ((tx - gdata->data.view_xx) * gdata->data.gsc) + mww2;
-                  float fiy =
-                      ((ty - gdata->data.view_yy) * gdata->data.gsc) + mhh2;
-
-                  bp_renderer_push(
-                      usr->r->bpr,
-                      &(bp_instance){{fix - (lsz * gdata->data.gsc + 1),
-                                      fiy - (lsz * gdata->data.gsc + 1),
-                                      (lsz * gdata->data.gsc + 1) * 2,
-                                      gdata->data.pba[(int)j]},
-                                     gdata->cg_uvs[BLANK_UV],
-                                     {0, 0, 0, a}});
-                }
-              }
-
-              float fix = ((px - gdata->data.view_xx) * gdata->data.gsc) + mww2;
-              float fiy = ((py - gdata->data.view_yy) * gdata->data.gsc) + mhh2;
-
-              int cg_id = o->cusk_data[0];
-              vec3s* cg_col = gdata->cg_colors + cg_id;
-
-              bp_renderer_push(
-                  usr->r->bpr,
-                  &(bp_instance){
-                      {fix - (gdata->data.gsc * lsz),
-                       fiy - (gdata->data.gsc * lsz), gdata->data.gsc * 2 * lsz,
-                       gdata->data.pba[(int)j]},
-                      gdata->cg_uvs[BLANK_UV],
-                      {cg_col->r, cg_col->g, cg_col->b, a}});
-            }
-        } else {
-          for (j = bp - 1; j >= 0; j--)
-            if (gdata->data.pbu[(int)j] >= 1) {
-              px = gdata->data.pbx[(int)j];
-              py = gdata->data.pby[(int)j];
-
-              if (j >= 4 && mode->show_shadows) {
-                k = j - 4;
-                if (gdata->data.pbu[(int)k] == 2) {
-                  ox = tx;
-                  oy = ty;
-                  tx = gdata->data.pbx[(int)k];
-                  ty = gdata->data.pby[(int)k];
-                  float fix =
-                      ((tx - gdata->data.view_xx) * gdata->data.gsc) + mww2;
-                  float fiy =
-                      ((ty - gdata->data.view_yy) * gdata->data.gsc) + mhh2;
-
-                  bp_renderer_push(
-                      usr->r->bpr,
-                      &(bp_instance){{fix - (lsz * gdata->data.gsc + 1),
-                                      fiy - (lsz * gdata->data.gsc + 1),
-                                      (lsz * gdata->data.gsc + 1) * 2,
-                                      gdata->data.pba[(int)j]},
-                                     gdata->cg_uvs[BLANK_UV],
-                                     {0, 0, 0, a}});
-                }
-              }
-
-              float fix = ((px - gdata->data.view_xx) * gdata->data.gsc) + mww2;
-              float fiy = ((py - gdata->data.view_yy) * gdata->data.gsc) + mhh2;
-
-              int default_skin_len = gdata->default_skins[o->cv][0];
-              int cg_id =
-                  gdata->default_skins[o->cv][1];
-              vec3s* cg_col = gdata->cg_colors + cg_id;
-
-              bp_renderer_push(
-                  usr->r->bpr,
-                  &(bp_instance){
-                      {fix - (gdata->data.gsc * lsz),
-                       fiy - (gdata->data.gsc * lsz), gdata->data.gsc * 2 * lsz,
-                       gdata->data.pba[(int)j]},
-                      gdata->cg_uvs[BLANK_UV],
-                      {cg_col->r, cg_col->g, cg_col->b, a}});
-            }
-        }
-      }
-
-      if (mode->show_boost) {
-        // boost effect 1:
-        if (o->smooth_tsp > o->fsp) {
-          m = a *
-              fmaxf(0, fminf(1, (o->smooth_tsp - o->ssp) / (o->msp - o->ssp)));
-          om = m * .37;
-          mr = powf(m, .5);
-          float glsz = (1 + mode->boost_type + mr) * gdata->data.gsc * lsz;
-          float strength = 1 + mode->boost_type;
-
+          // draw body parts:
           if (o->cusk) {
             for (j = bp - 1; j >= 0; j--)
-              if (gdata->data.pbu[(int)j] == 2) {
-                ox = tx;
-                oy = ty;
-                tx = gdata->data.pbx[(int)j];
-                ty = gdata->data.pby[(int)j];
-                if (tx > ox)
-                  d2 = tx - ox;
-                else
-                  d2 = ox - tx;
-                if (ty > oy)
-                  d2 += ty - oy;
-                else
-                  d2 += oy - ty;
-                d2 /= 6;
-                if (d2 > 1) d2 = 1;
+              if (gdata->data.pbu[(int)j] >= 1) {
+                px = gdata->data.pbx[(int)j];
+                py = gdata->data.pby[(int)j];
 
-                float fix = (tx - gdata->data.view_xx) * gdata->data.gsc + mww2;
-                float fiy = (ty - gdata->data.view_yy) * gdata->data.gsc + mhh2;
+                if (j >= 4 && mode->show_shadows) {
+                  k = j - 4;
+                  if (gdata->data.pbu[(int)k] == 2) {
+                    ox = tx;
+                    oy = ty;
+                    tx = gdata->data.pbx[(int)k];
+                    ty = gdata->data.pby[(int)k];
+                    float fix =
+                        ((tx - gdata->data.view_xx) * gdata->data.gsc) + mww2;
+                    float fiy =
+                        ((ty - gdata->data.view_yy) * gdata->data.gsc) + mhh2;
 
-                float alpha = strength * d2 * a * mr * .38 *
-                              (.6 + .4 * cosf(j / 4 - 1.15 * o->sfr));
+                    bp_renderer_push(
+                        usr->r->bpr,
+                        &(bp_instance){{fix - shsz, fiy - shsz, 2 * shsz,
+                                        gdata->data.pba[(int)j]},
+                                       gdata->SHADOW_UV,
+                                       {0, 0, 0, shadow_strength * a}});
+                  }
+                }
+
+                float fix =
+                    ((px - gdata->data.view_xx) * gdata->data.gsc) + mww2;
+                float fiy =
+                    ((py - gdata->data.view_yy) * gdata->data.gsc) + mhh2;
+
                 int cg_id = o->cusk_data[(int)j % o->cusk_len];
-                vec3s* shc = gdata->cg_glow_colors + cg_id;
 
-                bst_renderer_push(
-                    usr->r->bstb,
-                    &(bst_instance){{fix - glsz, fiy - glsz, 2 * glsz},
-                                    {shc->r, shc->g, shc->b, alpha}});
+                bp_renderer_push(usr->r->bpr,
+                                 &(bp_instance){{fix - (gdata->data.gsc * lsz),
+                                                 fiy - (gdata->data.gsc * lsz),
+                                                 gdata->data.gsc * 2 * lsz,
+                                                 gdata->data.pba[(int)j]},
+                                                gdata->cg_uvs[cg_id],
+                                                {1, 1, 1, a}});
               }
           } else {
             for (j = bp - 1; j >= 0; j--)
-              if (gdata->data.pbu[(int)j] == 2) {
-                ox = tx;
-                oy = ty;
-                tx = gdata->data.pbx[(int)j];
-                ty = gdata->data.pby[(int)j];
-                if (tx > ox)
-                  d2 = tx - ox;
-                else
-                  d2 = ox - tx;
-                if (ty > oy)
-                  d2 += ty - oy;
-                else
-                  d2 += oy - ty;
-                d2 /= 6;
-                if (d2 > 1) d2 = 1;
+              if (gdata->data.pbu[(int)j] >= 1) {
+                px = gdata->data.pbx[(int)j];
+                py = gdata->data.pby[(int)j];
 
-                float fix = (tx - gdata->data.view_xx) * gdata->data.gsc + mww2;
-                float fiy = (ty - gdata->data.view_yy) * gdata->data.gsc + mhh2;
+                if (j >= 4 && mode->show_shadows) {
+                  k = j - 4;
+                  if (gdata->data.pbu[(int)k] == 2) {
+                    ox = tx;
+                    oy = ty;
+                    tx = gdata->data.pbx[(int)k];
+                    ty = gdata->data.pby[(int)k];
+                    float fix =
+                        ((tx - gdata->data.view_xx) * gdata->data.gsc) + mww2;
+                    float fiy =
+                        ((ty - gdata->data.view_yy) * gdata->data.gsc) + mhh2;
 
-                float alpha = strength * d2 * a * mr * .38 *
-                              (.6 + .4 * cosf(j / 4 - 1.15 * o->sfr));
+                    bp_renderer_push(
+                        usr->r->bpr,
+                        &(bp_instance){{fix - shsz, fiy - shsz, 2 * shsz,
+                                        gdata->data.pba[(int)j]},
+                                       gdata->SHADOW_UV,
+                                       {0, 0, 0, shadow_strength * a}});
+                  }
+                }
+
+                float fix =
+                    ((px - gdata->data.view_xx) * gdata->data.gsc) + mww2;
+                float fiy =
+                    ((py - gdata->data.view_yy) * gdata->data.gsc) + mhh2;
 
                 int default_skin_len = gdata->default_skins[o->cv][0];
                 int cg_id =
                     gdata
                         ->default_skins[o->cv][1 + ((int)j % default_skin_len)];
-                vec3s* shc = gdata->cg_glow_colors + cg_id;
+                float se = gdata->worm_effect[(int)j % WORM_EFFECT_LEN];
 
-                bst_renderer_push(
-                    usr->r->bstb,
-                    &(bst_instance){{fix - glsz, fiy - glsz, 2 * glsz},
-                                    {shc->r, shc->g, shc->b, alpha}});
+                bp_renderer_push(usr->r->bpr,
+                                 &(bp_instance){{fix - (gdata->data.gsc * lsz),
+                                                 fiy - (gdata->data.gsc * lsz),
+                                                 gdata->data.gsc * 2 * lsz,
+                                                 gdata->data.pba[(int)j]},
+                                                gdata->cg_uvs[cg_id],
+                                                {se, se, se, a}});
               }
           }
-        }
-        // boost effect 2:
-        if (mode->boost_type == 0 && o->smooth_tsp > o->fsp) {
-          float glsz = lsz * 3 * gdata->data.gsc;
-          float strength = 0.7f;
+        } else if (mode->render_mode == 1) {
+          if (mode->show_shadows) {
+            // draw last 4 body parts' shadow:
+            int start = bp >= 4 ? bp - 4 : 0;
+            for (j = start; j < bp; j++) {
+              if (gdata->data.pbu[(int)j] >= 1) {
+                px = gdata->data.pbx[(int)j];
+                py = gdata->data.pby[(int)j];
 
+                float fix =
+                    ((px - gdata->data.view_xx) * gdata->data.gsc) + mww2;
+                float fiy =
+                    ((py - gdata->data.view_yy) * gdata->data.gsc) + mhh2;
+
+                bp_renderer_push(
+                    usr->r->bpr,
+                    &(bp_instance){{fix - (lsz * gdata->data.gsc + 1),
+                                    fiy - (lsz * gdata->data.gsc + 1),
+                                    (lsz * gdata->data.gsc + 1) * 2,
+                                    gdata->data.pba[(int)j]},
+                                   gdata->cg_uvs[BLANK_UV],
+                                   {0, 0, 0, a * a}});
+              }
+            }
+          }
+
+          // draw body parts:
           if (o->cusk) {
             for (j = bp - 1; j >= 0; j--)
-              if (gdata->data.pbu[(int)j] == 2) {
-                ox = tx;
-                oy = ty;
-                tx = gdata->data.pbx[(int)j];
-                ty = gdata->data.pby[(int)j];
-                if (tx > ox)
-                  d2 = tx - ox;
-                else
-                  d2 = ox - tx;
-                if (ty > oy)
-                  d2 += ty - oy;
-                else
-                  d2 += oy - ty;
-                d2 /= 6;
-                if (d2 > 1) d2 = 1;
+              if (gdata->data.pbu[(int)j] >= 1) {
+                px = gdata->data.pbx[(int)j];
+                py = gdata->data.pby[(int)j];
 
-                float fix = (tx - gdata->data.view_xx) * gdata->data.gsc + mww2;
-                float fiy = (ty - gdata->data.view_yy) * gdata->data.gsc + mhh2;
+                if (j >= 4 && mode->show_shadows) {
+                  k = j - 4;
+                  if (gdata->data.pbu[(int)k] == 2) {
+                    ox = tx;
+                    oy = ty;
+                    tx = gdata->data.pbx[(int)k];
+                    ty = gdata->data.pby[(int)k];
+                    float fix =
+                        ((tx - gdata->data.view_xx) * gdata->data.gsc) + mww2;
+                    float fiy =
+                        ((ty - gdata->data.view_yy) * gdata->data.gsc) + mhh2;
 
-                float alpha =
-                    strength * d2 * a * om * (.5 + .5 * cosf(j / 4 - o->sfr));
+                    bp_renderer_push(
+                        usr->r->bpr,
+                        &(bp_instance){{fix - (lsz * gdata->data.gsc + 1),
+                                        fiy - (lsz * gdata->data.gsc + 1),
+                                        (lsz * gdata->data.gsc + 1) * 2,
+                                        gdata->data.pba[(int)j]},
+                                       gdata->cg_uvs[BLANK_UV],
+                                       {0, 0, 0, a * a}});
+                  }
+                }
+
+                float fix =
+                    ((px - gdata->data.view_xx) * gdata->data.gsc) + mww2;
+                float fiy =
+                    ((py - gdata->data.view_yy) * gdata->data.gsc) + mhh2;
+
                 int cg_id = o->cusk_data[(int)j % o->cusk_len];
-                vec3s* shc = gdata->cg_glow_colors + cg_id;
+                vec3s* cg_col = gdata->cg_colors + cg_id;
 
-                bst_renderer_push(
-                    usr->r->bsta,
-                    &(bst_instance){{fix - glsz, fiy - glsz, 2 * glsz},
-                                    {shc->r, shc->g, shc->b, alpha}});
+                bp_renderer_push(
+                    usr->r->bpr,
+                    &(bp_instance){
+                        {fix - (gdata->data.gsc * lsz),
+                         fiy - (gdata->data.gsc * lsz),
+                         gdata->data.gsc * 2 * lsz, gdata->data.pba[(int)j]},
+                        gdata->cg_uvs[BLANK_UV],
+                        {cg_col->r, cg_col->g, cg_col->b, a}});
               }
           } else {
             for (j = bp - 1; j >= 0; j--)
-              if (gdata->data.pbu[(int)j] == 2) {
-                ox = tx;
-                oy = ty;
-                tx = gdata->data.pbx[(int)j];
-                ty = gdata->data.pby[(int)j];
-                if (tx > ox)
-                  d2 = tx - ox;
-                else
-                  d2 = ox - tx;
-                if (ty > oy)
-                  d2 += ty - oy;
-                else
-                  d2 += oy - ty;
-                d2 /= 6;
-                if (d2 > 1) d2 = 1;
+              if (gdata->data.pbu[(int)j] >= 1) {
+                px = gdata->data.pbx[(int)j];
+                py = gdata->data.pby[(int)j];
 
-                float fix = (tx - gdata->data.view_xx) * gdata->data.gsc + mww2;
-                float fiy = (ty - gdata->data.view_yy) * gdata->data.gsc + mhh2;
+                if (j >= 4 && mode->show_shadows) {
+                  k = j - 4;
+                  if (gdata->data.pbu[(int)k] == 2) {
+                    ox = tx;
+                    oy = ty;
+                    tx = gdata->data.pbx[(int)k];
+                    ty = gdata->data.pby[(int)k];
+                    float fix =
+                        ((tx - gdata->data.view_xx) * gdata->data.gsc) + mww2;
+                    float fiy =
+                        ((ty - gdata->data.view_yy) * gdata->data.gsc) + mhh2;
 
-                float alpha =
-                    strength * d2 * a * om * (.5 + .5 * cosf(j / 4 - o->sfr));
+                    bp_renderer_push(
+                        usr->r->bpr,
+                        &(bp_instance){{fix - (lsz * gdata->data.gsc + 1),
+                                        fiy - (lsz * gdata->data.gsc + 1),
+                                        (lsz * gdata->data.gsc + 1) * 2,
+                                        gdata->data.pba[(int)j]},
+                                       gdata->cg_uvs[BLANK_UV],
+                                       {0, 0, 0, a * a}});
+                  }
+                }
+
+                float fix =
+                    ((px - gdata->data.view_xx) * gdata->data.gsc) + mww2;
+                float fiy =
+                    ((py - gdata->data.view_yy) * gdata->data.gsc) + mhh2;
 
                 int default_skin_len = gdata->default_skins[o->cv][0];
                 int cg_id =
                     gdata
                         ->default_skins[o->cv][1 + ((int)j % default_skin_len)];
-                vec3s* shc = gdata->cg_glow_colors + cg_id;
+                vec3s* cg_col = gdata->cg_colors + cg_id;
 
-                bst_renderer_push(
-                    usr->r->bsta,
-                    &(bst_instance){{fix - glsz, fiy - glsz, 2 * glsz},
-                                    {shc->r, shc->g, shc->b, alpha}});
+                bp_renderer_push(
+                    usr->r->bpr,
+                    &(bp_instance){
+                        {fix - (gdata->data.gsc * lsz),
+                         fiy - (gdata->data.gsc * lsz),
+                         gdata->data.gsc * 2 * lsz, gdata->data.pba[(int)j]},
+                        gdata->cg_uvs[BLANK_UV],
+                        {cg_col->r, cg_col->g, cg_col->b, a}});
+              }
+          }
+        } else if (mode->render_mode == 2) {
+          if (mode->show_shadows) {
+            // draw last 4 body parts' shadow:
+            int start = bp >= 4 ? bp - 4 : 0;
+            for (j = start; j < bp; j++) {
+              if (gdata->data.pbu[(int)j] >= 1) {
+                px = gdata->data.pbx[(int)j];
+                py = gdata->data.pby[(int)j];
+
+                float fix =
+                    ((px - gdata->data.view_xx) * gdata->data.gsc) + mww2;
+                float fiy =
+                    ((py - gdata->data.view_yy) * gdata->data.gsc) + mhh2;
+
+                bp_renderer_push(
+                    usr->r->bpr,
+                    &(bp_instance){{fix - (lsz * gdata->data.gsc + 1),
+                                    fiy - (lsz * gdata->data.gsc + 1),
+                                    (lsz * gdata->data.gsc + 1) * 2,
+                                    gdata->data.pba[(int)j]},
+                                   gdata->cg_uvs[BLANK_UV],
+                                   {0, 0, 0, a * a}});
+              }
+            }
+          }
+
+          // draw body parts:
+          if (o->cusk) {
+            for (j = bp - 1; j >= 0; j--)
+              if (gdata->data.pbu[(int)j] >= 1) {
+                px = gdata->data.pbx[(int)j];
+                py = gdata->data.pby[(int)j];
+
+                if (j >= 4 && mode->show_shadows) {
+                  k = j - 4;
+                  if (gdata->data.pbu[(int)k] == 2) {
+                    ox = tx;
+                    oy = ty;
+                    tx = gdata->data.pbx[(int)k];
+                    ty = gdata->data.pby[(int)k];
+                    float fix =
+                        ((tx - gdata->data.view_xx) * gdata->data.gsc) + mww2;
+                    float fiy =
+                        ((ty - gdata->data.view_yy) * gdata->data.gsc) + mhh2;
+
+                    bp_renderer_push(
+                        usr->r->bpr,
+                        &(bp_instance){{fix - (lsz * gdata->data.gsc + 1),
+                                        fiy - (lsz * gdata->data.gsc + 1),
+                                        (lsz * gdata->data.gsc + 1) * 2,
+                                        gdata->data.pba[(int)j]},
+                                       gdata->cg_uvs[BLANK_UV],
+                                       {0, 0, 0, a * a}});
+                  }
+                }
+
+                float fix =
+                    ((px - gdata->data.view_xx) * gdata->data.gsc) + mww2;
+                float fiy =
+                    ((py - gdata->data.view_yy) * gdata->data.gsc) + mhh2;
+
+                int cg_id = o->cusk_data[0];
+                vec3s* cg_col = gdata->cg_colors + cg_id;
+
+                bp_renderer_push(
+                    usr->r->bpr,
+                    &(bp_instance){
+                        {fix - (gdata->data.gsc * lsz),
+                         fiy - (gdata->data.gsc * lsz),
+                         gdata->data.gsc * 2 * lsz, gdata->data.pba[(int)j]},
+                        gdata->cg_uvs[BLANK_UV],
+                        {cg_col->r, cg_col->g, cg_col->b, a * a}});
+              }
+          } else {
+            for (j = bp - 1; j >= 0; j--)
+              if (gdata->data.pbu[(int)j] >= 1) {
+                px = gdata->data.pbx[(int)j];
+                py = gdata->data.pby[(int)j];
+
+                if (j >= 4 && mode->show_shadows) {
+                  k = j - 4;
+                  if (gdata->data.pbu[(int)k] == 2) {
+                    ox = tx;
+                    oy = ty;
+                    tx = gdata->data.pbx[(int)k];
+                    ty = gdata->data.pby[(int)k];
+                    float fix =
+                        ((tx - gdata->data.view_xx) * gdata->data.gsc) + mww2;
+                    float fiy =
+                        ((ty - gdata->data.view_yy) * gdata->data.gsc) + mhh2;
+
+                    bp_renderer_push(
+                        usr->r->bpr,
+                        &(bp_instance){{fix - (lsz * gdata->data.gsc + 1),
+                                        fiy - (lsz * gdata->data.gsc + 1),
+                                        (lsz * gdata->data.gsc + 1) * 2,
+                                        gdata->data.pba[(int)j]},
+                                       gdata->cg_uvs[BLANK_UV],
+                                       {0, 0, 0, a}});
+                  }
+                }
+
+                float fix =
+                    ((px - gdata->data.view_xx) * gdata->data.gsc) + mww2;
+                float fiy =
+                    ((py - gdata->data.view_yy) * gdata->data.gsc) + mhh2;
+
+                int default_skin_len = gdata->default_skins[o->cv][0];
+                int cg_id = gdata->default_skins[o->cv][1];
+                vec3s* cg_col = gdata->cg_colors + cg_id;
+
+                bp_renderer_push(
+                    usr->r->bpr,
+                    &(bp_instance){
+                        {fix - (gdata->data.gsc * lsz),
+                         fiy - (gdata->data.gsc * lsz),
+                         gdata->data.gsc * 2 * lsz, gdata->data.pba[(int)j]},
+                        gdata->cg_uvs[BLANK_UV],
+                        {cg_col->r, cg_col->g, cg_col->b, a}});
               }
           }
         }
-      }
 
-      // draw eyes:
-      float ed = 6 * ssc;   // o->ed
-      float esp = 6 * ssc;  // o->esp
-      float er = 6;         // o->er
-      default_skin_data* dfs = gdata->dfs + ((1 - o->cusk) * (1 + o->cv));
-      float pr = dfs->pr;
-      float iris_r = er * ssc * gdata->data.gsc;
-      float pupil_r = pr * ssc * gdata->data.gsc;
+        if (mode->show_boost) {
+          // boost effect 1:
+          if (o->smooth_tsp > o->fsp) {
+            m = a * fmaxf(0, fminf(1, (o->smooth_tsp - o->ssp) /
+                                          (o->msp - o->ssp)));
+            om = m * .37;
+            mr = powf(m, .5);
+            float glsz = (1 + mode->boost_type + mr) * gdata->data.gsc * lsz;
+            float strength = 1 + mode->boost_type;
 
-      float ex = cosf(fang) * ed + cosf(fang - PI / 2) * (esp + .5);
-      float ey = sinf(fang) * ed + sinf(fang - PI / 2) * (esp + .5);
+            if (o->cusk) {
+              for (j = bp - 1; j >= 0; j--)
+                if (gdata->data.pbu[(int)j] == 2) {
+                  ox = tx;
+                  oy = ty;
+                  tx = gdata->data.pbx[(int)j];
+                  ty = gdata->data.pby[(int)j];
+                  if (tx > ox)
+                    d2 = tx - ox;
+                  else
+                    d2 = ox - tx;
+                  if (ty > oy)
+                    d2 += ty - oy;
+                  else
+                    d2 += oy - ty;
+                  d2 /= 6;
+                  if (d2 > 1) d2 = 1;
 
-      bp_renderer_push(
-          usr->r->bpr,
-          &(bp_instance){
-              {(mww2 + (ex + hx - gdata->data.view_xx) * gdata->data.gsc) -
-                   iris_r,
-               (mhh2 + (ey + hy - gdata->data.view_yy) * gdata->data.gsc) -
-                   iris_r,
-               iris_r * 2, 0},
-              gdata->cg_uvs[BLANK_UV],
-              {dfs->ec.r, dfs->ec.g, dfs->ec.b, a}});
+                  float fix =
+                      (tx - gdata->data.view_xx) * gdata->data.gsc + mww2;
+                  float fiy =
+                      (ty - gdata->data.view_yy) * gdata->data.gsc + mhh2;
 
-      ex = cosf(fang) * ed + cosf(fang + PI / 2) * (esp + .5);
-      ey = sinf(fang) * ed + sinf(fang + PI / 2) * (esp + .5);
+                  float alpha = strength * d2 * a * mr * .38 *
+                                (.6 + .4 * cosf(j / 4 - 1.15 * o->sfr));
+                  int cg_id = o->cusk_data[(int)j % o->cusk_len];
+                  vec3s* shc = gdata->cg_glow_colors + cg_id;
 
-      bp_renderer_push(
-          usr->r->bpr,
-          &(bp_instance){
-              {(mww2 + (ex + hx - gdata->data.view_xx) * gdata->data.gsc) -
-                   iris_r,
-               (mhh2 + (ey + hy - gdata->data.view_yy) * gdata->data.gsc) -
-                   iris_r,
-               iris_r * 2, 0},
-              gdata->cg_uvs[BLANK_UV],
-              {dfs->ec.r, dfs->ec.g, dfs->ec.b, a}});
+                  bst_renderer_push(
+                      usr->r->bstb,
+                      &(bst_instance){{fix - glsz, fiy - glsz, 2 * glsz},
+                                      {shc->r, shc->g, shc->b, alpha}});
+                }
+            } else {
+              for (j = bp - 1; j >= 0; j--)
+                if (gdata->data.pbu[(int)j] == 2) {
+                  ox = tx;
+                  oy = ty;
+                  tx = gdata->data.pbx[(int)j];
+                  ty = gdata->data.pby[(int)j];
+                  if (tx > ox)
+                    d2 = tx - ox;
+                  else
+                    d2 = ox - tx;
+                  if (ty > oy)
+                    d2 += ty - oy;
+                  else
+                    d2 += oy - ty;
+                  d2 /= 6;
+                  if (d2 > 1) d2 = 1;
 
-      ex = cosf(fang) * (ed + .5) + o->rex * ssc + cosf(fang - PI / 2) * esp;
-      ey = sinf(fang) * (ed + .5) + o->rey * ssc + sinf(fang - PI / 2) * esp;
+                  float fix =
+                      (tx - gdata->data.view_xx) * gdata->data.gsc + mww2;
+                  float fiy =
+                      (ty - gdata->data.view_yy) * gdata->data.gsc + mhh2;
 
-      bp_renderer_push(
-          usr->r->bpr,
-          &(bp_instance){
-              {(mww2 + (ex + hx - gdata->data.view_xx) * gdata->data.gsc) -
-                   pupil_r,
-               (mhh2 + (ey + hy - gdata->data.view_yy) * gdata->data.gsc) -
-                   pupil_r,
-               pupil_r * 2, 0},
-              gdata->cg_uvs[BLANK_UV],
-              {dfs->ppc.r, dfs->ppc.g, dfs->ppc.b, a}});
+                  float alpha = strength * d2 * a * mr * .38 *
+                                (.6 + .4 * cosf(j / 4 - 1.15 * o->sfr));
 
-      ex = cosf(fang) * (ed + .5) + o->rex * ssc + cosf(fang + PI / 2) * esp;
-      ey = sinf(fang) * (ed + .5) + o->rey * ssc + sinf(fang + PI / 2) * esp;
+                  int default_skin_len = gdata->default_skins[o->cv][0];
+                  int cg_id =
+                      gdata->default_skins[o->cv]
+                                          [1 + ((int)j % default_skin_len)];
+                  vec3s* shc = gdata->cg_glow_colors + cg_id;
 
-      bp_renderer_push(
-          usr->r->bpr,
-          &(bp_instance){
-              {(mww2 + (ex + hx - gdata->data.view_xx) * gdata->data.gsc) -
-                   pupil_r,
-               (mhh2 + (ey + hy - gdata->data.view_yy) * gdata->data.gsc) -
-                   pupil_r,
-               pupil_r * 2, 0},
-              gdata->cg_uvs[BLANK_UV],
-              {dfs->ppc.r, dfs->ppc.g, dfs->ppc.b, a}});
+                  bst_renderer_push(
+                      usr->r->bstb,
+                      &(bst_instance){{fix - glsz, fiy - glsz, 2 * glsz},
+                                      {shc->r, shc->g, shc->b, alpha}});
+                }
+            }
+          }
+          // boost effect 2:
+          if (mode->boost_type == 0 && o->smooth_tsp > o->fsp) {
+            float glsz = lsz * 3 * gdata->data.gsc;
+            float strength = 0.7f;
 
-      // accessory:
-      if (mode->show_accessories && o->accessory < NUM_ACCESSORIES) {
-        accessory_data* acc = gdata->accessories + o->accessory;
-        ex = acc->of * cosf(fang) * ed;
-        ey = acc->of * sinf(fang) * ed;
-        m = lsz * gdata->data.gsc * acc->sc;
-        float acx = mww2 + (ex + hx - gdata->data.view_xx) * gdata->data.gsc;
-        float acy = mhh2 + (ey + hy - gdata->data.view_yy) * gdata->data.gsc;
+            if (o->cusk) {
+              for (j = bp - 1; j >= 0; j--)
+                if (gdata->data.pbu[(int)j] == 2) {
+                  ox = tx;
+                  oy = ty;
+                  tx = gdata->data.pbx[(int)j];
+                  ty = gdata->data.pby[(int)j];
+                  if (tx > ox)
+                    d2 = tx - ox;
+                  else
+                    d2 = ox - tx;
+                  if (ty > oy)
+                    d2 += ty - oy;
+                  else
+                    d2 += oy - ty;
+                  d2 /= 6;
+                  if (d2 > 1) d2 = 1;
+
+                  float fix =
+                      (tx - gdata->data.view_xx) * gdata->data.gsc + mww2;
+                  float fiy =
+                      (ty - gdata->data.view_yy) * gdata->data.gsc + mhh2;
+
+                  float alpha =
+                      strength * d2 * a * om * (.5 + .5 * cosf(j / 4 - o->sfr));
+                  int cg_id = o->cusk_data[(int)j % o->cusk_len];
+                  vec3s* shc = gdata->cg_glow_colors + cg_id;
+
+                  bst_renderer_push(
+                      usr->r->bsta,
+                      &(bst_instance){{fix - glsz, fiy - glsz, 2 * glsz},
+                                      {shc->r, shc->g, shc->b, alpha}});
+                }
+            } else {
+              for (j = bp - 1; j >= 0; j--)
+                if (gdata->data.pbu[(int)j] == 2) {
+                  ox = tx;
+                  oy = ty;
+                  tx = gdata->data.pbx[(int)j];
+                  ty = gdata->data.pby[(int)j];
+                  if (tx > ox)
+                    d2 = tx - ox;
+                  else
+                    d2 = ox - tx;
+                  if (ty > oy)
+                    d2 += ty - oy;
+                  else
+                    d2 += oy - ty;
+                  d2 /= 6;
+                  if (d2 > 1) d2 = 1;
+
+                  float fix =
+                      (tx - gdata->data.view_xx) * gdata->data.gsc + mww2;
+                  float fiy =
+                      (ty - gdata->data.view_yy) * gdata->data.gsc + mhh2;
+
+                  float alpha =
+                      strength * d2 * a * om * (.5 + .5 * cosf(j / 4 - o->sfr));
+
+                  int default_skin_len = gdata->default_skins[o->cv][0];
+                  int cg_id =
+                      gdata->default_skins[o->cv]
+                                          [1 + ((int)j % default_skin_len)];
+                  vec3s* shc = gdata->cg_glow_colors + cg_id;
+
+                  bst_renderer_push(
+                      usr->r->bsta,
+                      &(bst_instance){{fix - glsz, fiy - glsz, 2 * glsz},
+                                      {shc->r, shc->g, shc->b, alpha}});
+                }
+            }
+          }
+        }
+
+        // draw eyes:
+        float ed = 6 * ssc;   // o->ed
+        float esp = 6 * ssc;  // o->esp
+        float er = 6;         // o->er
+        default_skin_data* dfs = gdata->dfs + ((1 - o->cusk) * (1 + o->cv));
+        float pr = dfs->pr;
+        float iris_r = er * ssc * gdata->data.gsc;
+        float pupil_r = pr * ssc * gdata->data.gsc;
+
+        float ex = cosf(fang) * ed + cosf(fang - PI / 2) * (esp + .5);
+        float ey = sinf(fang) * ed + sinf(fang - PI / 2) * (esp + .5);
 
         bp_renderer_push(
             usr->r->bpr,
             &(bp_instance){
-                {acx - m, acy - m, m * 2, fang}, acc->uv, {1, 1, 1, a}});
-      }
+                {(mww2 + (ex + hx - gdata->data.view_xx) * gdata->data.gsc) -
+                     iris_r,
+                 (mhh2 + (ey + hy - gdata->data.view_yy) * gdata->data.gsc) -
+                     iris_r,
+                 iris_r * 2, 0},
+                gdata->cg_uvs[BLANK_UV],
+                {dfs->ec.r, dfs->ec.g, dfs->ec.b, a}});
 
-      if (usrs->hotkeys.assist && gdata->data.snake_id == o->id) {
-        ImDrawList_AddLine(
-            igGetWindowDrawList(),
-            (ImVec2){mww2 + (hx - gdata->data.view_xx) * gdata->data.gsc,
-                     mhh2 + (hy - gdata->data.view_yy) * gdata->data.gsc},
-            (ImVec2){env->ms->pos[0], env->ms->pos[1]},
-            igColorConvertFloat4ToU32(
-                (ImVec4){usrs->laser_color[0], usrs->laser_color[1],
-                         usrs->laser_color[2], usrs->laser_color[3] * a}),
-            usrs->laser_thickness);
-        // ex = cosf(fang) * lsz;
-        // ey = sinf(fang) * lsz;
-        // float sz = 2 * gdata->data.gsc;
+        ex = cosf(fang) * ed + cosf(fang + PI / 2) * (esp + .5);
+        ey = sinf(fang) * ed + sinf(fang + PI / 2) * (esp + .5);
 
-        // bp_renderer_push(
-        //     usr->r->astr,
-        //     &(bp_instance){
-        //         {(mww2 + (ex + hx - gdata->data.view_xx) * gdata->data.gsc) -
-        //              (sz + 2),
-        //          (mhh2 + (ey + hy - gdata->data.view_yy) * gdata->data.gsc) -
-        //              (sz + 2),
-        //          (sz + 2) * 2, 0},
-        //         gdata->cg_uvs[BLANK_UV],
-        //         {0, 0, 0, a}});
+        bp_renderer_push(
+            usr->r->bpr,
+            &(bp_instance){
+                {(mww2 + (ex + hx - gdata->data.view_xx) * gdata->data.gsc) -
+                     iris_r,
+                 (mhh2 + (ey + hy - gdata->data.view_yy) * gdata->data.gsc) -
+                     iris_r,
+                 iris_r * 2, 0},
+                gdata->cg_uvs[BLANK_UV],
+                {dfs->ec.r, dfs->ec.g, dfs->ec.b, a}});
 
-        // bp_renderer_push(
-        //     usr->r->astr,
-        //     &(bp_instance){
-        //         {(mww2 + (ex + hx - gdata->data.view_xx) * gdata->data.gsc) -
-        //              sz,
-        //          (mhh2 + (ey + hy - gdata->data.view_yy) * gdata->data.gsc) -
-        //              sz,
-        //          sz * 2, 0},
-        //         gdata->cg_uvs[BLANK_UV],
-        //         {1, 1, 1, a}});
+        ex = cosf(fang) * (ed + .5) + o->rex * ssc + cosf(fang - PI / 2) * esp;
+        ey = sinf(fang) * (ed + .5) + o->rey * ssc + sinf(fang - PI / 2) * esp;
+
+        bp_renderer_push(
+            usr->r->bpr,
+            &(bp_instance){
+                {(mww2 + (ex + hx - gdata->data.view_xx) * gdata->data.gsc) -
+                     pupil_r,
+                 (mhh2 + (ey + hy - gdata->data.view_yy) * gdata->data.gsc) -
+                     pupil_r,
+                 pupil_r * 2, 0},
+                gdata->cg_uvs[BLANK_UV],
+                {dfs->ppc.r, dfs->ppc.g, dfs->ppc.b, a}});
+
+        ex = cosf(fang) * (ed + .5) + o->rex * ssc + cosf(fang + PI / 2) * esp;
+        ey = sinf(fang) * (ed + .5) + o->rey * ssc + sinf(fang + PI / 2) * esp;
+
+        bp_renderer_push(
+            usr->r->bpr,
+            &(bp_instance){
+                {(mww2 + (ex + hx - gdata->data.view_xx) * gdata->data.gsc) -
+                     pupil_r,
+                 (mhh2 + (ey + hy - gdata->data.view_yy) * gdata->data.gsc) -
+                     pupil_r,
+                 pupil_r * 2, 0},
+                gdata->cg_uvs[BLANK_UV],
+                {dfs->ppc.r, dfs->ppc.g, dfs->ppc.b, a}});
+
+        // accessory:
+        if (mode->show_accessories && o->accessory < NUM_ACCESSORIES) {
+          accessory_data* acc = gdata->accessories + o->accessory;
+          ex = acc->of * cosf(fang) * ed;
+          ey = acc->of * sinf(fang) * ed;
+          m = lsz * gdata->data.gsc * acc->sc;
+          float acx = mww2 + (ex + hx - gdata->data.view_xx) * gdata->data.gsc;
+          float acy = mhh2 + (ey + hy - gdata->data.view_yy) * gdata->data.gsc;
+
+          bp_renderer_push(
+              usr->r->bpr,
+              &(bp_instance){
+                  {acx - m, acy - m, m * 2, fang}, acc->uv, {1, 1, 1, a}});
+        }
+
+        if (usrs->hotkeys.assist && gdata->data.snake_id == o->id) {
+          ImDrawList_AddLine(
+              igGetWindowDrawList(),
+              (ImVec2){mww2 + (hx - gdata->data.view_xx) * gdata->data.gsc,
+                       mhh2 + (hy - gdata->data.view_yy) * gdata->data.gsc},
+              (ImVec2){env->ms->pos[0], env->ms->pos[1]},
+              igColorConvertFloat4ToU32(
+                  (ImVec4){usrs->laser_color[0], usrs->laser_color[1],
+                           usrs->laser_color[2], usrs->laser_color[3] * a}),
+              usrs->laser_thickness);
+          // ex = cosf(fang) * lsz;
+          // ey = sinf(fang) * lsz;
+          // float sz = 2 * gdata->data.gsc;
+
+          // bp_renderer_push(
+          //     usr->r->astr,
+          //     &(bp_instance){
+          //         {(mww2 + (ex + hx - gdata->data.view_xx) * gdata->data.gsc)
+          //         -
+          //              (sz + 2),
+          //          (mhh2 + (ey + hy - gdata->data.view_yy) * gdata->data.gsc)
+          //          -
+          //              (sz + 2),
+          //          (sz + 2) * 2, 0},
+          //         gdata->cg_uvs[BLANK_UV],
+          //         {0, 0, 0, a}});
+
+          // bp_renderer_push(
+          //     usr->r->astr,
+          //     &(bp_instance){
+          //         {(mww2 + (ex + hx - gdata->data.view_xx) * gdata->data.gsc)
+          //         -
+          //              sz,
+          //          (mhh2 + (ey + hy - gdata->data.view_yy) * gdata->data.gsc)
+          //          -
+          //              sz,
+          //          sz * 2, 0},
+          //         gdata->cg_uvs[BLANK_UV],
+          //         {1, 1, 1, a}});
+        }
       }
     }
   }

@@ -59,11 +59,8 @@ void ui_settings(tenv* env) {
 
       igTableSetColumnIndex(1);
       if (igCheckbox("##vsync", &usrs->vsync)) {
-        int w, h;
         env->config.vsync = usrs->vsync;
-        glfwGetWindowSize(env->wnd->handle, &w, &h);
-        glfwSetWindowSize(env->wnd->handle, w + 1, h);
-        glfwSetWindowSize(env->wnd->handle, w, h);
+        twindow_request_refresh(env->wnd);
       }
       igSetNextItemWidth(-1);
       igSliderInt("##cursor size", &usrs->cursor_size, 16, 64, "%d px",
@@ -136,10 +133,10 @@ void ui_settings(tenv* env) {
         igCheckbox("##acc", &mode->show_accessories);
         igCheckbox("##shad", &mode->show_shadows);
         igSetNextItemWidth(-1);
-        igDragFloat("##bps", &mode->qsm, 0.1f, 1, 4, "%.2f",
+        igSliderFloat("##bps", &mode->qsm, 1, 4, "%.2f",
                     ImGuiSliderFlags_AlwaysClamp);
         igSetNextItemWidth(-1);
-        igDragFloat("##bgs", &mode->bg_scale, 0.05f, 0.05, 4, "%.2f",
+        igSliderFloat("##bgs", &mode->bg_scale, 0.05, 4, "%.2f",
                     ImGuiSliderFlags_AlwaysClamp);
         igSetNextItemWidth(-1);
         igCombo_Str_arr("##render mode", &mode->render_mode,
@@ -205,11 +202,8 @@ void ui_settings(tenv* env) {
   igSetCursorPosY(ctx->size[1] - style->WindowPadding.y - igGetFrameHeight());
   if (igButton("Reset", (ImVec2){150, 0})) {
     user_settings_default(usrs);
-    int w, h;
     env->config.vsync = usrs->vsync;
-    glfwGetWindowSize(env->wnd->handle, &w, &h);
-    glfwSetWindowSize(env->wnd->handle, w + 1, h);
-    glfwSetWindowSize(env->wnd->handle, w, h);
+    twindow_request_refresh(env->wnd);
   }
   igSameLine(0, -1);
   if (igButton("OK", (ImVec2){150, 0})) {

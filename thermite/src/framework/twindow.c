@@ -3,6 +3,10 @@
 
 #include "../core/tenv.h"
 
+void twindow_request_refresh(twindow* twindow) {
+  twindow->_refresh = true;
+}
+
 void window_resize_callback(GLFWwindow* window, int width, int height) {
   tenv* env = glfwGetWindowUserPointer(window);
   env->wnd->size[0] = width;
@@ -20,6 +24,7 @@ twindow* twindow_create(tenv* env, trender_func render_func,
   twindow* window = malloc(sizeof(twindow));
   window->_render_func = render_func;
   window->_resize_func = resize_func;
+  window->_refresh = false;
   window->env = env;
   if (glfwInit() == GLFW_FALSE) {
     printf("Error initializing window\n");
@@ -80,8 +85,20 @@ twindow* twindow_create(tenv* env, trender_func render_func,
   return window;
 }
 
-void twindow_poll_input(const twindow* window) { glfwPollEvents(); }
-void twindow_wait_input(const twindow* window) { glfwWaitEvents(); }
+void twindow_poll_input(twindow* window) {
+  glfwPollEvents();
+  if (window->_refresh) {
+    tcontext_resize(window->env->ctx, window->env->wnd->size, window->env->config.vsync);
+    window->_refresh = false;
+  }
+}
+void twindow_wait_input(twindow* window) {
+  glfwWaitEvents();
+  if (window->_refresh) {
+    tcontext_resize(window->env->ctx, window->env->wnd->size, window->env->config.vsync);
+    window->_refresh = false;
+  }
+}
 
 void twindow_toggle_fullscreen(twindow* window) {
   GLFWmonitor* monitor = glfwGetPrimaryMonitor();
@@ -99,7 +116,6 @@ void twindow_toggle_fullscreen(twindow* window) {
     glfwRestoreWindow(window->handle);
     glfwSetWindowMonitor(window->handle, NULL, window->lpos[0], window->lpos[1],
                          window->lsize[0], window->lsize[1], mode->refreshRate);
-
     window->env->config.fullscreen = false;
   }
 }

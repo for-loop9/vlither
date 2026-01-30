@@ -21,12 +21,14 @@ typedef struct twindow {
   trender_func _render_func;
   tresize_func _resize_func;
   tenv* env;
+  bool _refresh;
 } twindow;
 
+void twindow_request_refresh(twindow* twindow);
 twindow* twindow_create(tenv* env, trender_func render_func,
                         tresize_func resize_func);
-void twindow_poll_input(const twindow* window);
-void twindow_wait_input(const twindow* window);
+void twindow_poll_input(twindow* window);
+void twindow_wait_input(twindow* window);
 void twindow_toggle_fullscreen(twindow* window);
 bool twindow_key_down(twindow* window, int key);
 bool twindow_button_down(twindow* window, int button);

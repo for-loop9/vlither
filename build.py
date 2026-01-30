@@ -36,7 +36,7 @@ def compile_shaders(src, dir):
 def run_compile_shaders():
   print("> Compiling shaders...")
   
-  compile_shaders('thermite/res/shaders/src', 'thermite/res/shaders/bin')
+  # compile_shaders('thermite/res/shaders/src', 'thermite/res/shaders/bin')
   compile_shaders('app/res/shaders/src', 'app/res/shaders/bin')
 
   print("> Shaders compiled successfully.")
