@@ -146,7 +146,7 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
     }
     ba[m] = 0;
     m++;
-    ba[m] = 255;
+    ba[m] = usrs->accessory;
     m++;
 
     if (usrs->custom_skin) {
@@ -268,7 +268,7 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
         }
       }
       m += skl;
-      m++;
+      uint8_t accessory = a[m++];
       float msl = gdata->data.default_msl;
       float xx = 0;
       float yy = 0;
@@ -360,6 +360,7 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
         glfwSetTime(0);
       }
 
+      o.accessory = accessory;
       o.tl = o.sct + o.fam;
       o.cfl = o.tl - .6;
       o.id = id;
@@ -843,6 +844,7 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
       rad = a[m] / 5.0f;
       m++;
       id = sx << 24 | sy << 16 | rx << 8 | ry;
+      float gfr = rand() % 64;
       tdarray_push(
           &gdata->data.foods,
           (&(food){.id = id,
@@ -854,7 +856,8 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
                    .rad = 1e-5,
                    .sz = rad,
                    .lrrad = 1e-5,
-                   .gfr = rand() % 64,
+                   .gfr = gfr,
+                   .gfr2 = gfr,
                    .gr = 0.65f + 0.1f * rad,
                    .wsp = (2 * ((float)rand() / RAND_MAX) - 1) * 0.0225f,
                    .sx = sx,
@@ -889,6 +892,7 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
       cv = gdata->data.lfcv;
     float rad = a[m] / 5.0f;
     m++;
+    float gfr = rand() % 64;
     tdarray_push(&gdata->data.foods,
                  (&(food){.id = id,
                           .cv = cv % NUM_COLOR_GROUPS,
@@ -899,7 +903,8 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
                           .rad = 1e-5,
                           .sz = rad,
                           .lrrad = 1e-5,
-                          .gfr = rand() % 64,
+                          .gfr = gfr,
+                          .gfr2 = gfr,
                           .gr = 0.65f + 0.1f * rad,
                           .wsp = (2 * ((float)rand() / RAND_MAX) - 1) * 0.0225f,
                           .sx = sx,

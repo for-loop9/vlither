@@ -108,14 +108,12 @@ void input(tenv* env) {
       GLM_MAX(MAX_ZOOM_OUT, GLM_MIN(gdata->data.ms_zoom, MAX_ZOOM_IN)),
 
   // hotkeys
-      usrs->hotkeys.shadow ^= tkeyboard_key_pressed(env->kb, SHADOW_HKEY);
-  usrs->hotkeys.boost ^= tkeyboard_key_pressed(env->kb, BOOST_EFFECT_HKEY);
   usrs->hotkeys.hud ^= tkeyboard_key_pressed(env->kb, HUD_HKEY);
-  usrs->hotkeys.background ^= tkeyboard_key_pressed(env->kb, BACKGROUND_HKEY);
   usrs->hotkeys.big_food ^= tkeyboard_key_pressed(env->kb, BIG_FOOD_HKEY);
-  usrs->hotkeys.peek_names ^= tkeyboard_key_pressed(env->kb, PEEK_NAMES_HKEY);
+  usrs->hotkeys.show_names ^= tkeyboard_key_pressed(env->kb, SHOW_NAMES_HKEY);
   usrs->hotkeys.toggle_hotkeys ^= tkeyboard_key_pressed(env->kb, HOTKEYS_HKEY);
   usrs->hotkeys.crosshair ^= tkeyboard_key_pressed(env->kb, CROSSHAIR_HKEY);
+  usrs->hotkeys.assist ^= tkeyboard_key_pressed(env->kb, ASSIST_HKEY);
 
   if (usrs->hotkeys.crosshair) igSetMouseCursor(ImGuiMouseCursor_None);
 }

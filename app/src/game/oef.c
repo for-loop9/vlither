@@ -48,6 +48,7 @@ void oef(tenv* env) {
   game_data* gdata = &usr->gdata;
   user_settings* usrs = &usr->usrs;
   struct mg_connection* connection = gdata->connection;
+  gameplay_mode* mode = usrs->modes + usrs->hotkeys.assist;
 
   gdata->data.gsc = usrs->smooth_zoom ? glm_lerp(gdata->data.gsc, gdata->data.ms_zoom, 0.25f * gdata->data.vfr) : gdata->data.ms_zoom;
 
@@ -382,6 +383,7 @@ void oef(tenv* env) {
   for (int i = cm1; i >= 0; i--) {
     food* fo = gdata->data.foods + i;
     fo->gfr += gdata->data.vfr * fo->gr;
+    fo->gfr2 += mode->food_float * gdata->data.vfr * fo->gr;
     if (fo->eaten) {
       fo->eaten_fr += gdata->data.vfr / 41;
       snake* o = get_snake(gdata, fo->ebid);
@@ -402,8 +404,8 @@ void oef(tenv* env) {
             fo->yy + (o->yy + o->fy +
                       sinf(o->ang + o->fa) * (43 - k * 24) * (1 - k) - fo->yy) *
                          k;
-        fo->rx += cosf(usrs->food_float * fo->wsp * fo->gfr) * 6 * (1 - fo->eaten_fr);
-        fo->ry += sinf(usrs->food_float * fo->wsp * fo->gfr) * 6 * (1 - fo->eaten_fr);
+        fo->rx += cosf(fo->wsp * fo->gfr2) * 6 * (1 - fo->eaten_fr);
+        fo->ry += sinf(fo->wsp * fo->gfr2) * 6 * (1 - fo->eaten_fr);
       }
     } else {
       if (fo->fr != 1) {
@@ -419,8 +421,8 @@ void oef(tenv* env) {
       }
       fo->rx = fo->xx;
       fo->ry = fo->yy;
-      fo->rx = fo->xx + cosf(usrs->food_float * fo->wsp * fo->gfr) * 6;
-      fo->ry = fo->yy + sinf(usrs->food_float * fo->wsp * fo->gfr) * 6;
+      fo->rx = fo->xx + cosf(fo->wsp * fo->gfr2) * 6;
+      fo->ry = fo->yy + sinf(fo->wsp * fo->gfr2) * 6;
     }
   }
 }

@@ -20,6 +20,7 @@ twindow* twindow_create(tenv* env, trender_func render_func,
   twindow* window = malloc(sizeof(twindow));
   window->_render_func = render_func;
   window->_resize_func = resize_func;
+  window->env = env;
   if (glfwInit() == GLFW_FALSE) {
     printf("Error initializing window\n");
     return NULL;
@@ -49,7 +50,6 @@ twindow* twindow_create(tenv* env, trender_func render_func,
     window->lsize[1] = mh;
     window->lpos[0] = mx;
     window->lpos[1] = my;
-    window->fullscreen = true;
 
     window->handle =
         glfwCreateWindow(window->size[0], window->size[1], env->config.title,
@@ -61,7 +61,6 @@ twindow* twindow_create(tenv* env, trender_func render_func,
     window->lpos[1] = 0;
     window->lsize[0] = vidmode->width;
     window->lsize[1] = vidmode->height;
-    window->fullscreen = false;
 
     glfwWindowHint(GLFW_POSITION_X, mx);
     glfwWindowHint(GLFW_POSITION_Y, my);
@@ -88,20 +87,20 @@ void twindow_toggle_fullscreen(twindow* window) {
   GLFWmonitor* monitor = glfwGetPrimaryMonitor();
   const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 
-  if (!window->fullscreen) {
+  if (!window->env->config.fullscreen) {
     glfwGetWindowPos(window->handle, &window->lpos[0], &window->lpos[1]);
     glfwGetWindowSize(window->handle, &window->lsize[0], &window->lsize[1]);
 
     glfwSetWindowMonitor(window->handle, monitor, 0, 0, mode->width,
-                         mode->height, GLFW_DONT_CARE);
+                         mode->height, mode->refreshRate);
 
-    window->fullscreen = true;
+    window->env->config.fullscreen = true;
   } else {
     glfwRestoreWindow(window->handle);
     glfwSetWindowMonitor(window->handle, NULL, window->lpos[0], window->lpos[1],
-                         window->lsize[0], window->lsize[1], GLFW_DONT_CARE);
+                         window->lsize[0], window->lsize[1], mode->refreshRate);
 
-    window->fullscreen = false;
+    window->env->config.fullscreen = false;
   }
 }
 

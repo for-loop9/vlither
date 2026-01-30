@@ -61,6 +61,7 @@ typedef struct snake {
   float fas[GD_AFC];
   float fls[GD_EEZ];
 
+  uint8_t accessory;
   uint8_t cusk_data[MAX_SKIN_CODE_LEN];
   char nk[MAX_NICKNAME_LEN + 1];
 

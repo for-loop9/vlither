@@ -26,11 +26,12 @@ void tlaunch(tenv* env) {
   strcpy(usrs->nickname, "");
   usrs->custom_skin = false;
   usrs->default_skin = rand() % 9;
+  usrs->accessory = NO_ACCESSORY;
 
   read_user_settings(usrs);
   env->config.vsync = false;
   env->config.fullscreen = usrs->hotkeys.fullscreen;
-
+  env->config.title = "Vlither";
 }
 
 void tinit(tenv* env) {

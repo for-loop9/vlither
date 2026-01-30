@@ -19,146 +19,199 @@ void ui_settings(tenv* env) {
     igTableNextRow(ImGuiTableRowFlags_None, 0);
     igTableSetColumnIndex(0);
 
-    igBeginChild_Str("settings_child_holder", (ImVec2){-1, -1}, ImGuiChildFlags_None, ImGuiWindowFlags_None);
-    if (igCollapsingHeader_BoolPtr("General", NULL, ImGuiTreeNodeFlags_DefaultOpen)) {
+    igBeginChild_Str("general_settings_child_holder", (ImVec2){-1, -1},
+                     ImGuiChildFlags_None, ImGuiWindowFlags_None);
+    igSeparatorText("General");
+    if (igBeginTable("field:value", 2, ImGuiTableFlags_None, (ImVec2){}, 0)) {
+      igTableNextRow(ImGuiTableRowFlags_None, 0);
+      igTableSetColumnIndex(0);
+      igIndent(style->WindowPadding.x);
+      igAlignTextToFramePadding();
+      igText("VSync");
+      igAlignTextToFramePadding();
+      igText("Cursor size");
+      igAlignTextToFramePadding();
+      igText("UI font size");
+      igAlignTextToFramePadding();
+      igText("Stats font size");
+      igAlignTextToFramePadding();
+      igText("Leaderboard font size");
+      igAlignTextToFramePadding();
+      igText("Names font size");
+      igAlignTextToFramePadding();
+      igText("Show snake scores");
+      igAlignTextToFramePadding();
+      igText("Smooth zoom");
+      igAlignTextToFramePadding();
+      igText("Zoom step");
+      igAlignTextToFramePadding();
+      igText("Border color");
+      igAlignTextToFramePadding();
+      igText("Minimap size");
+      igAlignTextToFramePadding();
+      igText("Restart with right click");
+      igAlignTextToFramePadding();
+      igText("Quit with middle click");
+      igAlignTextToFramePadding();
+      igText("Laser thickness");
+      igAlignTextToFramePadding();
+      igText("Laser color");
+
+      igTableSetColumnIndex(1);
+      if (igCheckbox("##vsync", &usrs->vsync)) {
+        int w, h;
+        env->config.vsync = usrs->vsync;
+        glfwGetWindowSize(env->wnd->handle, &w, &h);
+        glfwSetWindowSize(env->wnd->handle, w + 1, h);
+        glfwSetWindowSize(env->wnd->handle, w, h);
+      }
+      igSetNextItemWidth(-1);
+      igSliderInt("##cursor size", &usrs->cursor_size, 16, 64, "%d px",
+                  ImGuiSliderFlags_AlwaysClamp);
+      igSetNextItemWidth(-1);
+      igCombo_Str_arr("##ui font size", (int*)&usrs->ui_font_size,
+                      (const char*[]){"Small", "Regular", "Large"}, 3, -1);
+      igSetNextItemWidth(-1);
+      igCombo_Str_arr("##stats font size", (int*)&usrs->stats_font_size,
+                      (const char*[]){"Small", "Regular", "Large"}, 3, -1);
+      igSetNextItemWidth(-1);
+      igCombo_Str_arr("##leaderboard font size", (int*)&usrs->lb_font_size,
+                      (const char*[]){"Small", "Regular", "Large"}, 3, -1);
+      igSetNextItemWidth(-1);
+      igCombo_Str_arr("##snake name font size",
+                      (int*)&usrs->snake_names_font_size,
+                      (const char*[]){"Small", "Regular", "Large"}, 3, -1);
+      igCheckbox("##snake scores", &usrs->snake_scores);
+      igCheckbox("##smooth zoom", &usrs->smooth_zoom);
+      igSetNextItemWidth(-1);
+      igSliderFloat("##zoom step", &usrs->zoom_step, 0.05f, 0.5f, "%.2f",
+                    ImGuiSliderFlags_AlwaysClamp);
+      igSetNextItemWidth(-1);
+      igColorEdit3("##border color", usrs->bd_color, ImGuiColorEditFlags_None);
+      igSetNextItemWidth(-1);
+      igSliderInt("##minimap size", &usrs->minimap_size, 128, 512, "%d px",
+                  ImGuiSliderFlags_AlwaysClamp);
+      igCheckbox("##restart rc", &usrs->restart_rc);
+      igCheckbox("##quit mc", &usrs->quit_mc);
+      igSetNextItemWidth(-1);
+      igColorEdit4("##laser color", usrs->laser_color,
+                   ImGuiColorEditFlags_AlphaBar);
+      igSetNextItemWidth(-1);
+      igSliderInt("##laser thickness", &usrs->laser_thickness, 1, 4, "%d px",
+                  ImGuiSliderFlags_AlwaysClamp);
+      igIndent(-style->WindowPadding.x);
+      igEndTable();
+    }
+    igEndChild();
+
+    for (int i = 0; i < 2; i++) {
+      igTableSetColumnIndex(i + 1);
+      igPushID_Int(i + 1);
+      gameplay_mode* mode = usrs->modes + i;
+      igBeginChild_ID(igGetID_Int(i + 1), (ImVec2){-1, -1},
+                      ImGuiChildFlags_None, ImGuiWindowFlags_None);
+      igSeparatorText(i == 0 ? "Normal mode" : "Assist mode");
+
       if (igBeginTable("field:value", 2, ImGuiTableFlags_None, (ImVec2){}, 0)) {
         igTableNextRow(ImGuiTableRowFlags_None, 0);
         igTableSetColumnIndex(0);
         igIndent(style->WindowPadding.x);
         igAlignTextToFramePadding();
-        igText("Cursor size");
+        igText("Show background");
         igAlignTextToFramePadding();
-        igText("UI font size");
+        igText("Show accessories");
         igAlignTextToFramePadding();
-        igText("Stats font size");
+        igText("Show shadows");
         igAlignTextToFramePadding();
-        igText("Leaderboard font size");
-        igAlignTextToFramePadding();
-        igText("Names font size");
-        igAlignTextToFramePadding();
-        igText("Show snake scores");
-        igAlignTextToFramePadding();
-        igText("Body parts separation");
+        igText("Body part separation");
         igAlignTextToFramePadding();
         igText("Background scale");
         igAlignTextToFramePadding();
-        igText("Smooth zoom");
+        igText("Render mode");
         igAlignTextToFramePadding();
-        igText("Zoom step");
-        igAlignTextToFramePadding();
-        igText("Border color");
-        igAlignTextToFramePadding();
-        igText("Minimap size");
-        igAlignTextToFramePadding();
-        igText("Restart with right click");
-        igAlignTextToFramePadding();
-        igText("Quit with middle click");
+        igText("Boost");
 
         igTableSetColumnIndex(1);
+        igCheckbox("##bg", &mode->show_background);
+        igCheckbox("##acc", &mode->show_accessories);
+        igCheckbox("##shad", &mode->show_shadows);
         igSetNextItemWidth(-1);
-        igSliderInt("##cursor size", &usrs->cursor_size, 16, 64, "%d px",
+        igDragFloat("##bps", &mode->qsm, 0.1f, 1, 4, "%.2f",
                     ImGuiSliderFlags_AlwaysClamp);
         igSetNextItemWidth(-1);
-        igCombo_Str_arr("##ui font size", (int*)&usrs->ui_font_size,
-                        (const char*[]){"Small", "Regular", "Large"}, 3, -1);
-        igSetNextItemWidth(-1);
-        igCombo_Str_arr("##stats font size", (int*)&usrs->stats_font_size,
-                        (const char*[]){"Small", "Regular", "Large"}, 3, -1);
-        igSetNextItemWidth(-1);
-        igCombo_Str_arr("##leaderboard font size", (int*)&usrs->lb_font_size,
-                        (const char*[]){"Small", "Regular", "Large"}, 3, -1);
-        igSetNextItemWidth(-1);
-        igCombo_Str_arr("##snake name font size",
-                        (int*)&usrs->snake_names_font_size,
-                        (const char*[]){"Small", "Regular", "Large"}, 3, -1);
-        igCheckbox("##snake scores", &usrs->snake_scores);
-        igSetNextItemWidth(-1);
-        igSliderFloat("##bps", &usrs->qsm, 1, 4, "%.2f",
-                      ImGuiSliderFlags_AlwaysClamp);
-        igSetNextItemWidth(-1);
-        igSliderFloat("##bg scale", &usrs->bg_scale, 0.05f, 4, "%.2f",
-                      ImGuiSliderFlags_AlwaysClamp);
-        igCheckbox("##smooth zoom", &usrs->smooth_zoom);
-        igSetNextItemWidth(-1);
-        igSliderFloat("##zoom step", &usrs->zoom_step, 0.05f, 0.5f, "%.2f",
-                      ImGuiSliderFlags_AlwaysClamp);
-        igSetNextItemWidth(-1);
-        igColorEdit3("##border color", usrs->bd_color,
-                     ImGuiColorEditFlags_None);
-        igSetNextItemWidth(-1);
-        igSliderInt("##minimap size", &usrs->minimap_size, 128, 512, "%d px",
+        igDragFloat("##bgs", &mode->bg_scale, 0.05f, 0.05, 4, "%.2f",
                     ImGuiSliderFlags_AlwaysClamp);
-        igCheckbox("##restart rc", &usrs->restart_rc);
-        igCheckbox("##quit mc", &usrs->quit_mc);
-        igIndent(-style->WindowPadding.x);
-        igEndTable();
-      }
-    }
-    if (igCollapsingHeader_BoolPtr("Food", NULL, ImGuiTreeNodeFlags_DefaultOpen)) {
-      if (igBeginTable("field:value", 2, ImGuiTableFlags_None, (ImVec2){}, 0)) {
-        igTableNextRow(ImGuiTableRowFlags_None, 0);
-        igTableSetColumnIndex(0);
-        igIndent(style->WindowPadding.x);
-        igAlignTextToFramePadding();
-        igText("Shader");
-        igAlignTextToFramePadding();
-        igText("Scale");
-        igAlignTextToFramePadding();
-        igText("Float");
-        igAlignTextToFramePadding();
-        igText("Flicker");
-        igAlignTextToFramePadding();
-        igText("Uniform color");
+        igSetNextItemWidth(-1);
+        igCombo_Str_arr("##render mode", &mode->render_mode,
+          (const char*[]){"Texture", "Solid", "Flat"}, 3, -1);
 
-        igTableSetColumnIndex(1);
+        igCheckbox("##boost", &mode->show_boost); igSameLine(0, -1);
+        igBeginDisabled(!mode->show_boost);
         igSetNextItemWidth(-1);
-        igCombo_Str_arr("##food type", &usrs->food_type,
-                        (const char*[]){"Solid", "Rings"}, 2, -1);
-        igSetNextItemWidth(-1);
-        igSliderFloat("##food scale", &usrs->food_scale, 0.25f, 3, "%.2f",
-                      ImGuiSliderFlags_AlwaysClamp);
-        igCheckbox("##food float", &usrs->food_float);
-        igCheckbox("##food flicker", &usrs->food_flicker);
-        igCheckbox("##uniform food color", &usrs->uniform_food_color);
-        igSameLine(0, -1);
-        igBeginDisabled(!usrs->uniform_food_color);
-        igSetNextItemWidth(-1);
-        igColorEdit3("##fdcolor", usrs->food_color, ImGuiColorEditFlags_None);
+        igCombo_Str_arr("##boost type", &mode->boost_type,
+                        (const char*[]){"Normal", "Simple"}, 2, -1);
         igEndDisabled();
         igIndent(-style->WindowPadding.x);
 
         igEndTable();
       }
-    }
-    if (igCollapsingHeader_BoolPtr("Boost", NULL, ImGuiTreeNodeFlags_DefaultOpen)) {
-      if (igBeginTable("field:value", 2, ImGuiTableFlags_None, (ImVec2){}, 0)) {
-        igTableNextRow(ImGuiTableRowFlags_None, 0);
-        igTableSetColumnIndex(0);
-        igIndent(style->WindowPadding.x);
-        igAlignTextToFramePadding();
-        igText("Boost type");
 
-        igTableSetColumnIndex(1);
-        igSetNextItemWidth(-1);
-        int boost_type = usrs->boost_effect;
-        igCombo_Str_arr("##boost type", &boost_type,
-                        (const char*[]){"Normal", "Simple"}, 2, -1);
-        usrs->boost_effect = boost_type;
+      if (igCollapsingHeader_BoolPtr("Food", NULL,
+                                     ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (igBeginTable("field:value", 2, ImGuiTableFlags_None, (ImVec2){},
+                         0)) {
+          igTableNextRow(ImGuiTableRowFlags_None, 0);
+          igTableSetColumnIndex(0);
+          igIndent(style->WindowPadding.x);
+          igAlignTextToFramePadding();
+          igText("Shader");
+          igAlignTextToFramePadding();
+          igText("Scale");
+          igAlignTextToFramePadding();
+          igText("Float");
+          igAlignTextToFramePadding();
+          igText("Flicker");
+          igAlignTextToFramePadding();
+          igText("Uniform color");
 
-        igIndent(-style->WindowPadding.x);
-        igEndTable();
+          igTableSetColumnIndex(1);
+          igSetNextItemWidth(-1);
+          igCombo_Str_arr("##food type", &mode->food_type,
+                          (const char*[]){"Solid", "Rings"}, 2, -1);
+          igSetNextItemWidth(-1);
+          igSliderFloat("##food scale", &mode->food_scale, 0.25f, 3, "%.2f",
+                        ImGuiSliderFlags_AlwaysClamp);
+          igCheckbox("##food float", &mode->food_float);
+          igCheckbox("##food flicker", &mode->food_flicker);
+          igCheckbox("##uniform food color", &mode->uniform_food_color);
+          igSameLine(0, -1);
+          igBeginDisabled(!mode->uniform_food_color);
+          igSetNextItemWidth(-1);
+          igColorEdit3("##fdcolor", mode->food_color, ImGuiColorEditFlags_None);
+          igEndDisabled();
+          igIndent(-style->WindowPadding.x);
+
+          igEndTable();
+        }
       }
+      igEndChild();
+      igPopID();
     }
-
-    igEndChild();
     igEndTable();
   }
 
-  igSetCursorPosX(ctx->size[0] - style->WindowPadding.x - 150 - style->ItemSpacing.x - 150);
+  igSetCursorPosX(ctx->size[0] - style->WindowPadding.x - 150 -
+                  style->ItemSpacing.x - 150);
   igSetCursorPosY(ctx->size[1] - style->WindowPadding.y - igGetFrameHeight());
   if (igButton("Reset", (ImVec2){150, 0})) {
     user_settings_default(usrs);
-  } igSameLine(0, -1); 
+    int w, h;
+    env->config.vsync = usrs->vsync;
+    glfwGetWindowSize(env->wnd->handle, &w, &h);
+    glfwSetWindowSize(env->wnd->handle, w + 1, h);
+    glfwSetWindowSize(env->wnd->handle, w, h);
+  }
+  igSameLine(0, -1);
   if (igButton("OK", (ImVec2){150, 0})) {
     save_user_settings(usrs);
     gdata->curr_screen = TITLE_SCREEN;

@@ -2,7 +2,8 @@
 
 #include "../user.h"
 
-void show_hot_key(tuser_data* usr, int hotkey, vec3 color, const char* info, float offset, font_size sz) {
+void show_hot_key(tuser_data* usr, int hotkey, vec3 color, const char* info,
+                  float offset, font_size sz) {
   user_settings* usrs = &usr->usrs;
 
   char hotkey_str[3] = {0};
@@ -17,7 +18,8 @@ void show_hot_key(tuser_data* usr, int hotkey, vec3 color, const char* info, flo
   igTextColored((ImVec4){color[0], color[1], color[2], 0.5f}, info);
 }
 
-void show_hot_key_str(tuser_data* usr, const char* str, vec3 color, const char* info, float offset, font_size sz) {
+void show_hot_key_str(tuser_data* usr, const char* str, vec3 color,
+                      const char* info, float offset, font_size sz) {
   user_settings* usrs = &usr->usrs;
 
   igPushFont(usr->imgui_data.mono_font_bold[sz],
@@ -36,20 +38,23 @@ void display_hotkeys(tuser_data* usr, float offset, font_size sz) {
 
   show_hot_key(usr, RESTART_HKEY, (vec3){1, 0.7f, 0.7f}, "Restart", offset, sz);
   show_hot_key(usr, QUIT_HKEY, (vec3){1, 0.7f, 0.7f}, "Quit", offset, sz);
-  show_hot_key(usr, CROSSHAIR_HKEY, (vec3){1, 0.7f, 0.7f}, "Crosshair", offset, sz);
-  show_hot_key_str(usr, "F11", (vec3){1, 0.7f, 0.7f}, " Fullscreen", offset, sz);
+  show_hot_key(usr, CROSSHAIR_HKEY, (vec3){1, 0.7f, 0.7f}, "Crosshair", offset,
+               sz);
+  show_hot_key_str(usr, "F11", (vec3){1, 0.7f, 0.7f}, " Fullscreen", offset,
+                   sz);
 
   show_hot_key(usr, ZOOM_IN_HKEY, (vec3){0.7f, 1, 0.7f}, "Zoom in", offset, sz);
-  show_hot_key(usr, ZOOM_OUT_HKEY, (vec3){0.7f, 1, 0.7f}, "Zoom out", offset, sz);
+  show_hot_key(usr, ZOOM_OUT_HKEY, (vec3){0.7f, 1, 0.7f}, "Zoom out", offset,
+               sz);
   show_hot_key_str(usr, "\ueaed", (vec3){0.7f, 1, 0.7f}, "Boost", 0, sz);
 
-  show_hot_key(usr, SHADOW_HKEY, (vec3){1, 1, 0.7f}, "Shadows", offset, sz);
-  show_hot_key(usr, BOOST_EFFECT_HKEY, (vec3){1, 1, 0.7f}, "Boost effect", offset, sz);
+  show_hot_key(usr, ASSIST_HKEY, (vec3){1, 1, 0.7f}, "Assist", offset, sz);
   show_hot_key(usr, HUD_HKEY, (vec3){1, 1, 0.7f}, "HUD", offset, sz);
-  show_hot_key(usr, BACKGROUND_HKEY, (vec3){1, 1, 0.7f}, "Background", offset, sz);
   show_hot_key(usr, BIG_FOOD_HKEY, (vec3){1, 1, 0.7f}, "Big food", offset, sz);
-  show_hot_key(usr, PEEK_NAMES_HKEY, (vec3){1, 1, 0.7f}, "Player names", offset, sz);
-  show_hot_key(usr, HOTKEYS_HKEY, (vec3){1, 1, 0.7f}, "Hotkey info", offset, sz);
+  show_hot_key(usr, SHOW_NAMES_HKEY, (vec3){1, 1, 0.7f}, "Player names", offset,
+               sz);
+  show_hot_key(usr, HOTKEYS_HKEY, (vec3){1, 1, 0.7f}, "Hide", offset,
+               sz);
 
   igPopFont();
 }
@@ -121,6 +126,122 @@ void calc_cg_uvs(vec4s* cg_uvs, tuser_data* usr) {
       cg_id++;
     }
   }
+}
+
+void setup_accessories(accessory_data* accessories, tuser_data* usr) {
+  int aid = 0;
+
+  vec2 uv_start = {5 / 7.0f, 8 / 9.0f};
+
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 8; j++) {
+      int col = aid % 8;
+      int row = aid / 8;
+
+      accessories[aid].uv.x = uv_start[0] + col * (1 / 28.0f);
+      accessories[aid].uv.y = uv_start[1] + row * (1 / 36.0f);
+      accessories[aid].uv.z = 1 / 28.0f;
+      accessories[aid].uv.w = 1 / 36.0f;
+
+      aid++;
+    }
+  }
+
+  accessories[0].sc = 1.8f;
+  accessories[0].of = 0.6f;
+
+  accessories[1].sc = 1.8f;
+  accessories[1].of = -3;
+
+  accessories[2].sc = 1.8f;
+  accessories[2].of = 0.5f;
+
+  accessories[3].sc = 2.25f;
+  accessories[3].of = -1.25f;
+
+  accessories[4].sc = 2.2f;
+  accessories[4].of = -0.25f;
+
+  accessories[5].sc = 2.5f;
+  accessories[5].of = -1.6f;
+
+  accessories[6].sc = 2;
+  accessories[6].of = 1.5f;
+
+  accessories[7].sc = 3;
+  accessories[7].of = -5;
+
+  accessories[8].sc = 1.7f;
+  accessories[8].of = -2.5f;
+
+  accessories[9].sc = 3;
+  accessories[9].of = -2.5f;
+
+  accessories[10].sc = 2.9f;
+  accessories[10].of = -4.1f;
+
+  accessories[11].sc = 3;
+  accessories[11].of = -4;
+
+  accessories[12].sc = 2.6f;
+  accessories[12].of = -2.5f;
+
+  accessories[13].sc = 2.6f;
+  accessories[13].of = -3;
+
+  accessories[14].sc = 1.5f;
+  accessories[14].of = -1.5f;
+
+  accessories[15].sc = 1.8f;
+  accessories[15].of = -2.5f;
+
+  accessories[16].sc = 1.6f;
+  accessories[16].of = -1.5f;
+
+  accessories[17].sc = 2.4f;
+  accessories[17].of = -1.15f;
+
+  accessories[18].sc = 2.1f;
+  accessories[18].of = -1.8f;
+
+  accessories[19].sc = 2;
+  accessories[19].of = -1.8f;
+
+  accessories[20].sc = 1.8f;
+  accessories[20].of = -1.8f;
+
+  accessories[21].sc = 2.1f;
+  accessories[21].of = -3;
+
+  accessories[22].sc = 1.63f;
+  accessories[22].of = 0.55f;
+
+  accessories[23].sc = 1.6f;
+  accessories[23].of = 0.8f;
+
+  accessories[24].sc = 1.6f;
+  accessories[24].of = 0.5f;
+
+  accessories[25].sc = 1.4f;
+  accessories[25].of = 0.4f;
+
+  accessories[26].sc = 1.4f;
+  accessories[26].of = 1;
+
+  accessories[27].sc = 1.5f;
+  accessories[27].of = 1;
+
+  accessories[28].sc = 1.7f;
+  accessories[28].of = -2.5f;
+
+  accessories[29].sc = 1.8f;
+  accessories[29].of = 0.5f;
+
+  accessories[30].sc = 1.7f;
+  accessories[30].of = -2.5f;
+
+  accessories[31].sc = 1.5f;
+  accessories[31].of = -2.6f;
 }
 
 void calc_g_glow_colors(game_data* gdata) {
@@ -440,6 +561,7 @@ void game_data_init(tenv* env) {
 
   recalc_sep_mults(gdata);
   calc_cg_uvs(gdata->cg_uvs, usr);
+  setup_accessories(gdata->accessories, usr);
   game_data_reset(env);
 }
 
@@ -484,13 +606,15 @@ void game_data_reset(tenv* env) {
   gdata->data.kd_r_frb = 0;
   gdata->data.lkstm = 0;
   gdata->data.gsc = gdata->data.ms_zoom;
-  
-  memset(gdata->data.lb.entries, 0, NUM_LEADERBOARD_ENTRIES * sizeof(gdata->data.lb.entries[0]));
+
+  memset(gdata->data.lb.entries, 0,
+         NUM_LEADERBOARD_ENTRIES * sizeof(gdata->data.lb.entries[0]));
   memset(gdata->data.pings, 0, sizeof(int) * PING_SAMPLE_COUNT);
 
   for (int row = 0; row < gdata->data.mmsz; row++) {
     memset(gdata->data.mm_data + row * MAX_MINIMAP_SIZE, 0, gdata->data.mmsz);
-    memset(gdata->data.mm_data_follow + row * MAX_MINIMAP_SIZE, 0, gdata->data.mmsz * sizeof(float));
+    memset(gdata->data.mm_data_follow + row * MAX_MINIMAP_SIZE, 0,
+           gdata->data.mmsz * sizeof(float));
     memset(usr->r->mmr->minimap + row * MAX_MINIMAP_SIZE, 0, gdata->data.mmsz);
   }
 

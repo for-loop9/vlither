@@ -20,7 +20,7 @@ typedef struct twindow {
   ivec2 lpos;
   trender_func _render_func;
   tresize_func _resize_func;
-  bool fullscreen;
+  tenv* env;
 } twindow;
 
 twindow* twindow_create(tenv* env, trender_func render_func,

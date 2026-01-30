@@ -317,7 +317,7 @@ renderer* renderer_create(tenv* env) {
 
   r->bgr = bg_renderer_create(ctx, r->pipeline_layout, r->render_pass);
   r->bstb = bst_renderer_create(ctx, MAX_BOOST_INSTANCES, r->pipeline_layout, r->render_pass);
-  r->bpr = bp_renderer_create(ctx, MAX_BP_SHADOW_INSTANCES, r->pipeline_layout, r->render_pass);
+  r->bpr = bp_renderer_create(ctx, MAX_SPRITE_INSTANCES, r->pipeline_layout, r->render_pass);
   r->bsta = bst_renderer_create(ctx, MAX_BOOST_INSTANCES, r->pipeline_layout, r->render_pass);
   r->fdr = fd_renderer_create(ctx, MAX_FOOD_INSTANCES, r->pipeline_layout, r->render_pass);
   r->bdr = bd_renderer_create(ctx, r->pipeline_layout, r->render_pass);

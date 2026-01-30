@@ -36,11 +36,6 @@ void ui_skin_editor(tenv* env) {
 
   igSetCursorPosX(ctx->size[0] * 0.5 - sk_w * 0.5f);
   igSetCursorPosY((ctx->size[1] * 0.5 - tot_size[1] * 0.5f) -
-                  ((style->ItemSpacing.y + frame_height) * 3 +
-                   3 * (scale + style->ItemSpacing.y)));
-
-  igSetCursorPosX(ctx->size[0] * 0.5 - sk_w * 0.5f);
-  igSetCursorPosY((ctx->size[1] * 0.5 - tot_size[1] * 0.5f) -
                   ((style->ItemSpacing.y + frame_height) * 3 + scale +
                    style->ItemSpacing.y));
 
@@ -183,6 +178,21 @@ void ui_skin_editor(tenv* env) {
           gdata->cg_uvs[BLANK_UV],
           {dfs->ppc.r, dfs->ppc.g, dfs->ppc.b, 1}});
 
+
+
+  if (usrs->accessory < NUM_ACCESSORIES) {
+    accessory_data* acc = gdata->accessories + usrs->accessory;
+    ex = acc->of * ed;
+    ey = 0;
+    float m = scale * 0.5f * acc->sc;
+    float acx = (ex + last_bp_pos[0] + scale / 2);
+    float acy = (ey + last_bp_pos[1] + scale / 2);
+
+    bp_renderer_push(
+        usr->r->bpr,
+        &(bp_instance){{acx - m, acy - m, m * 2, 0}, acc->uv, {1, 1, 1, 1}});
+  }
+
   igSetCursorPosX(ctx->size[0] * 0.5 - tot_size[0] * 0.5f);
   igSetCursorPosY((ctx->size[1] * 0.5 - tot_size[1] * 0.5f) -
                   ((style->ItemSpacing.y + frame_height) * 3));
@@ -291,8 +301,6 @@ void ui_skin_editor(tenv* env) {
         if (pressed) {
           if (strlen(usrs->skin_code) < MAX_SKIN_CODE_LEN) {
             usrs->skin_code[strlen(usrs->skin_code)] = gdata->ntl_cg_map[cg_id];
-          } else {
-            printf("too much\n");
           }
         }
         bool active = igIsItemActive();
@@ -305,6 +313,55 @@ void ui_skin_editor(tenv* env) {
                                                      gdata->cg_uvs[cg_id],
                                                      {1, 1, 1, a}});
         cg_id++;
+      }
+    }
+    igSetCursorPosX(ctx->size[0] * 0.5 - tot_size[0] * 0.5f);
+    igSetCursorPosY((ctx->size[1] * 0.5 - tot_size[1] * 0.5f) + (scale + style->ItemSpacing.y) * 6);
+    cx = igGetCursorPosX();
+    cy = igGetCursorPosY();
+    int aid = 0;
+    for (int i = 0; i < 5; i++) {
+      for (int j = 0; j < 7; j++) {
+        if (aid > NUM_ACCESSORIES) break;
+        bool is_no_accessory = aid == NUM_ACCESSORIES;
+
+        igSetCursorPosY(cy + style->ItemSpacing.y * i + scale * i);
+        igSetCursorPosX(cx + style->ItemSpacing.x * j + scale * j);
+        float ncx = igGetCursorPosX();
+        float ncy = igGetCursorPosY();
+        float a = 0.8f;
+
+        char label[4] = {0};
+        sprintf(label, "a%d", aid);
+        igPushStyleColor_Vec4(ImGuiCol_Text, (ImVec4){1, 0.5f, 0.5f, 1});
+        if (!is_no_accessory) {
+          igPushStyleVar_Float(ImGuiStyleVar_FrameRounding, scale / 2);
+          igPushStyleColor_Vec4(ImGuiCol_Button, (ImVec4){0, 0, 0, 0});
+          igPushStyleColor_Vec4(ImGuiCol_Border, (ImVec4){0, 0, 0, 0});
+          igPushStyleColor_Vec4(ImGuiCol_BorderShadow, (ImVec4){0, 0, 0, 0});
+          igPushStyleColor_Vec4(ImGuiCol_ButtonHovered, (ImVec4){0, 0, 0, 0});
+          igPushStyleColor_Vec4(ImGuiCol_ButtonActive, (ImVec4){0, 0, 0, 0});
+        }
+        igPushID_Str(label);
+        bool pressed = igButton(is_no_accessory ? "\uea0f" : "", (ImVec2){scale, scale});
+        igPopID();
+        if (!is_no_accessory) igPopStyleVar(1);
+        igPopStyleColor(is_no_accessory ? 1 : 6);
+        if (pressed) {
+          usrs->accessory = is_no_accessory ? NO_ACCESSORY : aid;
+        }
+        bool active = igIsItemActive();
+        bool hovered = igIsItemHovered(ImGuiHoveredFlags_None);
+
+        if (hovered) a = 1;
+        if (active) a = 0;
+
+        if (!is_no_accessory)
+          bp_renderer_push(
+              usr->r->bpr,
+              &(bp_instance){
+                  {ncx, ncy, scale}, gdata->accessories[aid].uv, {1, 1, 1, a}});
+        aid++;
       }
     }
   }

@@ -22,6 +22,12 @@ typedef struct leaderboard {
   } entries[NUM_LEADERBOARD_ENTRIES];
 } leaderboard;
 
+typedef struct accessory_data {
+  vec4s uv;
+  float sc;
+  float of;
+} accessory_data;
+
 typedef struct game_data {
   screen curr_screen;
   conn_status conn;
@@ -30,6 +36,7 @@ typedef struct game_data {
   char ntl_cg_map[NUM_COLOR_GROUPS];
   vec4s cg_uvs[NUM_COLOR_GROUPS];
   vec3s cg_colors[NUM_COLOR_GROUPS]; // original rgbs
+  accessory_data accessories[NUM_ACCESSORIES];
   vec3s cg_glow_colors[NUM_COLOR_GROUPS]; // glow color rgbs
   bool cg_colors_ct[NUM_COLOR_GROUPS]; // original rgbs' contrasts
   float worm_effect[WORM_EFFECT_LEN]; // skin effect for default skins
