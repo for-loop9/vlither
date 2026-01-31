@@ -844,7 +844,6 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
       rad = a[m] / 5.0f;
       m++;
       id = sx << 24 | sy << 16 | rx << 8 | ry;
-      float gfr = rand() % 64;
       tdarray_push(
           &gdata->data.foods,
           (&(food){.id = id,
@@ -856,8 +855,7 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
                    .rad = 1e-5,
                    .sz = rad,
                    .lrrad = 1e-5,
-                   .gfr = gfr,
-                   .gfr2 = gfr,
+                   .gfr = rand() % 64,
                    .gr = 0.65f + 0.1f * rad,
                    .wsp = (2 * ((float)rand() / RAND_MAX) - 1) * 0.0225f,
                    .sx = sx,
@@ -892,7 +890,6 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
       cv = gdata->data.lfcv;
     float rad = a[m] / 5.0f;
     m++;
-    float gfr = rand() % 64;
     tdarray_push(&gdata->data.foods,
                  (&(food){.id = id,
                           .cv = cv % NUM_COLOR_GROUPS,
@@ -903,8 +900,7 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
                           .rad = 1e-5,
                           .sz = rad,
                           .lrrad = 1e-5,
-                          .gfr = gfr,
-                          .gfr2 = gfr,
+                          .gfr = rand() % 64,
                           .gr = 0.65f + 0.1f * rad,
                           .wsp = (2 * ((float)rand() / RAND_MAX) - 1) * 0.0225f,
                           .sx = sx,
@@ -1113,13 +1109,13 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
         .yy = yy,
         .rad = 1e-5,
         .sz = rad,
-        .cv = cv % 9,
+        .cv = cv % NUM_COLOR_GROUPS,
         .dir = dir,
         .wang = wang,
         .ang = ang,
         .sp = speed,
         .gfr = rand() % 64,
-        .gr = 0.5f + ((float)rand() / (float)RAND_MAX) * 0.15f + 0.1f * rad,
+        .gr = 0.5f + ((float)rand() / (float)RAND_MAX) * 0.15f + 0.1f * 6, // * rad
         .cv2 = GLM_MIN(NUM_PREY_SIZES - 1, GLM_MAX(0, (int)floorf(NUM_PREY_SIZES * rad / 9)))
       }));
     }

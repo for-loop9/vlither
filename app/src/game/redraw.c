@@ -113,41 +113,6 @@ void redraw(tenv* env) {
                                             (.5 + .5 * cosf(fo->gfr / 13))});
       }
     }
-
-    for (int i = preys_len - 1; i >= 0; i--) {
-      prey* pr = gdata->data.preys + i;
-      float tx = pr->xx + pr->fx;
-      float ty = pr->yy + pr->fy;
-      float px = mww2 + gdata->data.gsc * (tx - gdata->data.view_xx);
-      float py = mhh2 + gdata->data.gsc * (ty - gdata->data.view_yy);
-      if (px >= -50 && py >= -50 && px <= mwwp50 && py <= mhhp50) {
-        if (pr->eaten) {
-          snake* o = get_snake(gdata, pr->ebid);
-          float k = powf(pr->eaten_fr, 2);
-          tx += (o->xx + o->fx +
-                 cosf(o->ang + o->fa) * (43 - k * 24) * (1 - k) - tx) *
-                k;
-          ty += (o->yy + o->fy +
-                 sinf(o->ang + o->fa) * (43 - k * 24) * (1 - k) - ty) *
-                k;
-          px = mww2 + gdata->data.gsc * (tx - gdata->data.view_xx);
-          py = mhh2 + gdata->data.gsc * (ty - gdata->data.view_yy);
-        }
-
-        float d =
-            gdata->psz[pr->cv2] * gdata->data.gsc * pr->rad * mode->food_scale;
-        vec3s c = {mode->food_color[0], mode->food_color[1],
-                   mode->food_color[2]};
-        float fx = px - d * 0.5f;
-        float fy = py - d * 0.5f;
-
-        fd_renderer_push(usr->r->fdr,
-                         &(fd_instance){{fx, fy, d},
-                                        (vec4s){c.r, c.g, c.b, pr->fr * 0.75f},
-                                        mode->food_flicker *
-                                            (.5 + .5 * cosf(pr->gfr / 13))});
-      }
-    }
   } else {
     for (int i = foods_len - 1; i >= 0; i--) {
       food* fo = gdata->data.foods + i;
@@ -172,39 +137,39 @@ void redraw(tenv* env) {
                                             (.5 + .5 * cosf(fo->gfr / 13))});
       }
     }
+  }
 
-    for (int i = preys_len - 1; i >= 0; i--) {
-      prey* pr = gdata->data.preys + i;
-      float tx = pr->xx + pr->fx;
-      float ty = pr->yy + pr->fy;
-      float px = mww2 + gdata->data.gsc * (tx - gdata->data.view_xx);
-      float py = mhh2 + gdata->data.gsc * (ty - gdata->data.view_yy);
-      if (px >= -50 && py >= -50 && px <= mwwp50 && py <= mhhp50) {
-        if (pr->eaten) {
-          snake* o = get_snake(gdata, pr->ebid);
-          float k = powf(pr->eaten_fr, 2);
-          tx += (o->xx + o->fx +
-                 cosf(o->ang + o->fa) * (43 - k * 24) * (1 - k) - tx) *
-                k;
-          ty += (o->yy + o->fy +
-                 sinf(o->ang + o->fa) * (43 - k * 24) * (1 - k) - ty) *
-                k;
-          px = mww2 + gdata->data.gsc * (tx - gdata->data.view_xx);
-          py = mhh2 + gdata->data.gsc * (ty - gdata->data.view_yy);
-        }
-
-        float d =
-            gdata->psz[pr->cv2] * gdata->data.gsc * pr->rad * mode->food_scale;
-        vec3s c = gdata->cg_colors[pr->cv];
-        float fx = px - d * 0.5f;
-        float fy = py - d * 0.5f;
-
-        fd_renderer_push(usr->r->fdr,
-                         &(fd_instance){{fx, fy, d},
-                                        (vec4s){c.r, c.g, c.b, pr->fr * 0.75f},
-                                        mode->food_flicker *
-                                            (.5 + .5 * cosf(pr->gfr / 13))});
+  for (int i = preys_len - 1; i >= 0; i--) {
+    prey* pr = gdata->data.preys + i;
+    float tx = pr->xx + pr->fx;
+    float ty = pr->yy + pr->fy;
+    float px = mww2 + gdata->data.gsc * (tx - gdata->data.view_xx);
+    float py = mhh2 + gdata->data.gsc * (ty - gdata->data.view_yy);
+    if (px >= -50 && py >= -50 && px <= mwwp50 && py <= mhhp50) {
+      if (pr->eaten) {
+        snake* o = get_snake(gdata, pr->ebid);
+        float k = powf(pr->eaten_fr, 2);
+        tx += (o->xx + o->fx + cosf(o->ang + o->fa) * (43 - k * 24) * (1 - k) -
+               tx) *
+              k;
+        ty += (o->yy + o->fy + sinf(o->ang + o->fa) * (43 - k * 24) * (1 - k) -
+               ty) *
+              k;
+        px = mww2 + gdata->data.gsc * (tx - gdata->data.view_xx);
+        py = mhh2 + gdata->data.gsc * (ty - gdata->data.view_yy);
       }
+
+      float d =
+          gdata->psz[pr->cv2] * gdata->data.gsc * pr->rad;
+      vec3s c = gdata->cg_colors[pr->cv];
+      float fx = px - d * 0.5f;
+      float fy = py - d * 0.5f;
+
+      fd_renderer_push_p(
+          usr->r->fdr,
+          &(fd_instance){{fx, fy, d},
+                         (vec4s){c.r, c.g, c.b, pr->fr * 0.75f},
+                         .5 + .5 * cosf(pr->gfr / 13)});
     }
   }
 
@@ -1270,16 +1235,7 @@ void redraw(tenv* env) {
                   {acx - m, acy - m, m * 2, fang}, acc->uv, {1, 1, 1, a}});
         }
 
-        if (usrs->hotkeys.assist && gdata->data.snake_id == o->id) {
-          ImDrawList_AddLine(
-              igGetWindowDrawList(),
-              (ImVec2){mww2 + (hx - gdata->data.view_xx) * gdata->data.gsc,
-                       mhh2 + (hy - gdata->data.view_yy) * gdata->data.gsc},
-              (ImVec2){env->ms->pos[0], env->ms->pos[1]},
-              igColorConvertFloat4ToU32(
-                  (ImVec4){usrs->laser_color[0], usrs->laser_color[1],
-                           usrs->laser_color[2], usrs->laser_color[3] * a}),
-              usrs->laser_thickness);
+        
           // ex = cosf(fang) * lsz;
           // ey = sinf(fang) * lsz;
           // float sz = 2 * gdata->data.gsc;
@@ -1309,7 +1265,6 @@ void redraw(tenv* env) {
           //          sz * 2, 0},
           //         gdata->cg_uvs[BLANK_UV],
           //         {1, 1, 1, a}});
-        }
       }
     }
   }

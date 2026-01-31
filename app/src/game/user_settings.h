@@ -55,7 +55,6 @@ typedef struct user_settings {
 
   // hotkeys:
   struct {
-    bool fullscreen;
     bool hud;
     bool big_food;
     bool show_names;

@@ -9,9 +9,11 @@ void tinput(tenv* env) {
   tuser_data* usr = env->usr;
   user_settings* usrs = &usr->usrs;
 
-  if (twindow_closed(env->wnd)) env->config.running = false;
-  if (tkeyboard_key_pressed(env->kb, FULLSCREEN_HKEY)) {
-    usrs->hotkeys.fullscreen = !usrs->hotkeys.fullscreen;
+  if (twindow_closed(env->wnd)) {
+    env->config.running = false;
+    save_user_settings(usrs);
+  }
+  if (tkeyboard_key_pressed(env->kb, GLFW_KEY_F11)) {
     twindow_toggle_fullscreen(env->wnd);
   }
 }
@@ -30,7 +32,7 @@ void tlaunch(tenv* env) {
 
   read_user_settings(usrs);
   env->config.vsync = usrs->vsync;
-  env->config.fullscreen = usrs->hotkeys.fullscreen;
+  env->config.fullscreen = false;
   env->config.title = "Vlither";
 }
 

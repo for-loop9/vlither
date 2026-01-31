@@ -2,7 +2,7 @@
 
 #include <string.h>
 
-fd_renderer* fd_renderer_create(tcontext* ctx, int max_instances,
+fd_renderer* fd_renderer_create(tcontext* ctx, int max_instances, int max_p_instances,
                                 VkPipelineLayout layout, VkRenderPass pass) {
   fd_renderer* r = malloc(sizeof(fd_renderer));
   r->pipeline_idx = 0;
@@ -328,6 +328,13 @@ fd_renderer* fd_renderer_create(tcontext* ctx, int max_instances,
   r->max_instances = max_instances;
   r->num_instances = 0;
 
+  r->p_instance_buffer =
+      tdbuffer_create(ctx, NULL, max_p_instances * sizeof(fd_instance),
+                      VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+  r->p_instances = malloc(max_p_instances * sizeof(fd_instance));
+  r->max_p_instances = max_p_instances;
+  r->num_p_instances = 0;
+
   return r;
 }
 
@@ -338,19 +345,38 @@ void fd_renderer_push(fd_renderer* r, const fd_instance* instance) {
   r->instances[r->num_instances++] = *instance;
 }
 
+void fd_renderer_push_p(fd_renderer* r, const fd_instance* instance) {
+  if (r->num_p_instances >= r->max_p_instances) {
+    return;
+  }
+  r->p_instances[r->num_p_instances++] = *instance;
+}
+
 void fd_renderer_render(fd_renderer* r, tcontext* ctx) {
   tcontext_frame* fr = ctx->frames + ctx->current_frame;
   memcpy(r->instance_buffer[ctx->current_frame].data, r->instances,
          r->num_instances * sizeof(fd_instance));
+  memcpy(r->p_instance_buffer[ctx->current_frame].data, r->p_instances,
+         r->num_p_instances * sizeof(fd_instance));
   vkCmdBindPipeline(fr->cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
                     r->pipelines[r->pipeline_idx]);
   vkCmdBindVertexBuffers(fr->cmd, 1, 1,
                          &r->instance_buffer[ctx->current_frame].handle,
                          (VkDeviceSize[]){0});
   vkCmdDraw(fr->cmd, 4, r->num_instances, 0, 0);
+
+  vkCmdBindPipeline(fr->cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+                    r->pipelines[0]);
+  vkCmdBindVertexBuffers(fr->cmd, 1, 1,
+                         &r->p_instance_buffer[ctx->current_frame].handle,
+                         (VkDeviceSize[]){0});
+  vkCmdDraw(fr->cmd, 4, r->num_p_instances, 0, 0);
 }
 
 void fd_renderer_destroy(fd_renderer* r, tcontext* ctx) {
+  free(r->p_instances);
+  tdbuffer_destroy(ctx, r->p_instance_buffer);
+
   free(r->instances);
   tdbuffer_destroy(ctx, r->instance_buffer);
   vkDestroyPipeline(ctx->device, r->pipelines[1], NULL);

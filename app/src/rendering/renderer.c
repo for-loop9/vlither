@@ -319,7 +319,7 @@ renderer* renderer_create(tenv* env) {
   r->bstb = bst_renderer_create(ctx, MAX_BOOST_INSTANCES, r->pipeline_layout, r->render_pass);
   r->bpr = bp_renderer_create(ctx, MAX_SPRITE_INSTANCES, r->pipeline_layout, r->render_pass);
   r->bsta = bst_renderer_create(ctx, MAX_BOOST_INSTANCES, r->pipeline_layout, r->render_pass);
-  r->fdr = fd_renderer_create(ctx, MAX_FOOD_INSTANCES, r->pipeline_layout, r->render_pass);
+  r->fdr = fd_renderer_create(ctx, MAX_FOOD_INSTANCES, MAX_PREYS, r->pipeline_layout, r->render_pass);
   r->bdr = bd_renderer_create(ctx, r->pipeline_layout, r->render_pass);
   r->astr = bp_renderer_create(ctx, 2, r->pipeline_layout, r->render_pass);
   r->cr = spr_renderer_create(ctx, 1, r->pipeline_layout, env->ctx->renderpass);
@@ -417,6 +417,7 @@ void renderer_resize(renderer* r, tcontext* ctx, ivec2 size) {
 
 void renderer_clear_instances(renderer* r) {
   r->fdr->num_instances = 0;
+  r->fdr->num_p_instances = 0;
   r->bsta->num_instances = 0;
   r->bpr->num_instances = 0;
   r->bstb->num_instances = 0;

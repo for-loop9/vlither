@@ -22,7 +22,6 @@ typedef struct food {
   float lrrad;
   float fr;
   float gfr;
-  float gfr2;
   float gr;
   float wsp;
   float eaten_fr;

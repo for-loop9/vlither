@@ -91,7 +91,10 @@ void ui_title_screen(tenv* env) {
   igSetCursorPosX(ctx->size[0] / 2.0f - logo_size / 2);
   igSetCursorPosY(ctx->size[1] / 2.0f + style->ItemSpacing.y * 5 +
                   frame_height * 4);
-  if (igButton("\ue9b6 Quit", (ImVec2){logo_size})) env->config.running = false;
+  if (igButton("\ue9b6 Quit", (ImVec2){logo_size})) {
+    env->config.running = false;
+    save_user_settings(usrs);
+  }
 
   igPopFont();
 }

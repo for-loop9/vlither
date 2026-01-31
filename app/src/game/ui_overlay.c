@@ -8,21 +8,42 @@ void ui_overlay(tenv* env) {
   game_data* gdata = &usr->gdata;
   user_settings* usrs = &usr->usrs;
 
+  float mww2 = ctx->size[0] / 2.0f;
+  float mhh2 = ctx->size[1] / 2.0f;
+
+  int snakes_len = tdarray_length(gdata->data.snakes);
+  if (snakes_len) {
+    snake* me = gdata->data.snakes + (snakes_len - 1);
+    if (gdata->data.snake_id == me->id) {
+      float a = me->alive_amt * (1 - me->dead_amt);
+      int sct = me->sct + me->rsc;
+      float hx = me->xx + me->fx;
+      float hy = me->yy + me->fy;
+
+      gdata->data.score = (int)floorf((gdata->data.fpsls[sct] +
+                                       me->fam / gdata->data.fmlts[sct] - 1) *
+                                          15 -
+                                      5) /
+                          1;
+
+      if (usrs->hotkeys.assist) {
+        ImDrawList_AddLine(
+            igGetWindowDrawList(),
+            (ImVec2){mww2 + (hx - gdata->data.view_xx) * gdata->data.gsc,
+                     mhh2 + (hy - gdata->data.view_yy) * gdata->data.gsc},
+            (ImVec2){env->ms->pos[0], env->ms->pos[1]},
+            igColorConvertFloat4ToU32(
+                (ImVec4){usrs->laser_color[0], usrs->laser_color[1],
+                         usrs->laser_color[2], usrs->laser_color[3] * a}),
+            usrs->laser_thickness);
+      }
+    }
+  }
+
   usr->r->global.minimap_opacity = 0;
   if (usrs->hotkeys.hud) {
     ImGuiStyle* style = igGetStyle();
     float frame_height = igGetFrameHeight();
-
-    if (gdata->data.follow_view) {
-      int snakes_len = tdarray_length(gdata->data.snakes);
-      snake* o = gdata->data.snakes + (snakes_len - 1);
-      int sct = o->sct + o->rsc;
-      gdata->data.score = (int)floorf((gdata->data.fpsls[sct] +
-                                       o->fam / gdata->data.fmlts[sct] - 1) *
-                                          15 -
-                                      5) /
-                          1;
-    }
 
     igPushFont(usr->imgui_data.mono_font[usrs->stats_font_size],
                usr->imgui_data.mono_font[usrs->stats_font_size]->LegacySize);
@@ -155,7 +176,7 @@ void ui_overlay(tenv* env) {
             igPushFont(
                 usr->imgui_data.mono_font[usrs->lb_font_size],
                 usr->imgui_data.mono_font[usrs->lb_font_size]->LegacySize);
-            itcolor.w = 0.6f; // .7f * (.3f + .7f * (1 - (1 + row) / 10.0f));
+            itcolor.w = 0.6f;  // .7f * (.3f + .7f * (1 - (1 + row) / 10.0f));
           }
 
           igTableNextRow(ImGuiTableRowFlags_None, 0);

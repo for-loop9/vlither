@@ -61,7 +61,6 @@ void user_settings_default(user_settings* usr_settings) {
   usr_settings->modes[1].show_accessories = false;
   usr_settings->modes[1].render_mode = 1;
 
-  usr_settings->hotkeys.fullscreen = false;
   usr_settings->hotkeys.hud = true;
   usr_settings->hotkeys.show_names = true;
   usr_settings->hotkeys.big_food = false;
