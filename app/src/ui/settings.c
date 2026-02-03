@@ -114,11 +114,15 @@ void ui_settings(tenv* env) {
         igTableSetColumnIndex(0);
         igIndent(style->WindowPadding.x);
         igAlignTextToFramePadding();
+        igText("Show crosshair");
+        igAlignTextToFramePadding();
         igText("Show background");
         igAlignTextToFramePadding();
         igText("Show accessories");
         igAlignTextToFramePadding();
         igText("Show shadows");
+        igAlignTextToFramePadding();
+        igText("Death effect");
         igAlignTextToFramePadding();
         igText("Body part separation");
         igAlignTextToFramePadding();
@@ -129,9 +133,11 @@ void ui_settings(tenv* env) {
         igText("Boost");
 
         igTableSetColumnIndex(1);
+        igCheckbox("##crosshair", &mode->show_crosshair);
         igCheckbox("##bg", &mode->show_background);
         igCheckbox("##acc", &mode->show_accessories);
         igCheckbox("##shad", &mode->show_shadows);
+        igCheckbox("##death effect", &mode->death_effect);
         igSetNextItemWidth(-1);
         igSliderFloat("##bps", &mode->qsm, 1, 4, "%.2f",
                     ImGuiSliderFlags_AlwaysClamp);

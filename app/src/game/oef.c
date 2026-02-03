@@ -291,14 +291,14 @@ void oef(tenv* env) {
       }
     }
     if (o->dead) {
-      o->dead_amt += gdata->data.vfr * .03;
+      o->dead_amt += gdata->data.vfr * (mode->death_effect ? 0.02f : 0.03f);
       if (o->dead_amt >= 1) {
         tdarray_destroy(o->pts);
         tdarray_destroy(o->gptz);
         tdarray_remove(gdata->data.snakes, i);
       }
     } else if (o->alive_amt != 1) {
-      o->alive_amt += gdata->data.vfr * .02;
+      o->alive_amt += gdata->data.vfr * 0.02f;
       if (o->alive_amt >= 1) o->alive_amt = 1;
     }
   }

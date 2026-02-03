@@ -37,10 +37,12 @@ void user_settings_default(user_settings* usr_settings) {
   usr_settings->modes[0].boost_type = 0;
   usr_settings->modes[0].qsm = 1;
   usr_settings->modes[0].bg_scale = 599 / 4096.0f;
+  usr_settings->modes[0].show_crosshair = false;
   usr_settings->modes[0].show_boost = true;
   usr_settings->modes[0].show_shadows = true;
   usr_settings->modes[0].show_background = true;
   usr_settings->modes[0].show_accessories = true;
+  usr_settings->modes[0].death_effect = true;
   usr_settings->modes[0].render_mode = 0;
 
   // assist mode
@@ -55,16 +57,17 @@ void user_settings_default(user_settings* usr_settings) {
   usr_settings->modes[1].boost_type = 1;
   usr_settings->modes[1].qsm = 1;
   usr_settings->modes[1].bg_scale = 599 / 4096.0f;
+  usr_settings->modes[1].show_crosshair = true;
   usr_settings->modes[1].show_boost = false;
   usr_settings->modes[1].show_shadows = true;
   usr_settings->modes[1].show_background = false;
   usr_settings->modes[1].show_accessories = false;
+  usr_settings->modes[1].death_effect = false;
   usr_settings->modes[1].render_mode = 1;
 
   usr_settings->hotkeys.hud = true;
   usr_settings->hotkeys.show_names = true;
   usr_settings->hotkeys.big_food = false;
-  usr_settings->hotkeys.crosshair = true;
   usr_settings->hotkeys.assist = false;
   usr_settings->hotkeys.toggle_hotkeys = true;
 }

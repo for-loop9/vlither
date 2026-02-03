@@ -994,6 +994,45 @@ void redraw(tenv* env) {
           }
         }
 
+        if (mode->death_effect && o->dead) {
+          float falf = (.15 + .15 * fabsf(sinf(5 * PI * o->dead_amt))) * sinf(PI * o->dead_amt);
+          float dsz = gdata->data.gsc * lsz;
+
+          for (j = bp - 1; j >= 0; j--)
+            if (gdata->data.pbu[(int)j] == 2) {
+              ox = tx;
+              oy = ty;
+              tx = gdata->data.pbx[(int)j];
+              ty = gdata->data.pby[(int)j];
+              if (tx > ox)
+                d2 = tx - ox;
+              else
+                d2 = ox - tx;
+              if (ty > oy)
+                d2 += ty - oy;
+              else
+                d2 += oy - ty;
+              d2 /= 6;
+              if (d2 > 1) d2 = 1;
+              px = gdata->data.pbx[(int)j];
+              py = gdata->data.pby[(int)j];
+              float alpha =
+                  d2 * falf * (.6 + .4 * cosf(j / 4 - 15 * o->dead_amt));
+
+              float fix = ((px - gdata->data.view_xx) * gdata->data.gsc) + mww2;
+              float fiy = ((py - gdata->data.view_yy) * gdata->data.gsc) + mhh2;
+
+              bp_renderer_push(
+                    usr->r->bpr,
+                    &(bp_instance){{fix - dsz,
+                                    fiy - dsz,
+                                    dsz * 2,
+                                    0},
+                                   gdata->cg_uvs[BLANK_UV],
+                                   {1, 1, 1, alpha * 0.5f}});
+            }
+        }
+
         if (mode->show_boost) {
           // boost effect 1:
           if (o->smooth_tsp > o->fsp) {
@@ -1167,6 +1206,8 @@ void redraw(tenv* env) {
         float ex = cosf(fang) * ed + cosf(fang - PI / 2) * (esp + .5);
         float ey = sinf(fang) * ed + sinf(fang - PI / 2) * (esp + .5);
 
+        float ea = mode->death_effect ? o->alive_amt * o->alive_amt * sqrtf(1 - o->dead_amt) : a;
+
         bp_renderer_push(
             usr->r->bpr,
             &(bp_instance){
@@ -1176,7 +1217,7 @@ void redraw(tenv* env) {
                      iris_r,
                  iris_r * 2, 0},
                 gdata->cg_uvs[BLANK_UV],
-                {dfs->ec.r, dfs->ec.g, dfs->ec.b, a}});
+                {dfs->ec.r, dfs->ec.g, dfs->ec.b, ea}});
 
         ex = cosf(fang) * ed + cosf(fang + PI / 2) * (esp + .5);
         ey = sinf(fang) * ed + sinf(fang + PI / 2) * (esp + .5);
@@ -1190,7 +1231,7 @@ void redraw(tenv* env) {
                      iris_r,
                  iris_r * 2, 0},
                 gdata->cg_uvs[BLANK_UV],
-                {dfs->ec.r, dfs->ec.g, dfs->ec.b, a}});
+                {dfs->ec.r, dfs->ec.g, dfs->ec.b, ea}});
 
         ex = cosf(fang) * (ed + .5) + o->rex * ssc + cosf(fang - PI / 2) * esp;
         ey = sinf(fang) * (ed + .5) + o->rey * ssc + sinf(fang - PI / 2) * esp;
@@ -1204,7 +1245,7 @@ void redraw(tenv* env) {
                      pupil_r,
                  pupil_r * 2, 0},
                 gdata->cg_uvs[BLANK_UV],
-                {dfs->ppc.r, dfs->ppc.g, dfs->ppc.b, a}});
+                {dfs->ppc.r, dfs->ppc.g, dfs->ppc.b, ea}});
 
         ex = cosf(fang) * (ed + .5) + o->rex * ssc + cosf(fang + PI / 2) * esp;
         ey = sinf(fang) * (ed + .5) + o->rey * ssc + sinf(fang + PI / 2) * esp;
@@ -1218,7 +1259,7 @@ void redraw(tenv* env) {
                      pupil_r,
                  pupil_r * 2, 0},
                 gdata->cg_uvs[BLANK_UV],
-                {dfs->ppc.r, dfs->ppc.g, dfs->ppc.b, a}});
+                {dfs->ppc.r, dfs->ppc.g, dfs->ppc.b, ea}});
 
         // accessory:
         if (mode->show_accessories && o->accessory < NUM_ACCESSORIES) {
@@ -1232,7 +1273,7 @@ void redraw(tenv* env) {
           bp_renderer_push(
               usr->r->bpr,
               &(bp_instance){
-                  {acx - m, acy - m, m * 2, fang}, acc->uv, {1, 1, 1, a}});
+                  {acx - m, acy - m, m * 2, fang}, acc->uv, {1, 1, 1, ea}});
         }
 
         
@@ -1284,7 +1325,7 @@ void redraw(tenv* env) {
   usr->r->global.bd_opacity = 0.8f;
   usr->r->global.minimap_data_size = gdata->data.mmsz;
 
-  if (usrs->hotkeys.crosshair)
+  if (mode->show_crosshair)
     spr_renderer_push(usr->r->cr,
                       &(spr_instance){{env->ms->pos[0], env->ms->pos[1],
                                        usrs->cursor_size, usrs->cursor_size},

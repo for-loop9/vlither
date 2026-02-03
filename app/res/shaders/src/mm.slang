@@ -58,7 +58,7 @@ float4 fs_main(vs_output input) {
   float4 cc = float4(0.4, 0.4, 0.4, 0.7) * c;
   float4 bc = float4(0.1, 0.1, 0.1, 0.6) * b;
   float4 dc = float4(1, 0.5, 0.5, 1) * a;
-  float4 sc = float4(lerp(global.bd_color, float3(1, 1, 1), 0.25), 1) * s;
+  float4 sc = float4(lerp(global.bd_color, float3(1, 1, 1), 0.25), 1.75) * s;
 
   return (sc + bc + cc + dc) * float4(1, 1, 1, global.minimap_opacity);
 }

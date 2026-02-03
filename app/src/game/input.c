@@ -8,6 +8,7 @@ void input(tenv* env) {
   game_data* gdata = &usr->gdata;
   user_settings* usrs = &usr->usrs;
   struct mg_connection* connection = gdata->connection;
+  gameplay_mode* mode = usrs->modes + usrs->hotkeys.assist;
 
   if (!gdata->data.wfpr) {
     if (gdata->data.ctm - gdata->data.last_ping_mtm > 250) {
@@ -112,8 +113,7 @@ void input(tenv* env) {
   usrs->hotkeys.big_food ^= tkeyboard_key_pressed(env->kb, BIG_FOOD_HKEY);
   usrs->hotkeys.show_names ^= tkeyboard_key_pressed(env->kb, SHOW_NAMES_HKEY);
   usrs->hotkeys.toggle_hotkeys ^= tkeyboard_key_pressed(env->kb, HOTKEYS_HKEY);
-  usrs->hotkeys.crosshair ^= tkeyboard_key_pressed(env->kb, CROSSHAIR_HKEY);
   usrs->hotkeys.assist ^= tkeyboard_key_pressed(env->kb, ASSIST_HKEY);
 
-  if (usrs->hotkeys.crosshair) igSetMouseCursor(ImGuiMouseCursor_None);
+  if (mode->show_crosshair) igSetMouseCursor(ImGuiMouseCursor_None);
 }

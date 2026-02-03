@@ -16,10 +16,12 @@ typedef struct gameplay_mode {
   float qsm;
   float bg_scale;
   int boost_type;
+  bool show_crosshair;
   bool show_boost;
   bool show_shadows;
   bool show_background;
   bool show_accessories;
+  bool death_effect;
   int render_mode;
 } gameplay_mode;
 
@@ -58,7 +60,6 @@ typedef struct user_settings {
     bool hud;
     bool big_food;
     bool show_names;
-    bool crosshair;
     bool assist;
     bool toggle_hotkeys;
   } hotkeys;

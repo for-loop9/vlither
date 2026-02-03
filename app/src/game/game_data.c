@@ -36,12 +36,10 @@ void display_hotkeys(tuser_data* usr, float offset, font_size sz) {
   igPushFont(usr->imgui_data.mono_font[sz],
              usr->imgui_data.mono_font[sz]->LegacySize);
 
-  show_hot_key(usr, RESTART_HKEY, (vec3){1, 0.7f, 0.7f}, "Restart", offset, sz);
-  show_hot_key(usr, QUIT_HKEY, (vec3){1, 0.7f, 0.7f}, "Quit", offset, sz);
-  show_hot_key(usr, CROSSHAIR_HKEY, (vec3){1, 0.7f, 0.7f}, "Crosshair", offset,
-               sz);
   show_hot_key_str(usr, "F11", (vec3){1, 0.7f, 0.7f}, " Fullscreen", offset,
                    sz);
+  show_hot_key(usr, RESTART_HKEY, (vec3){1, 0.7f, 0.7f}, "Restart", offset, sz);
+  show_hot_key(usr, QUIT_HKEY, (vec3){1, 0.7f, 0.7f}, "Quit", offset, sz);
 
   show_hot_key(usr, ZOOM_IN_HKEY, (vec3){0.7f, 1, 0.7f}, "Zoom in", offset, sz);
   show_hot_key(usr, ZOOM_OUT_HKEY, (vec3){0.7f, 1, 0.7f}, "Zoom out", offset,
@@ -53,8 +51,7 @@ void display_hotkeys(tuser_data* usr, float offset, font_size sz) {
   show_hot_key(usr, BIG_FOOD_HKEY, (vec3){1, 1, 0.7f}, "Big food", offset, sz);
   show_hot_key(usr, SHOW_NAMES_HKEY, (vec3){1, 1, 0.7f}, "Player names", offset,
                sz);
-  show_hot_key(usr, HOTKEYS_HKEY, (vec3){1, 1, 0.7f}, "Hide", offset,
-               sz);
+  show_hot_key(usr, HOTKEYS_HKEY, (vec3){1, 1, 0.7f}, "Hide", offset, sz);
 
   igPopFont();
 }
