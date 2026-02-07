@@ -153,6 +153,8 @@ typedef struct game_data {
     snake* snakes;
     food* foods;
     prey* preys;
+    body_part** pts_dp;
+    gpt** gptz_dp;
 
     bool wfpr;
     bool lagging;

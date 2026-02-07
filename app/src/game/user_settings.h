@@ -1,10 +1,11 @@
 #ifndef USER_SETTINGS_H
 #define USER_SETTINGS_H
 
-#include "../constants.h"
-#include <stdint.h>
-#include <stdbool.h>
 #include <cglm/cglm.h>
+#include <stdbool.h>
+#include <stdint.h>
+
+#include "../constants.h"
 
 typedef struct gameplay_mode {
   bool food_flicker;

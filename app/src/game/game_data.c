@@ -510,6 +510,9 @@ void game_data_init(tenv* env) {
   gdata->data.snakes = tdarray_create(snake);
   gdata->data.foods = tdarray_create(food);
   gdata->data.preys = tdarray_create(prey);
+  gdata->data.pts_dp = tdarray_create(body_part*);
+  gdata->data.gptz_dp = tdarray_create(gpt*);
+
   gdata->data.fmlts = tdarray_create(float);
   gdata->data.fpsls = tdarray_create(float);
 
@@ -624,8 +627,8 @@ void game_data_reset(tenv* env) {
 
   int snakes_len = tdarray_length(gdata->data.snakes);
   for (int i = 0; i < snakes_len; i++) {
-    tdarray_destroy(gdata->data.snakes[i].gptz);
-    tdarray_destroy(gdata->data.snakes[i].pts);
+    tdarray_push(&gdata->data.pts_dp, &gdata->data.snakes[i].pts);
+    tdarray_push(&gdata->data.gptz_dp, &gdata->data.snakes[i].gptz);
   }
   tdarray_clear(gdata->data.snakes);
   tdarray_clear(gdata->data.foods);
@@ -638,12 +641,17 @@ void game_data_destroy(tenv* env) {
 
   tdarray_destroy(gdata->data.fpsls);
   tdarray_destroy(gdata->data.fmlts);
-
+  int gptz_dp_len = tdarray_length(gdata->data.gptz_dp);
+  for (int i = 0; i < gptz_dp_len; i++) {
+    tdarray_destroy(gdata->data.gptz_dp[i]);
+  }
+  int pts_dp_len = tdarray_length(gdata->data.pts_dp);
+  for (int i = 0; i < pts_dp_len; i++) {
+    tdarray_destroy(gdata->data.pts_dp[i]);
+  }
+  tdarray_destroy(gdata->data.gptz_dp);
+  tdarray_destroy(gdata->data.pts_dp);
   tdarray_destroy(gdata->data.preys);
   tdarray_destroy(gdata->data.foods);
-  int snakes_len = tdarray_length(gdata->data.snakes);
-  for (int i = 0; i < snakes_len; i++) {
-    tdarray_destroy(gdata->data.snakes[i].pts);
-  }
   tdarray_destroy(gdata->data.snakes);
 }

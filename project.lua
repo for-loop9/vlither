@@ -110,6 +110,9 @@ workspace "vlither"
 
     libdirs { vk_path .. "/lib" }
     files { "app/src/**.c", "app/src/**.cpp" }
+    defines {
+      "APP_VERSION=\"2.1\""
+    }
 
     filter { "platforms:linux" }
       links { "thermite", "glfw", "vulkan", "stdc++", "m" }

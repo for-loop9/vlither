@@ -6,7 +6,6 @@ void time_step(tenv* env) {
   tuser_data* usr = env->usr;
   tcontext* ctx = env->ctx;
   game_data* gdata = &usr->gdata;
-  struct mg_connection* connection = gdata->connection;
 
   double time_sec = glfwGetTime();
   gdata->data.ctm = time_sec * 1000;
@@ -47,7 +46,6 @@ void oef(tenv* env) {
   tcontext* ctx = env->ctx;
   game_data* gdata = &usr->gdata;
   user_settings* usrs = &usr->usrs;
-  struct mg_connection* connection = gdata->connection;
   gameplay_mode* mode = usrs->modes + usrs->hotkeys.assist;
 
   gdata->data.gsc = usrs->smooth_zoom
@@ -293,8 +291,9 @@ void oef(tenv* env) {
     if (o->dead) {
       o->dead_amt += gdata->data.vfr * (mode->death_effect ? 0.02f : 0.03f);
       if (o->dead_amt >= 1) {
-        tdarray_destroy(o->pts);
-        tdarray_destroy(o->gptz);
+        tdarray_push(&gdata->data.pts_dp, &o->pts);
+        tdarray_push(&gdata->data.gptz_dp, &o->gptz);
+
         tdarray_remove(gdata->data.snakes, i);
       }
     } else if (o->alive_amt != 1) {

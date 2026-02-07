@@ -12,6 +12,16 @@ void ui_title_screen(tenv* env) {
   ImGuiStyle* style = igGetStyle();
   ImGuiIO* io = igGetIO_Nil();
   game_data* gdata = &usr->gdata;
+  
+  // version
+  char version_str[16] = {0};
+  sprintf(version_str, "v%s", APP_VERSION);
+  ImVec2 vtxtsz; igCalcTextSize(&vtxtsz, version_str, NULL, false, -1);
+  igSetCursorPosX(ctx->size[0] - vtxtsz.x - style->WindowPadding.x);
+  igPushFont(usr->imgui_data.regular_font[FONT_SIZE_SMALL],
+             usr->imgui_data.regular_font[FONT_SIZE_SMALL]->LegacySize);
+  igTextColored((ImVec4){0.168f, 0.668f, 0.375f, 1}, version_str);
+  igPopFont();
 
   igPushFont(usr->imgui_data.regular_font[usrs->ui_font_size],
              usr->imgui_data.regular_font[usrs->ui_font_size]->LegacySize);

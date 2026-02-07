@@ -277,7 +277,15 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
       bool fp = false;
       int alen_m2 = alen - 2;
 
-      body_part* pts = tdarray_create(body_part);
+      int pts_dp_len = tdarray_length(gdata->data.pts_dp);
+      body_part* pts;
+      if (pts_dp_len) {
+        pts = gdata->data.pts_dp[pts_dp_len - 1];
+        tdarray_pop(gdata->data.pts_dp);
+        tdarray_clear(pts);
+      } else
+        pts = tdarray_create(body_part);
+
       body_part po = {0};
 
       while (m < alen) {
@@ -326,7 +334,14 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
         pts[i].smu = k;
       }
 
-      o.gptz = tdarray_create(gpt);
+      int gptz_dp_len = tdarray_length(gdata->data.gptz_dp);
+      if (gptz_dp_len) {
+        o.gptz = gdata->data.gptz_dp[gptz_dp_len - 1];
+        tdarray_pop(gdata->data.gptz_dp);
+        tdarray_clear(o.gptz);
+      } else
+        o.gptz = tdarray_create(gpt);
+
       o.pts = pts;
       if (pts) {
         o.pts = pts;
@@ -407,8 +422,9 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
             o->dead_amt = 0;
             o->edir = 0;
           } else {
-            tdarray_destroy(o->pts);
-            tdarray_destroy(o->gptz);
+            tdarray_push(&gdata->data.pts_dp, &o->pts);
+            tdarray_push(&gdata->data.gptz_dp, &o->gptz);
+
             tdarray_remove(gdata->data.snakes, i);
           }
           break;

@@ -159,17 +159,15 @@ void redraw(tenv* env) {
         py = mhh2 + gdata->data.gsc * (ty - gdata->data.view_yy);
       }
 
-      float d =
-          gdata->psz[pr->cv2] * gdata->data.gsc * pr->rad;
+      float d = gdata->psz[pr->cv2] * gdata->data.gsc * pr->rad;
       vec3s c = gdata->cg_colors[pr->cv];
       float fx = px - d * 0.5f;
       float fy = py - d * 0.5f;
 
-      fd_renderer_push_p(
-          usr->r->fdr,
-          &(fd_instance){{fx, fy, d},
-                         (vec4s){c.r, c.g, c.b, pr->fr * 0.75f},
-                         .5 + .5 * cosf(pr->gfr / 13)});
+      fd_renderer_push_p(usr->r->fdr,
+                         &(fd_instance){{fx, fy, d},
+                                        (vec4s){c.r, c.g, c.b, pr->fr * 0.75f},
+                                        .5 + .5 * cosf(pr->gfr / 13)});
     }
   }
 
@@ -995,7 +993,8 @@ void redraw(tenv* env) {
         }
 
         if (mode->death_effect && o->dead) {
-          float falf = (.15 + .15 * fabsf(sinf(5 * PI * o->dead_amt))) * sinf(PI * o->dead_amt);
+          float falf = (.15 + .15 * fabsf(sinf(5 * PI * o->dead_amt))) *
+                       sinf(PI * o->dead_amt);
           float dsz = gdata->data.gsc * lsz;
 
           for (j = bp - 1; j >= 0; j--)
@@ -1023,13 +1022,10 @@ void redraw(tenv* env) {
               float fiy = ((py - gdata->data.view_yy) * gdata->data.gsc) + mhh2;
 
               bp_renderer_push(
-                    usr->r->bpr,
-                    &(bp_instance){{fix - dsz,
-                                    fiy - dsz,
-                                    dsz * 2,
-                                    0},
-                                   gdata->cg_uvs[BLANK_UV],
-                                   {1, 1, 1, alpha * 0.5f}});
+                  usr->r->bpr,
+                  &(bp_instance){{fix - dsz, fiy - dsz, dsz * 2, 0},
+                                 gdata->cg_uvs[BLANK_UV],
+                                 {1, 1, 1, alpha * 0.5f}});
             }
         }
 
@@ -1206,7 +1202,9 @@ void redraw(tenv* env) {
         float ex = cosf(fang) * ed + cosf(fang - PI / 2) * (esp + .5);
         float ey = sinf(fang) * ed + sinf(fang - PI / 2) * (esp + .5);
 
-        float ea = mode->death_effect ? o->alive_amt * o->alive_amt * sqrtf(1 - o->dead_amt) : a;
+        float ea = mode->death_effect
+                       ? o->alive_amt * o->alive_amt * sqrtf(1 - o->dead_amt)
+                       : a;
 
         bp_renderer_push(
             usr->r->bpr,
@@ -1276,36 +1274,35 @@ void redraw(tenv* env) {
                   {acx - m, acy - m, m * 2, fang}, acc->uv, {1, 1, 1, ea}});
         }
 
-        
-          // ex = cosf(fang) * lsz;
-          // ey = sinf(fang) * lsz;
-          // float sz = 2 * gdata->data.gsc;
+        // ex = cosf(fang) * lsz;
+        // ey = sinf(fang) * lsz;
+        // float sz = 2 * gdata->data.gsc;
 
-          // bp_renderer_push(
-          //     usr->r->astr,
-          //     &(bp_instance){
-          //         {(mww2 + (ex + hx - gdata->data.view_xx) * gdata->data.gsc)
-          //         -
-          //              (sz + 2),
-          //          (mhh2 + (ey + hy - gdata->data.view_yy) * gdata->data.gsc)
-          //          -
-          //              (sz + 2),
-          //          (sz + 2) * 2, 0},
-          //         gdata->cg_uvs[BLANK_UV],
-          //         {0, 0, 0, a}});
+        // bp_renderer_push(
+        //     usr->r->astr,
+        //     &(bp_instance){
+        //         {(mww2 + (ex + hx - gdata->data.view_xx) * gdata->data.gsc)
+        //         -
+        //              (sz + 2),
+        //          (mhh2 + (ey + hy - gdata->data.view_yy) * gdata->data.gsc)
+        //          -
+        //              (sz + 2),
+        //          (sz + 2) * 2, 0},
+        //         gdata->cg_uvs[BLANK_UV],
+        //         {0, 0, 0, a}});
 
-          // bp_renderer_push(
-          //     usr->r->astr,
-          //     &(bp_instance){
-          //         {(mww2 + (ex + hx - gdata->data.view_xx) * gdata->data.gsc)
-          //         -
-          //              sz,
-          //          (mhh2 + (ey + hy - gdata->data.view_yy) * gdata->data.gsc)
-          //          -
-          //              sz,
-          //          sz * 2, 0},
-          //         gdata->cg_uvs[BLANK_UV],
-          //         {1, 1, 1, a}});
+        // bp_renderer_push(
+        //     usr->r->astr,
+        //     &(bp_instance){
+        //         {(mww2 + (ex + hx - gdata->data.view_xx) * gdata->data.gsc)
+        //         -
+        //              sz,
+        //          (mhh2 + (ey + hy - gdata->data.view_yy) * gdata->data.gsc)
+        //          -
+        //              sz,
+        //          sz * 2, 0},
+        //         gdata->cg_uvs[BLANK_UV],
+        //         {1, 1, 1, a}});
       }
     }
   }
