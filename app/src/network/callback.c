@@ -224,7 +224,6 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
 
     if (dlen > 6) {
       snake o = {0};
-
       float ang =
           (a[m] << 16 | a[m + 1] << 8 | a[m + 2]) * 2 * PI / 16777215.0f;
       m += 3;
@@ -239,7 +238,6 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
       m += 3;
       int cv = a[m];
       m++;
-      // pts = []
       float snx = (a[m] << 16 | a[m + 1] << 8 | a[m + 2]) / 5.0f;
       m += 3;
       float sny = (a[m] << 16 | a[m + 1] << 8 | a[m + 2]) / 5.0f;
@@ -292,6 +290,7 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
         lx = xx;
         ly = yy;
         if (!fp) {
+          // tail
           xx = (a[m] << 16 | a[m + 1] << 8 | a[m + 2]) / 5.0f;
           m += 3;
           yy = (a[m] << 16 | a[m + 1] << 8 | a[m + 2]) / 5.0f;
@@ -300,6 +299,7 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
           ly = yy;
           fp = true;
         } else if (m == alen_m2) {
+          // head
           float iang = a[m] << 8 | a[m + 1];
           po.iang = iang;
           m += 2;
@@ -307,6 +307,7 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
           xx += cosf(ang) * gdata->data.default_msl;
           yy += sinf(ang) * gdata->data.default_msl;
         } else {
+          // body
           xx += (a[m] - 127) / 2.0f;
           m++;
           yy += (a[m] - 127) / 2.0f;
@@ -612,7 +613,6 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
       m += 2;
       o = get_snake(gdata, id);
     }
-
     if (o) {
       if (adding_only)
         o->sct++;
@@ -651,6 +651,7 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
           m += 2;
         } else
           iang = o->pts[lpo_i].iang;
+
         po->iang = iang;
         float ang = iang * GD_K64A;
         xx = o->pts[lpo_i].xx + cosf(ang) * msl;
@@ -687,6 +688,7 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
         dx = hx - (o->pts[lpo_i].xx + o->pts[lpo_i].fx);
         dy = hy - (o->pts[lpo_i].yy + o->pts[lpo_i].fy);
         d = sqrtf(dx * dx + dy * dy);
+
         if (d > 1) {
           dx /= d;
           dy /= d;

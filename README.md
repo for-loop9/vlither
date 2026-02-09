@@ -25,8 +25,9 @@ Make sure the `VULKAN_SDK` environment variable is set (and acquire `vulkan-1.li
 ```bash
 git clone https://github.com/for-loop9/vlither.git
 cd vlither
-python3 build.py 0 1
-python3 build.py
+python3 build.py 2 # compile shaders
+python3 build.py 0 # debug build
+./build/bin/linux_x86_64_debug/app
 ```
 You may also work on the project with VS Code by opening the `.code-workspace` file. Make sure you have the required extensions installed:
 - [C/C++ tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)

@@ -182,6 +182,7 @@ void redraw(tenv* env) {
       body_part* po = o->pts + j;
       float px = po->xx + po->fx;
       float py = po->yy + po->fy;
+
       if (px >= gdata->data.bpx1 && py >= gdata->data.bpy1 &&
           px <= gdata->data.bpx2 && py <= gdata->data.bpy2) {
         iiv = true;
@@ -991,6 +992,30 @@ void redraw(tenv* env) {
               }
           }
         }
+
+        // debugging
+        // for (int bpi = pts_len - 1; bpi >= 0; bpi--) {
+        //   body_part* po = o->pts + bpi;
+        //   float fix = ((po->xx - gdata->data.view_xx) * gdata->data.gsc) +
+        //   mww2; float fiy = ((po->yy - gdata->data.view_yy) *
+        //   gdata->data.gsc) + mhh2;
+
+        //   ImDrawList_AddCircleFilled(igGetWindowDrawList(), (ImVec2){fix,
+        //   fiy}, 5, UINT32_MAX, 10);
+        // }
+
+        // if (o->id == gdata->data.snake_id) {
+        //   ImDrawList_AddLine(igGetWindowDrawList(), (ImVec2){mww2, mhh2},
+        //   (ImVec2){mww2 + 120 * cosf(o->ang), mhh2 + 120 * sinf(o->ang)},
+        //   igColorConvertFloat4ToU32((ImVec4){1, 0, 0, 1}), 2);
+        //   ImDrawList_AddLine(igGetWindowDrawList(), (ImVec2){mww2, mhh2},
+        //   (ImVec2){mww2 + 120 * cosf(o->wang), mhh2 + 120 * sinf(o->wang)},
+        //   igColorConvertFloat4ToU32((ImVec4){0, 1, 0, 1}), 2);
+        //   ImDrawList_AddLine(igGetWindowDrawList(), (ImVec2){mww2, mhh2},
+        //   (ImVec2){mww2 + 120 * cosf(o->pts[pts_len - 1].iang), mhh2 + 120 *
+        //   sinf(o->pts[pts_len - 1].iang)},
+        //   igColorConvertFloat4ToU32((ImVec4){0.3f, 0.3f, 1, 1}), 2);
+        // }
 
         if (mode->death_effect && o->dead) {
           float falf = (.15 + .15 * fabsf(sinf(5 * PI * o->dead_amt))) *

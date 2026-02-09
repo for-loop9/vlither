@@ -36,15 +36,15 @@
 #define GD_VFC 62
 #define GD_SMUC 100
 #define GD_SMUC_M3 (GD_SMUC - 3)
-#define GD_A64K (65536.0f / PI2);
-#define GD_K64A (PI2 / 65536.0f);
+#define GD_A64K (65536.0f / PI2)
+#define GD_K64A (PI2 / 65536.0f)
 #define GD_NSEP 4.5f
 
 // render constants:
 #define MAX_BOOST_INSTANCES 131072
 #define MAX_FOOD_INSTANCES 131072
 #define MAX_SPRITE_INSTANCES 131072
-#define MAX_PREYS 1024
+#define MAX_PREYS 2048
 
 // hotkeys:
 #define RESTART_HKEY GLFW_KEY_R

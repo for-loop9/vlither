@@ -14,6 +14,7 @@ void ui_overlay(tenv* env) {
   int snakes_len = tdarray_length(gdata->data.snakes);
   if (snakes_len) {
     snake* me = gdata->data.snakes + (snakes_len - 1);
+
     if (gdata->data.snake_id == me->id) {
       float a = me->alive_amt * (1 - me->dead_amt);
       int sct = me->sct + me->rsc;
