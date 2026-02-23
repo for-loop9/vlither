@@ -1,6 +1,7 @@
 #include "user_settings.h"
 
 #include <string.h>
+#include <thermite.h>
 
 void user_settings_default(user_settings* usr_settings) {
   usr_settings->ui_font_size = FONT_SIZE_SMALL;
@@ -37,12 +38,14 @@ void user_settings_default(user_settings* usr_settings) {
   usr_settings->modes[0].boost_type = 0;
   usr_settings->modes[0].qsm = 1;
   usr_settings->modes[0].bg_scale = 599 / 4096.0f;
+  usr_settings->modes[0].boost_strength = 1;
   usr_settings->modes[0].show_crosshair = false;
   usr_settings->modes[0].show_boost = true;
   usr_settings->modes[0].show_shadows = true;
   usr_settings->modes[0].show_background = true;
   usr_settings->modes[0].show_accessories = true;
   usr_settings->modes[0].death_effect = true;
+  usr_settings->modes[0].player_names_outline = false;
   usr_settings->modes[0].render_mode = 0;
 
   // assist mode
@@ -57,42 +60,60 @@ void user_settings_default(user_settings* usr_settings) {
   usr_settings->modes[1].boost_type = 1;
   usr_settings->modes[1].qsm = 1;
   usr_settings->modes[1].bg_scale = 599 / 4096.0f;
+  usr_settings->modes[1].boost_strength = 1;
   usr_settings->modes[1].show_crosshair = true;
   usr_settings->modes[1].show_boost = false;
   usr_settings->modes[1].show_shadows = true;
   usr_settings->modes[1].show_background = false;
   usr_settings->modes[1].show_accessories = false;
   usr_settings->modes[1].death_effect = false;
+  usr_settings->modes[1].player_names_outline = true;
   usr_settings->modes[1].render_mode = 1;
 
-  usr_settings->hotkeys.hud = true;
-  usr_settings->hotkeys.show_names = true;
-  usr_settings->hotkeys.big_food = false;
-  usr_settings->hotkeys.assist = false;
-  usr_settings->hotkeys.toggle_hotkeys = true;
+  usr_settings->hotkeys[HOTKEY_HUD] = (hotkey){GLFW_KEY_H, true, 0, "HUD"};
+  usr_settings->hotkeys[HOTKEY_SHOW_NAMES] =
+      (hotkey){GLFW_KEY_P, true, 0, "Show names"};
+  usr_settings->hotkeys[HOTKEY_BIG_FOOD] =
+      (hotkey){GLFW_KEY_F, false, 0, "Big food"};
+  usr_settings->hotkeys[HOTKEY_ASSIST] =
+      (hotkey){GLFW_KEY_K, false, 1, "Assist"};
+  usr_settings->hotkeys[HOTKEY_MENU] =
+      (hotkey){GLFW_KEY_Z, true, 0, "Hotkey menu"};
+  usr_settings->hotkeys[HOTKEY_RESTART] =
+      (hotkey){GLFW_KEY_R, false, 1, "Restart"};
+  usr_settings->hotkeys[HOTKEY_QUIT] = (hotkey){GLFW_KEY_Q, false, 1, "Quit"};
+}
+
+void write_default_settings(user_settings* usr_settings) {
+  user_settings_default(usr_settings);
+
+  FILE* f = fopen(USER_SETTINGS_FILE, "wb");
+  if (f == NULL) {
+    printf("Error creating settings file.");
+    exit(-1);
+  }
+
+  fwrite(usr_settings, sizeof(user_settings), 1, f);
+  fclose(f);
 }
 
 void read_user_settings(user_settings* usr_settings) {
   FILE* f = fopen(USER_SETTINGS_FILE, "rb");
-  if (f == NULL) {
-    user_settings_default(usr_settings);
-    f = fopen(USER_SETTINGS_FILE, "wb");
-    if (f == NULL) {
-      printf("Error creating settings file.");
-      exit(-1);
-    }
 
-    fwrite(usr_settings, sizeof(user_settings), 1, f);
-    fclose(f);
+  if (f == NULL) {
+    // File doesn't exist → create it
+    write_default_settings(usr_settings);
     return;
   }
 
   size_t read = fread(usr_settings, sizeof(user_settings), 1, f);
   fclose(f);
 
-  if (read != 1) {
-    printf("Settings file corrupted.");
-    exit(-1);
+  if (read != 1 || strncmp(usr_settings->version, SETTINGS_VERSION,
+                           strlen(SETTINGS_VERSION)) != 0) {
+    printf("Settings file outdated, recreating with default settings.\n");
+    write_default_settings(usr_settings);
+    return;
   }
 }
 

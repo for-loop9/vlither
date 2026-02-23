@@ -7,26 +7,36 @@
 
 #include "../constants.h"
 
+typedef struct hotkey {
+  int key;
+  bool active;
+  int mode;
+  char description[MAX_HOTKEY_DESC_LENGTH + 1];
+} hotkey;
+
 typedef struct gameplay_mode {
   bool food_flicker;
   bool food_float;
   bool uniform_food_color;
-  vec3 food_color;
-  int food_type;
-  float food_scale;
-  float qsm;
-  float bg_scale;
-  int boost_type;
   bool show_crosshair;
   bool show_boost;
   bool show_shadows;
   bool show_background;
   bool show_accessories;
   bool death_effect;
+  bool player_names_outline;
+  int food_type;
+  int boost_type;
   int render_mode;
+  float food_scale;
+  float qsm;
+  float bg_scale;
+  float boost_strength;
+  vec3 food_color;
 } gameplay_mode;
 
 typedef struct user_settings {
+  char version[4];
   char nickname[MAX_NICKNAME_LEN + 1];
   char ipv4[MAX_IPV4_LEN + 1];
   char skin_code[MAX_SKIN_CODE_LEN + 1];
@@ -57,13 +67,7 @@ typedef struct user_settings {
   gameplay_mode modes[2];
 
   // hotkeys:
-  struct {
-    bool hud;
-    bool big_food;
-    bool show_names;
-    bool assist;
-    bool toggle_hotkeys;
-  } hotkeys;
+  hotkey hotkeys[NUM_HOTKEYS];
 } user_settings;
 
 void user_settings_default(user_settings* usr_settings);

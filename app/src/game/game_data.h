@@ -7,6 +7,7 @@
 #include "snake.h"
 #include "food.h"
 #include "prey.h"
+#include "sbot.h"
 
 typedef struct default_skin_data {
   vec3s ec;
@@ -44,6 +45,7 @@ typedef struct game_data {
   float psz[NUM_PREY_SIZES]; // prey sizes
   default_skin_data dfs[NUM_DEFAULT_SKINS + 1]; // + 1 for custom skin
   int u_m[7];
+  sbot bot;
 
   vec4s SHADOW_UV;
   vec4s CURSOR_UV;
@@ -70,6 +72,8 @@ typedef struct game_data {
     float real_flux_grd;
     float view_xx;
     float view_yy;
+    float lview_xx;
+    float lview_yy;
     float lfsx;
     float lfsy;
     float lfcv;

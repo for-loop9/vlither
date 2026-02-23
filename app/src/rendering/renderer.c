@@ -254,6 +254,8 @@ renderer* renderer_create(tenv* env) {
   r->global.minimap_circ[1] = 0;
   r->global.minimap_circ[2] = 256;
   r->global.minimap_opacity = 1;
+  r->global.lview[0] = -1;
+  r->global.lview[1] = -1;
 
   r->global_buffer = tdbuffer_create(ctx, &r->global, sizeof(r->global),
                                      VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);

@@ -10,6 +10,7 @@ public struct Global {
   public float3 bd_color;
   public float3 minimap_circ;
   public float2 view;
+  public float2 lview;
   public float zoom;
   public float bg_opacity;
   public float bg_scale;

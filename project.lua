@@ -111,7 +111,8 @@ workspace "vlither"
     libdirs { vk_path .. "/lib" }
     files { "app/src/**.c", "app/src/**.cpp" }
     defines {
-      "APP_VERSION=\"2.1\""
+      "APP_VERSION=\"2.2\"",
+      "SETTINGS_VERSION=\"1.0\""
     }
 
     filter { "platforms:linux" }

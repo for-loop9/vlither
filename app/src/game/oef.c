@@ -46,7 +46,7 @@ void oef(tenv* env) {
   tcontext* ctx = env->ctx;
   game_data* gdata = &usr->gdata;
   user_settings* usrs = &usr->usrs;
-  gameplay_mode* mode = usrs->modes + usrs->hotkeys.assist;
+  gameplay_mode* mode = usrs->modes + usrs->hotkeys[HOTKEY_ASSIST].active;
 
   gdata->data.gsc = usrs->smooth_zoom
                         ? glm_lerp(gdata->data.gsc, gdata->data.ms_zoom,
@@ -72,6 +72,11 @@ void oef(tenv* env) {
       gdata->data.flx_tg = -1;
   }
 
+  if (gdata->data.play_etm >= LAST_POSITION_DURATION) {
+    usr->r->global.lview[0] = -1;
+    usr->r->global.lview[1] = -1;
+  }
+
   // update snakes:
   int snakes_len = _tdarray_length(gdata->data.snakes);
   for (int i = snakes_len - 1; i >= 0; i--) {
@@ -89,19 +94,18 @@ void oef(tenv* env) {
       }
     }
     if (!o->dead) {
-      if (o->tsp != o->sp) {
-        if (o->tsp < o->sp) {
-          o->tsp += (o->sp - o->tsp) * .1;
-          o->tsp += 1E-4;
-          if (o->tsp > o->sp) o->tsp = o->sp;
-        } else {
-          o->tsp += (o->sp - o->tsp) * .3;
-          o->tsp -= 1E-4;
-          if (o->tsp < o->sp) o->tsp = o->sp;
-        }
-      }
+      float rate_up = 0.05f;
+      float rate_down = rate_up * 2;
 
-      o->smooth_tsp = glm_lerp(o->smooth_tsp, o->tsp, 0.05f * gdata->data.vfr);
+      float diff = o->sp - o->tsp;
+
+      if (diff > 0.0f) {
+        float factor = 1.0f - expf(-rate_up * gdata->data.vfr);
+        o->tsp += diff * factor;
+      } else if (diff < 0.0f) {
+        float factor = 1.0f - expf(-rate_down * gdata->data.vfr);
+        o->tsp += diff * factor;
+      }
 
       if (o->tsp > o->fsp) o->sfr += (o->tsp - o->fsp) * gdata->data.vfr * .021;
       if (o->fltg > 0) {

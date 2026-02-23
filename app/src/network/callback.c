@@ -352,6 +352,9 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
 
       if (gdata->data.dead) {
         // player snake:
+        usr->r->global.lview[0] = gdata->data.lview_xx;
+        usr->r->global.lview[1] = gdata->data.lview_yy;
+
         gdata->data.snake_id = id;
         gdata->data.dead = false;
         gdata->data.follow_view = true;
@@ -393,7 +396,7 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
       o.msl = msl;
       o.ang = ang;
       o.eang = o.wang = wang;
-      o.sp = o.smooth_tsp = speed;
+      o.sp = o.tsp = speed;
       o.spang = o.sp / gdata->data.spangdv;
       if (o.spang > 1) o.spang = 1;
       o.fam = fam;
@@ -1258,6 +1261,8 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
     gdata->data.kills++;
   } else if (cmd == 'v') {
     gdata->data.follow_view = false;
+    gdata->data.lview_xx = gdata->data.view_xx;
+    gdata->data.lview_yy = gdata->data.view_yy;
     usrs->kills = gdata->data.kills;
     usrs->score = gdata->data.score;
     usrs->play_time = gdata->data.play_etm;

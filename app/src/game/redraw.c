@@ -55,7 +55,7 @@ void redraw(tenv* env) {
   float mwwp50 = ctx->size[0] + 50;
   float mhhp50 = ctx->size[1] + 50;
 
-  gameplay_mode* mode = usrs->modes + usrs->hotkeys.assist;
+  gameplay_mode* mode = usrs->modes + usrs->hotkeys[HOTKEY_ASSIST].active;
 
   if (!gdata->data.dead) {
     if (gdata->data.fvtg > 0) {
@@ -92,7 +92,7 @@ void redraw(tenv* env) {
     for (int i = foods_len - 1; i >= 0; i--) {
       food* fo = gdata->data.foods + i;
 
-      if (usrs->hotkeys.big_food && fo->sz < 10) continue;
+      if (usrs->hotkeys[HOTKEY_BIG_FOOD].active && fo->sz < 10) continue;
 
       if (fo->rx >= gdata->data.fpx1 && fo->ry >= gdata->data.fpy1 &&
           fo->rx <= gdata->data.fpx2 && fo->ry <= gdata->data.fpy2) {
@@ -117,7 +117,7 @@ void redraw(tenv* env) {
     for (int i = foods_len - 1; i >= 0; i--) {
       food* fo = gdata->data.foods + i;
 
-      if (usrs->hotkeys.big_food && fo->sz < 10) continue;
+      if (usrs->hotkeys[HOTKEY_BIG_FOOD].active && fo->sz < 10) continue;
 
       if (fo->rx >= gdata->data.fpx1 && fo->ry >= gdata->data.fpy1 &&
           fo->rx <= gdata->data.fpx2 && fo->ry <= gdata->data.fpy2) {
@@ -209,7 +209,7 @@ void redraw(tenv* env) {
       float py = hy;
       float a = o->alive_amt * (1 - o->dead_amt);
 
-      if (usrs->hotkeys.show_names) {
+      if (usrs->hotkeys[HOTKEY_SHOW_NAMES].active) {
         int score = (int)floorf((gdata->data.fpsls[sct] +
                                  o->fam / gdata->data.fmlts[sct] - 1) *
                                     15 -
@@ -239,35 +239,41 @@ void redraw(tenv* env) {
               (o->cusk ? o->cusk_data[0] : gdata->default_skins[o->cv][1]);
 
           vec3 ncolor;
-          glm_vec3_lerp((float*)scolor, (vec3){1, 1, 1}, 0.6f, ncolor);
+          glm_vec3_lerp((float*)scolor, (vec3){1, 1, 1}, mode->player_names_outline ? 0.7f : 0.6f, ncolor);
           vec3 lcolor;
-          glm_vec3_lerp((float*)scolor, (vec3){1, 1, 1}, 0.7f, lcolor);
+          glm_vec3_lerp((float*)scolor, (vec3){1, 1, 1}, mode->player_names_outline ? 0.8f : 0.7f, lcolor);
 
           ntx = ntx - (usrs->snake_scores ? tsize.x : nsize.x) * 0.5f;
           nty = nty + 32 + 11 * o->sc * gdata->data.gsc;
 
-          // for (int x = -1; x <= 1; x++) {
-          //   for (int y = -1; y <= 1; y++) {
-          //     if (x == 0 && y == 0) continue;
-          //     ImDrawList_AddText_Vec2(igGetWindowDrawList(), (ImVec2){ntx +
-          //     x, nty + y}, igColorConvertFloat4ToU32((ImVec4){0, 0, 0, 1}),
-          //     o->nk, NULL); ImDrawList_AddText_Vec2(igGetWindowDrawList(),
-          //     (ImVec2){ntx + nsize.x + x, nty + y},
-          //     igColorConvertFloat4ToU32((ImVec4){0, 0, 0, 1}), score_rep_str,
-          //     NULL);
-          //   }
-          // }
+          if (mode->player_names_outline) {
+            for (int x = -1; x <= 1; x++) {
+              for (int y = -1; y <= 1; y++) {
+                if (x == 0 && y == 0) continue;
+                ImDrawList_AddText_Vec2(
+                    igGetWindowDrawList(), (ImVec2){ntx + x, nty + y},
+                    igColorConvertFloat4ToU32((ImVec4){0, 0, 0, a}), o->nk,
+                    NULL);
+              }
+            }
 
-          // for (int x = -1; x <= 1; x++) {
-          //   for (int y = -1; y <= 1; y++) {
-          //     if (x == 0 && y == 0) continue;
-          //   }
-          // }
+            if (usrs->snake_scores) {
+              for (int x = -1; x <= 1; x++) {
+                for (int y = -1; y <= 1; y++) {
+                  ImDrawList_AddText_Vec2(
+                      igGetWindowDrawList(),
+                      (ImVec2){ntx + nsize.x + x, nty + y},
+                      igColorConvertFloat4ToU32((ImVec4){0, 0, 0, a}),
+                      score_rep_str, NULL);
+                }
+              }
+            }
+          }
 
           ImDrawList_AddText_Vec2(
               igGetWindowDrawList(), (ImVec2){ntx, nty},
               igColorConvertFloat4ToU32(
-                  (ImVec4){ncolor[0], ncolor[1], ncolor[2], 0.5f * a}),
+                  (ImVec4){ncolor[0], ncolor[1], ncolor[2], mode->player_names_outline ? a : 0.5f * a}),
               o->nk, NULL);
 
           if (usrs->snake_scores) {
@@ -278,7 +284,7 @@ void redraw(tenv* env) {
             ImDrawList_AddText_Vec2(
                 igGetWindowDrawList(), (ImVec2){ntx + nsize.x, nty},
                 igColorConvertFloat4ToU32(
-                    (ImVec4){lcolor[0], lcolor[1], lcolor[2], 0.7f * a}),
+                    (ImVec4){lcolor[0], lcolor[1], lcolor[2], mode->player_names_outline ? a : 0.7f * a}),
                 score_rep_str, NULL);
             igPopFont();
           }
@@ -1056,13 +1062,13 @@ void redraw(tenv* env) {
 
         if (mode->show_boost) {
           // boost effect 1:
-          if (o->smooth_tsp > o->fsp) {
-            m = a * fmaxf(0, fminf(1, (o->smooth_tsp - o->ssp) /
+          if (o->tsp > o->fsp) {
+            m = a * fmaxf(0, fminf(1, (o->tsp - o->ssp) /
                                           (o->msp - o->ssp)));
             om = m * .37;
             mr = powf(m, .5);
             float glsz = (1 + mode->boost_type + mr) * gdata->data.gsc * lsz;
-            float strength = 1 + mode->boost_type;
+            float strength = 1 + mode->boost_type * mode->boost_strength;
 
             if (o->cusk) {
               for (j = bp - 1; j >= 0; j--)
@@ -1137,9 +1143,9 @@ void redraw(tenv* env) {
             }
           }
           // boost effect 2:
-          if (mode->boost_type == 0 && o->smooth_tsp > o->fsp) {
+          if (mode->boost_type == 0 && o->tsp > o->fsp) {
             float glsz = lsz * 3 * gdata->data.gsc;
-            float strength = 0.7f;
+            float strength = 0.7f * mode->boost_strength;
 
             if (o->cusk) {
               for (j = bp - 1; j >= 0; j--)

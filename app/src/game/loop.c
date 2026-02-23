@@ -47,9 +47,9 @@ void game_loop(tenv* env) {
       ui_overlay(env);
 
       // special hotkeys
-      if (tkeyboard_key_pressed(env->kb, QUIT_HKEY) || (usrs->quit_mc && tmouse_button_pressed(env->ms, GLFW_MOUSE_BUTTON_MIDDLE))) {
+      if (usrs->hotkeys[HOTKEY_QUIT].active || (usrs->quit_mc && tmouse_button_pressed(env->ms, GLFW_MOUSE_BUTTON_MIDDLE))) {
         gdata->conn = DISCONNECTED;
-      } else if (tkeyboard_key_pressed(env->kb, RESTART_HKEY) || (usrs->restart_rc && tmouse_button_pressed(env->ms, GLFW_MOUSE_BUTTON_RIGHT))) {
+      } else if (usrs->hotkeys[HOTKEY_RESTART].active || (usrs->restart_rc && tmouse_button_pressed(env->ms, GLFW_MOUSE_BUTTON_RIGHT))) {
         game_data_reset(env);
         server_disconnect(env);
         usr->gdata.conn = CONNECTING;

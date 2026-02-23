@@ -20,14 +20,13 @@ void ui_overlay(tenv* env) {
       int sct = me->sct + me->rsc;
       float hx = me->xx + me->fx;
       float hy = me->yy + me->fy;
-
       gdata->data.score = (int)floorf((gdata->data.fpsls[sct] +
                                        me->fam / gdata->data.fmlts[sct] - 1) *
                                           15 -
                                       5) /
                           1;
 
-      if (usrs->hotkeys.assist) {
+      if (usrs->hotkeys[HOTKEY_ASSIST].active) {
         ImDrawList_AddLine(
             igGetWindowDrawList(),
             (ImVec2){mww2 + (hx - gdata->data.view_xx) * gdata->data.gsc,
@@ -42,7 +41,7 @@ void ui_overlay(tenv* env) {
   }
 
   usr->r->global.minimap_opacity = 0;
-  if (usrs->hotkeys.hud) {
+  if (usrs->hotkeys[HOTKEY_HUD].active) {
     ImGuiStyle* style = igGetStyle();
     float frame_height = igGetFrameHeight();
 
@@ -95,7 +94,7 @@ void ui_overlay(tenv* env) {
                   seconds);
     igText("");
 
-    if (usrs->hotkeys.toggle_hotkeys) {
+    if (usrs->hotkeys[HOTKEY_MENU].active) {
       display_hotkeys(usr, (icon_sz.x - char_sz.x) * 0.5f,
                       usrs->stats_font_size);
     }
@@ -144,6 +143,7 @@ void ui_overlay(tenv* env) {
       char tmp[MAX_NICKNAME_LEN + 1] = {0};
       memset(tmp, (int)'a', MAX_NICKNAME_LEN);
       igCalcTextSize(&nksize, tmp, NULL, false, -1);
+      nksize.x *= 1.25f;
 
       ImVec2 scsize;
       igCalcTextSize(&scsize, "999999", NULL, false, -1);
@@ -182,7 +182,7 @@ void ui_overlay(tenv* env) {
 
           igTableNextRow(ImGuiTableRowFlags_None, 0);
           igTableSetColumnIndex(0);
-          igTextColored(itcolor, "%2d.", row + 1);
+          igTextColored((ImVec4){1, 1, 1, itcolor.w}, "%2d.", row + 1);
           igTableSetColumnIndex(1);
           igTextColored(itcolor, "%s", gdata->data.lb.entries[row].nickname);
           igTableSetColumnIndex(2);

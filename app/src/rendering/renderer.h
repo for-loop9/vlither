@@ -28,6 +28,7 @@ typedef struct renderer {
     alignas(16) vec3 bd_color;
     alignas(16) vec3 minimap_circ;
     alignas(8) vec2 view;
+    alignas(8) vec2 lview;
     alignas(4) float zoom;
     alignas(4) float bg_opacity;
     alignas(4) float bg_scale;

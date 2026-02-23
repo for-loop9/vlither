@@ -6,9 +6,7 @@ void show_hot_key(tuser_data* usr, int hotkey, vec3 color, const char* info,
                   float offset, font_size sz) {
   user_settings* usrs = &usr->usrs;
 
-  char hotkey_str[3] = {0};
-  sprintf(hotkey_str, "%s ", glfwGetKeyName(hotkey, 0));
-  hotkey_str[0] -= 32;
+  char hotkey_str[3] = {(char) hotkey, ' ', 0};
   igPushFont(usr->imgui_data.mono_font_bold[sz],
              usr->imgui_data.mono_font_bold[sz]->LegacySize);
   igSetCursorPosX(igGetCursorPosX() + offset);
@@ -38,20 +36,18 @@ void display_hotkeys(tuser_data* usr, float offset, font_size sz) {
 
   show_hot_key_str(usr, "F11", (vec3){1, 0.7f, 0.7f}, " Fullscreen", offset,
                    sz);
-  show_hot_key(usr, RESTART_HKEY, (vec3){1, 0.7f, 0.7f}, "Restart", offset, sz);
-  show_hot_key(usr, QUIT_HKEY, (vec3){1, 0.7f, 0.7f}, "Quit", offset, sz);
+  show_hot_key(usr, usrs->hotkeys[HOTKEY_RESTART].key, (vec3){1, 0.7f, 0.7f}, usrs->hotkeys[HOTKEY_RESTART].description, offset, sz);
+  show_hot_key(usr, usrs->hotkeys[HOTKEY_QUIT].key, (vec3){1, 0.7f, 0.7f}, usrs->hotkeys[HOTKEY_QUIT].description, offset, sz);
 
-  show_hot_key(usr, ZOOM_IN_HKEY, (vec3){0.7f, 1, 0.7f}, "Zoom in", offset, sz);
-  show_hot_key(usr, ZOOM_OUT_HKEY, (vec3){0.7f, 1, 0.7f}, "Zoom out", offset,
+  show_hot_key(usr, GLFW_KEY_N, (vec3){0.7f, 1, 0.7f}, "Zoom in", offset, sz);
+  show_hot_key(usr, GLFW_KEY_M, (vec3){0.7f, 1, 0.7f}, "Zoom out", offset,
                sz);
   show_hot_key_str(usr, "\ueaed", (vec3){0.7f, 1, 0.7f}, "Boost", 0, sz);
 
-  show_hot_key(usr, ASSIST_HKEY, (vec3){1, 1, 0.7f}, "Assist", offset, sz);
-  show_hot_key(usr, HUD_HKEY, (vec3){1, 1, 0.7f}, "HUD", offset, sz);
-  show_hot_key(usr, BIG_FOOD_HKEY, (vec3){1, 1, 0.7f}, "Big food", offset, sz);
-  show_hot_key(usr, SHOW_NAMES_HKEY, (vec3){1, 1, 0.7f}, "Player names", offset,
-               sz);
-  show_hot_key(usr, HOTKEYS_HKEY, (vec3){1, 1, 0.7f}, "Hide", offset, sz);
+  for (int i = 0; i < NUM_HOTKEYS - 2; i++) {
+    hotkey* hk = usrs->hotkeys + i;
+    show_hot_key(usr, hk->key, (vec3){1, 1, 0.7f}, hk->description, offset, sz);
+  }
 
   igPopFont();
 }
@@ -493,6 +489,8 @@ void game_data_init(tenv* env) {
     gdata->psz[i] = i + 3;
   }
 
+  gdata->data.lview_xx = -1;
+  gdata->data.lview_yy = -1;
   gdata->data.grd = 16384;
   gdata->data.sector_size = 480;
   gdata->data.ssd256 = gdata->data.sector_size / 256.0f;
@@ -563,6 +561,7 @@ void game_data_init(tenv* env) {
   calc_cg_uvs(gdata->cg_uvs, usr);
   setup_accessories(gdata->accessories, usr);
   game_data_reset(env);
+  sbot_init(env);
 }
 
 void game_data_reset(tenv* env) {
@@ -639,6 +638,8 @@ void game_data_destroy(tenv* env) {
   tuser_data* usr = env->usr;
   game_data* gdata = &usr->gdata;
 
+  sbot_destroy(env);
+  
   tdarray_destroy(gdata->data.fpsls);
   tdarray_destroy(gdata->data.fmlts);
   int gptz_dp_len = tdarray_length(gdata->data.gptz_dp);

@@ -1,10 +1,10 @@
 # Vlither
 ## A Desktop Client for Slither.io
 
-Vlither is a client for [Slither.io](https://slither.io) which can run outside the browser. It is written in C and uses Vulkan for rendering all the graphics, resulting in faster rendering. This implementation is based on [protocol version 19](./game1107241958.js), which was the latest version in January 2026. It has been tested on Windows 11, Debian 13, Ubuntu 24.04, and LMDE7 (AMD and Intel).
+Vlither is a client for [Slither.io](https://slither.io) which can run outside the browser. It is written in C and uses Vulkan for rendering all the graphics, resulting in faster rendering. This implementation is based on [protocol version 19](./game1107241958.js), which was the latest version on web in February 2026. It has been tested on Windows 11, Debian 13, Ubuntu 24.04, and LMDE7 (AMD and Intel).
 
 ### Running Instructions
-No dependencies are required to run the program. If your GPU supports at least Vulkan 1.0, you're good to go. Download the [latest release](https://github.com/for-loop9/vlither/releases/latest).
+No dependencies are required to run the program. If your GPU supports at least Vulkan 1.0, there should be no issues. Download the [latest release](https://github.com/for-loop9/vlither/releases/latest).
 
 ### Build Instructions
 Prerequisites
@@ -20,7 +20,7 @@ Prerequisites
 
 For simplicity, _building_ is only supported on Linux.
 
-Make sure the `VULKAN_SDK` environment variable is set (and acquire `vulkan-1.lib` and place it in `VULKAN_SDK/lib` if targetting Windows).
+Make sure the `VULKAN_SDK` environment variable is set (and acquire `vulkan-1.lib` and place it in `$VULKAN_SDK/lib` if targetting Windows).
 
 ```bash
 git clone https://github.com/for-loop9/vlither.git
@@ -35,9 +35,8 @@ You may also work on the project with VS Code by opening the `.code-workspace` f
 ## Features
 
 - Upscaled/sharper textures
-- Supports all 66 skins
+- Supports all 66 skins and 32 accessories
 - Custom skin
-- Cosmetics
 - Server selection
 - Zoom
 - Kill count

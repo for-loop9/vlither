@@ -2,13 +2,14 @@
 
 #include "../user.h"
 
+#define BOT 0
+
 void input(tenv* env) {
   tuser_data* usr = env->usr;
   tcontext* ctx = env->ctx;
   game_data* gdata = &usr->gdata;
   user_settings* usrs = &usr->usrs;
   struct mg_connection* connection = gdata->connection;
-  gameplay_mode* mode = usrs->modes + usrs->hotkeys.assist;
 
   if (!gdata->data.wfpr) {
     if (gdata->data.ctm - gdata->data.last_ping_mtm > 250) {
@@ -18,6 +19,7 @@ void input(tenv* env) {
     }
   }
 
+#if !BOT
   if (gdata->data.follow_view) {
     if (twindow_key_down(env->wnd, GLFW_KEY_LEFT))
       gdata->data.kd_l_frb += gdata->data.vfrb;
@@ -57,11 +59,15 @@ void input(tenv* env) {
                      WEBSOCKET_OP_BINARY);
         }
       }
+#endif
 
+#if BOT
+    gdata->data.wmd = gdata->bot.output.accel;
+#else
     gdata->data.wmd = twindow_button_down(env->wnd, GLFW_MOUSE_BUTTON_LEFT) ||
-                      twindow_key_down(env->wnd, BOOST_HKEY) ||
+                      twindow_key_down(env->wnd, GLFW_KEY_SPACE) ||
                       twindow_key_down(env->wnd, GLFW_KEY_UP);
-
+#endif
     if (gdata->data.md != gdata->data.wmd &&
         gdata->data.ctm - gdata->data.last_accel_mtm > 150) {
       gdata->data.md = gdata->data.wmd;
@@ -70,9 +76,13 @@ void input(tenv* env) {
                  WEBSOCKET_OP_BINARY);
     }
 
+#if BOT
+    int xm = gdata->bot.output.xm;
+    int ym = gdata->bot.output.ym;
+#else
     int xm = (int)env->ms->pos[0] - ctx->size[0] / 2;
     int ym = (int)env->ms->pos[1] - ctx->size[1] / 2;
-
+#endif
     bool want_e = false;
     if (xm != gdata->data.lsxm || ym != gdata->data.lsym) want_e = true;
     me->eang = atan2f(ym, xm);
@@ -100,20 +110,26 @@ void input(tenv* env) {
 
   gdata->data.ms_zoom *= expf(env->ms->dwheel * usrs->zoom_step);
 
-  if (tkeyboard_key_pressed(env->kb, ZOOM_IN_HKEY))
+  if (tkeyboard_key_pressed(env->kb, GLFW_KEY_N))
     gdata->data.ms_zoom *= expf(1 * usrs->zoom_step);
-  else if (tkeyboard_key_pressed(env->kb, ZOOM_OUT_HKEY))
+  else if (tkeyboard_key_pressed(env->kb, GLFW_KEY_M))
     gdata->data.ms_zoom *= expf(-1 * usrs->zoom_step);
 
   gdata->data.ms_zoom =
-      GLM_MAX(MAX_ZOOM_OUT, GLM_MIN(gdata->data.ms_zoom, MAX_ZOOM_IN)),
+      GLM_MAX(MAX_ZOOM_OUT, GLM_MIN(gdata->data.ms_zoom, MAX_ZOOM_IN));
 
   // hotkeys
-  usrs->hotkeys.hud ^= tkeyboard_key_pressed(env->kb, HUD_HKEY);
-  usrs->hotkeys.big_food ^= tkeyboard_key_pressed(env->kb, BIG_FOOD_HKEY);
-  usrs->hotkeys.show_names ^= tkeyboard_key_pressed(env->kb, SHOW_NAMES_HKEY);
-  usrs->hotkeys.toggle_hotkeys ^= tkeyboard_key_pressed(env->kb, HOTKEYS_HKEY);
-  usrs->hotkeys.assist ^= tkeyboard_key_pressed(env->kb, ASSIST_HKEY);
+  usrs->hotkeys[HOTKEY_RESTART].active = false;
+  usrs->hotkeys[HOTKEY_QUIT].active = false;
 
+  for (int i = 0; i < NUM_HOTKEYS; i++) {
+    hotkey* hk = usrs->hotkeys + i;
+    if (hk->mode)
+      hk->active = twindow_key_down(env->wnd, hk->key);
+    else
+      hk->active ^= tkeyboard_key_pressed(env->kb, hk->key);
+  }
+
+  gameplay_mode* mode = usrs->modes + usrs->hotkeys[HOTKEY_ASSIST].active;
   if (mode->show_crosshair) igSetMouseCursor(ImGuiMouseCursor_None);
 }
