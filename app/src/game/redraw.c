@@ -299,7 +299,6 @@ void redraw(tenv* env) {
         int pts_len = tdarray_length(o->pts);
         int po_i = pts_len - 1;
 
-        // render_mode 2:
         lsz *= .5;
         float ix1 = 0, iy1 = 0, ix2 = 0, iy2 = 0, ax1 = 0, ay1 = 0, ax2 = 0,
               ay2 = 0, cx2 = 0, cy2 = 0, pax1 = 0, pay1 = 0;
@@ -1061,162 +1060,316 @@ void redraw(tenv* env) {
         }
 
         if (mode->show_boost) {
-          // boost effect 1:
-          if (o->tsp > o->fsp) {
-            m = a * fmaxf(0, fminf(1, (o->tsp - o->ssp) /
-                                          (o->msp - o->ssp)));
-            om = m * .37;
-            mr = powf(m, .5);
-            float glsz = (1 + mode->boost_type + mr) * gdata->data.gsc * lsz;
-            float strength = 1 + mode->boost_type * mode->boost_strength;
+          if (mode->render_mode == 2) {
+            if (o->tsp > o->fsp) {
+              m = a * fmaxf(0, fminf(1, (o->tsp - o->ssp) / (o->msp - o->ssp)));
+              om = m * .37;
+              mr = powf(m, .5);
+              float glsz = (1 + mode->boost_type + mr) * gdata->data.gsc * lsz;
+              float strength = 1 + mode->boost_type * mode->boost_strength;
 
-            if (o->cusk) {
-              for (j = bp - 1; j >= 0; j--)
-                if (gdata->data.pbu[(int)j] == 2) {
-                  ox = tx;
-                  oy = ty;
-                  tx = gdata->data.pbx[(int)j];
-                  ty = gdata->data.pby[(int)j];
-                  if (tx > ox)
-                    d2 = tx - ox;
-                  else
-                    d2 = ox - tx;
-                  if (ty > oy)
-                    d2 += ty - oy;
-                  else
-                    d2 += oy - ty;
-                  d2 /= 6;
-                  if (d2 > 1) d2 = 1;
+              if (o->cusk) {
+                for (j = bp - 1; j >= 0; j--)
+                  if (gdata->data.pbu[(int)j] == 2) {
+                    ox = tx;
+                    oy = ty;
+                    tx = gdata->data.pbx[(int)j];
+                    ty = gdata->data.pby[(int)j];
+                    if (tx > ox)
+                      d2 = tx - ox;
+                    else
+                      d2 = ox - tx;
+                    if (ty > oy)
+                      d2 += ty - oy;
+                    else
+                      d2 += oy - ty;
+                    d2 /= 6;
+                    if (d2 > 1) d2 = 1;
 
-                  float fix =
-                      (tx - gdata->data.view_xx) * gdata->data.gsc + mww2;
-                  float fiy =
-                      (ty - gdata->data.view_yy) * gdata->data.gsc + mhh2;
+                    float fix =
+                        (tx - gdata->data.view_xx) * gdata->data.gsc + mww2;
+                    float fiy =
+                        (ty - gdata->data.view_yy) * gdata->data.gsc + mhh2;
 
-                  float alpha = strength * d2 * a * mr * .38 *
-                                (.6 + .4 * cosf(j / 4 - 1.15 * o->sfr));
-                  int cg_id = o->cusk_data[(int)j % o->cusk_len];
-                  vec3s* shc = gdata->cg_glow_colors + cg_id;
+                    float alpha = strength * d2 * a * mr * .38 *
+                                  (.6 + .4 * cosf(j / 4 - 1.15 * o->sfr));
+                    int cg_id = o->cusk_data[0];
+                    vec3s* shc = gdata->cg_glow_colors + cg_id;
 
-                  bst_renderer_push(
-                      usr->r->bstb,
-                      &(bst_instance){{fix - glsz, fiy - glsz, 2 * glsz},
-                                      {shc->r, shc->g, shc->b, alpha}});
-                }
-            } else {
-              for (j = bp - 1; j >= 0; j--)
-                if (gdata->data.pbu[(int)j] == 2) {
-                  ox = tx;
-                  oy = ty;
-                  tx = gdata->data.pbx[(int)j];
-                  ty = gdata->data.pby[(int)j];
-                  if (tx > ox)
-                    d2 = tx - ox;
-                  else
-                    d2 = ox - tx;
-                  if (ty > oy)
-                    d2 += ty - oy;
-                  else
-                    d2 += oy - ty;
-                  d2 /= 6;
-                  if (d2 > 1) d2 = 1;
+                    bst_renderer_push(
+                        usr->r->bstb,
+                        &(bst_instance){{fix - glsz, fiy - glsz, 2 * glsz},
+                                        {shc->r, shc->g, shc->b, alpha}});
+                  }
+              } else {
+                for (j = bp - 1; j >= 0; j--)
+                  if (gdata->data.pbu[(int)j] == 2) {
+                    ox = tx;
+                    oy = ty;
+                    tx = gdata->data.pbx[(int)j];
+                    ty = gdata->data.pby[(int)j];
+                    if (tx > ox)
+                      d2 = tx - ox;
+                    else
+                      d2 = ox - tx;
+                    if (ty > oy)
+                      d2 += ty - oy;
+                    else
+                      d2 += oy - ty;
+                    d2 /= 6;
+                    if (d2 > 1) d2 = 1;
 
-                  float fix =
-                      (tx - gdata->data.view_xx) * gdata->data.gsc + mww2;
-                  float fiy =
-                      (ty - gdata->data.view_yy) * gdata->data.gsc + mhh2;
+                    float fix =
+                        (tx - gdata->data.view_xx) * gdata->data.gsc + mww2;
+                    float fiy =
+                        (ty - gdata->data.view_yy) * gdata->data.gsc + mhh2;
 
-                  float alpha = strength * d2 * a * mr * .38 *
-                                (.6 + .4 * cosf(j / 4 - 1.15 * o->sfr));
+                    float alpha = strength * d2 * a * mr * .38 *
+                                  (.6 + .4 * cosf(j / 4 - 1.15 * o->sfr));
 
-                  int default_skin_len = gdata->default_skins[o->cv][0];
-                  int cg_id =
-                      gdata->default_skins[o->cv]
-                                          [1 + ((int)j % default_skin_len)];
-                  vec3s* shc = gdata->cg_glow_colors + cg_id;
+                    int default_skin_len = gdata->default_skins[o->cv][0];
+                    int cg_id = gdata->default_skins[o->cv][1];
+                    vec3s* shc = gdata->cg_glow_colors + cg_id;
 
-                  bst_renderer_push(
-                      usr->r->bstb,
-                      &(bst_instance){{fix - glsz, fiy - glsz, 2 * glsz},
-                                      {shc->r, shc->g, shc->b, alpha}});
-                }
+                    bst_renderer_push(
+                        usr->r->bstb,
+                        &(bst_instance){{fix - glsz, fiy - glsz, 2 * glsz},
+                                        {shc->r, shc->g, shc->b, alpha}});
+                  }
+              }
             }
-          }
-          // boost effect 2:
-          if (mode->boost_type == 0 && o->tsp > o->fsp) {
-            float glsz = lsz * 3 * gdata->data.gsc;
-            float strength = 0.7f * mode->boost_strength;
+            // boost effect 2:
+            if (mode->boost_type == 0 && o->tsp > o->fsp) {
+              float glsz = lsz * 3 * gdata->data.gsc;
+              float strength = 0.7f * mode->boost_strength;
 
-            if (o->cusk) {
-              for (j = bp - 1; j >= 0; j--)
-                if (gdata->data.pbu[(int)j] == 2) {
-                  ox = tx;
-                  oy = ty;
-                  tx = gdata->data.pbx[(int)j];
-                  ty = gdata->data.pby[(int)j];
-                  if (tx > ox)
-                    d2 = tx - ox;
-                  else
-                    d2 = ox - tx;
-                  if (ty > oy)
-                    d2 += ty - oy;
-                  else
-                    d2 += oy - ty;
-                  d2 /= 6;
-                  if (d2 > 1) d2 = 1;
+              if (o->cusk) {
+                for (j = bp - 1; j >= 0; j--)
+                  if (gdata->data.pbu[(int)j] == 2) {
+                    ox = tx;
+                    oy = ty;
+                    tx = gdata->data.pbx[(int)j];
+                    ty = gdata->data.pby[(int)j];
+                    if (tx > ox)
+                      d2 = tx - ox;
+                    else
+                      d2 = ox - tx;
+                    if (ty > oy)
+                      d2 += ty - oy;
+                    else
+                      d2 += oy - ty;
+                    d2 /= 6;
+                    if (d2 > 1) d2 = 1;
 
-                  float fix =
-                      (tx - gdata->data.view_xx) * gdata->data.gsc + mww2;
-                  float fiy =
-                      (ty - gdata->data.view_yy) * gdata->data.gsc + mhh2;
+                    float fix =
+                        (tx - gdata->data.view_xx) * gdata->data.gsc + mww2;
+                    float fiy =
+                        (ty - gdata->data.view_yy) * gdata->data.gsc + mhh2;
 
-                  float alpha =
-                      strength * d2 * a * om * (.5 + .5 * cosf(j / 4 - o->sfr));
-                  int cg_id = o->cusk_data[(int)j % o->cusk_len];
-                  vec3s* shc = gdata->cg_glow_colors + cg_id;
+                    float alpha = strength * d2 * a * om *
+                                  (.5 + .5 * cosf(j / 4 - o->sfr));
+                    int cg_id = o->cusk_data[0];
+                    vec3s* shc = gdata->cg_glow_colors + cg_id;
 
-                  bst_renderer_push(
-                      usr->r->bsta,
-                      &(bst_instance){{fix - glsz, fiy - glsz, 2 * glsz},
-                                      {shc->r, shc->g, shc->b, alpha}});
-                }
-            } else {
-              for (j = bp - 1; j >= 0; j--)
-                if (gdata->data.pbu[(int)j] == 2) {
-                  ox = tx;
-                  oy = ty;
-                  tx = gdata->data.pbx[(int)j];
-                  ty = gdata->data.pby[(int)j];
-                  if (tx > ox)
-                    d2 = tx - ox;
-                  else
-                    d2 = ox - tx;
-                  if (ty > oy)
-                    d2 += ty - oy;
-                  else
-                    d2 += oy - ty;
-                  d2 /= 6;
-                  if (d2 > 1) d2 = 1;
+                    bst_renderer_push(
+                        usr->r->bsta,
+                        &(bst_instance){{fix - glsz, fiy - glsz, 2 * glsz},
+                                        {shc->r, shc->g, shc->b, alpha}});
+                  }
+              } else {
+                for (j = bp - 1; j >= 0; j--)
+                  if (gdata->data.pbu[(int)j] == 2) {
+                    ox = tx;
+                    oy = ty;
+                    tx = gdata->data.pbx[(int)j];
+                    ty = gdata->data.pby[(int)j];
+                    if (tx > ox)
+                      d2 = tx - ox;
+                    else
+                      d2 = ox - tx;
+                    if (ty > oy)
+                      d2 += ty - oy;
+                    else
+                      d2 += oy - ty;
+                    d2 /= 6;
+                    if (d2 > 1) d2 = 1;
 
-                  float fix =
-                      (tx - gdata->data.view_xx) * gdata->data.gsc + mww2;
-                  float fiy =
-                      (ty - gdata->data.view_yy) * gdata->data.gsc + mhh2;
+                    float fix =
+                        (tx - gdata->data.view_xx) * gdata->data.gsc + mww2;
+                    float fiy =
+                        (ty - gdata->data.view_yy) * gdata->data.gsc + mhh2;
 
-                  float alpha =
-                      strength * d2 * a * om * (.5 + .5 * cosf(j / 4 - o->sfr));
+                    float alpha = strength * d2 * a * om *
+                                  (.5 + .5 * cosf(j / 4 - o->sfr));
 
-                  int default_skin_len = gdata->default_skins[o->cv][0];
-                  int cg_id =
-                      gdata->default_skins[o->cv]
-                                          [1 + ((int)j % default_skin_len)];
-                  vec3s* shc = gdata->cg_glow_colors + cg_id;
+                    int default_skin_len = gdata->default_skins[o->cv][0];
+                    int cg_id = gdata->default_skins[o->cv][1];
+                    vec3s* shc = gdata->cg_glow_colors + cg_id;
 
-                  bst_renderer_push(
-                      usr->r->bsta,
-                      &(bst_instance){{fix - glsz, fiy - glsz, 2 * glsz},
-                                      {shc->r, shc->g, shc->b, alpha}});
-                }
+                    bst_renderer_push(
+                        usr->r->bsta,
+                        &(bst_instance){{fix - glsz, fiy - glsz, 2 * glsz},
+                                        {shc->r, shc->g, shc->b, alpha}});
+                  }
+              }
+            }
+          } else {
+            // boost effect 1:
+            if (o->tsp > o->fsp) {
+              m = a * fmaxf(0, fminf(1, (o->tsp - o->ssp) / (o->msp - o->ssp)));
+              om = m * .37;
+              mr = powf(m, .5);
+              float glsz = (1 + mode->boost_type + mr) * gdata->data.gsc * lsz;
+              float strength = 1 + mode->boost_type * mode->boost_strength;
+
+              if (o->cusk) {
+                for (j = bp - 1; j >= 0; j--)
+                  if (gdata->data.pbu[(int)j] == 2) {
+                    ox = tx;
+                    oy = ty;
+                    tx = gdata->data.pbx[(int)j];
+                    ty = gdata->data.pby[(int)j];
+                    if (tx > ox)
+                      d2 = tx - ox;
+                    else
+                      d2 = ox - tx;
+                    if (ty > oy)
+                      d2 += ty - oy;
+                    else
+                      d2 += oy - ty;
+                    d2 /= 6;
+                    if (d2 > 1) d2 = 1;
+
+                    float fix =
+                        (tx - gdata->data.view_xx) * gdata->data.gsc + mww2;
+                    float fiy =
+                        (ty - gdata->data.view_yy) * gdata->data.gsc + mhh2;
+
+                    float alpha = strength * d2 * a * mr * .38 *
+                                  (.6 + .4 * cosf(j / 4 - 1.15 * o->sfr));
+                    int cg_id = o->cusk_data[(int)j % o->cusk_len];
+                    vec3s* shc = gdata->cg_glow_colors + cg_id;
+
+                    bst_renderer_push(
+                        usr->r->bstb,
+                        &(bst_instance){{fix - glsz, fiy - glsz, 2 * glsz},
+                                        {shc->r, shc->g, shc->b, alpha}});
+                  }
+              } else {
+                for (j = bp - 1; j >= 0; j--)
+                  if (gdata->data.pbu[(int)j] == 2) {
+                    ox = tx;
+                    oy = ty;
+                    tx = gdata->data.pbx[(int)j];
+                    ty = gdata->data.pby[(int)j];
+                    if (tx > ox)
+                      d2 = tx - ox;
+                    else
+                      d2 = ox - tx;
+                    if (ty > oy)
+                      d2 += ty - oy;
+                    else
+                      d2 += oy - ty;
+                    d2 /= 6;
+                    if (d2 > 1) d2 = 1;
+
+                    float fix =
+                        (tx - gdata->data.view_xx) * gdata->data.gsc + mww2;
+                    float fiy =
+                        (ty - gdata->data.view_yy) * gdata->data.gsc + mhh2;
+
+                    float alpha = strength * d2 * a * mr * .38 *
+                                  (.6 + .4 * cosf(j / 4 - 1.15 * o->sfr));
+
+                    int default_skin_len = gdata->default_skins[o->cv][0];
+                    int cg_id =
+                        gdata->default_skins[o->cv]
+                                            [1 + ((int)j % default_skin_len)];
+                    vec3s* shc = gdata->cg_glow_colors + cg_id;
+
+                    bst_renderer_push(
+                        usr->r->bstb,
+                        &(bst_instance){{fix - glsz, fiy - glsz, 2 * glsz},
+                                        {shc->r, shc->g, shc->b, alpha}});
+                  }
+              }
+            }
+            // boost effect 2:
+            if (mode->boost_type == 0 && o->tsp > o->fsp) {
+              float glsz = lsz * 3 * gdata->data.gsc;
+              float strength = 0.7f * mode->boost_strength;
+
+              if (o->cusk) {
+                for (j = bp - 1; j >= 0; j--)
+                  if (gdata->data.pbu[(int)j] == 2) {
+                    ox = tx;
+                    oy = ty;
+                    tx = gdata->data.pbx[(int)j];
+                    ty = gdata->data.pby[(int)j];
+                    if (tx > ox)
+                      d2 = tx - ox;
+                    else
+                      d2 = ox - tx;
+                    if (ty > oy)
+                      d2 += ty - oy;
+                    else
+                      d2 += oy - ty;
+                    d2 /= 6;
+                    if (d2 > 1) d2 = 1;
+
+                    float fix =
+                        (tx - gdata->data.view_xx) * gdata->data.gsc + mww2;
+                    float fiy =
+                        (ty - gdata->data.view_yy) * gdata->data.gsc + mhh2;
+
+                    float alpha = strength * d2 * a * om *
+                                  (.5 + .5 * cosf(j / 4 - o->sfr));
+                    int cg_id = o->cusk_data[(int)j % o->cusk_len];
+                    vec3s* shc = gdata->cg_glow_colors + cg_id;
+
+                    bst_renderer_push(
+                        usr->r->bsta,
+                        &(bst_instance){{fix - glsz, fiy - glsz, 2 * glsz},
+                                        {shc->r, shc->g, shc->b, alpha}});
+                  }
+              } else {
+                for (j = bp - 1; j >= 0; j--)
+                  if (gdata->data.pbu[(int)j] == 2) {
+                    ox = tx;
+                    oy = ty;
+                    tx = gdata->data.pbx[(int)j];
+                    ty = gdata->data.pby[(int)j];
+                    if (tx > ox)
+                      d2 = tx - ox;
+                    else
+                      d2 = ox - tx;
+                    if (ty > oy)
+                      d2 += ty - oy;
+                    else
+                      d2 += oy - ty;
+                    d2 /= 6;
+                    if (d2 > 1) d2 = 1;
+
+                    float fix =
+                        (tx - gdata->data.view_xx) * gdata->data.gsc + mww2;
+                    float fiy =
+                        (ty - gdata->data.view_yy) * gdata->data.gsc + mhh2;
+
+                    float alpha = strength * d2 * a * om *
+                                  (.5 + .5 * cosf(j / 4 - o->sfr));
+
+                    int default_skin_len = gdata->default_skins[o->cv][0];
+                    int cg_id =
+                        gdata->default_skins[o->cv]
+                                            [1 + ((int)j % default_skin_len)];
+                    vec3s* shc = gdata->cg_glow_colors + cg_id;
+
+                    bst_renderer_push(
+                        usr->r->bsta,
+                        &(bst_instance){{fix - glsz, fiy - glsz, 2 * glsz},
+                                        {shc->r, shc->g, shc->b, alpha}});
+                  }
+              }
             }
           }
         }
