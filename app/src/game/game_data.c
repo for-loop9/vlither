@@ -560,8 +560,8 @@ void game_data_init(tenv* env) {
   recalc_sep_mults(gdata);
   calc_cg_uvs(gdata->cg_uvs, usr);
   setup_accessories(gdata->accessories, usr);
-  game_data_reset(env);
   sbot_init(env);
+  game_data_reset(env);
 }
 
 void game_data_reset(tenv* env) {

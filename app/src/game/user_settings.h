@@ -63,6 +63,8 @@ typedef struct user_settings {
   bool smooth_zoom;
   bool snake_scores;
   float zoom_step;
+  int bot_radius_mult;
+  int bot_follow_circle_score;
 
   gameplay_mode modes[2];
 

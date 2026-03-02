@@ -61,6 +61,10 @@ void ui_settings(tenv* env) {
       igText("Laser color");
       igAlignTextToFramePadding();
       igText("Laser thickness");
+      igAlignTextToFramePadding();
+      igText("Bot circle after score");
+      igAlignTextToFramePadding();
+      igText("Bot radius multiplier");
 
       igTableSetColumnIndex(1);
       if (igCheckbox("##vsync", &usrs->vsync)) {
@@ -100,6 +104,12 @@ void ui_settings(tenv* env) {
                    ImGuiColorEditFlags_AlphaBar);
       igSetNextItemWidth(-1);
       igSliderInt("##laser thickness", &usrs->laser_thickness, 1, 4, "%d px",
+                  ImGuiSliderFlags_AlwaysClamp);
+                  igSetNextItemWidth(-1);
+      igSliderInt("##circle after", &usrs->bot_follow_circle_score, 1000, 6000, "%d",
+                  ImGuiSliderFlags_AlwaysClamp);
+                  igSetNextItemWidth(-1);
+      igSliderInt("##rad mult", &usrs->bot_radius_mult, 10, 40, "%dx",
                   ImGuiSliderFlags_AlwaysClamp);
       igIndent(-style->WindowPadding.x);
       igEndTable();

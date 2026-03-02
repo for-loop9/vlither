@@ -25,6 +25,8 @@ void user_settings_default(user_settings* usr_settings) {
   usr_settings->quit_mc = false;
   usr_settings->smooth_zoom = false;
   usr_settings->vsync = false;
+  usr_settings->bot_radius_mult = 20;
+  usr_settings->bot_follow_circle_score = 2000;
 
   // normal mode
   usr_settings->modes[0].food_flicker = true;
@@ -77,6 +79,8 @@ void user_settings_default(user_settings* usr_settings) {
       (hotkey){GLFW_KEY_F, false, 0, "Big food"};
   usr_settings->hotkeys[HOTKEY_ASSIST] =
       (hotkey){GLFW_KEY_K, false, 1, "Assist"};
+  usr_settings->hotkeys[HOTKEY_BOT] =
+      (hotkey){GLFW_KEY_T, false, 0, "Bot"};
   usr_settings->hotkeys[HOTKEY_MENU] =
       (hotkey){GLFW_KEY_Z, true, 0, "Hotkey menu"};
   usr_settings->hotkeys[HOTKEY_RESTART] =

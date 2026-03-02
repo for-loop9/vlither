@@ -2,7 +2,7 @@
 
 #include "../user.h"
 
-#define BOT 0
+#define BOT 1
 
 void input(tenv* env) {
   tuser_data* usr = env->usr;
@@ -19,55 +19,61 @@ void input(tenv* env) {
     }
   }
 
-#if !BOT
   if (gdata->data.follow_view) {
-    if (twindow_key_down(env->wnd, GLFW_KEY_LEFT))
-      gdata->data.kd_l_frb += gdata->data.vfrb;
-    if (twindow_key_down(env->wnd, GLFW_KEY_RIGHT))
-      gdata->data.kd_r_frb += gdata->data.vfrb;
+    int xm;
+    int ym;
 
     int snakes_len = tdarray_length(gdata->data.snakes);
     snake* me = gdata->data.snakes + (snakes_len - 1);
 
-    if (gdata->data.kd_l_frb > 0 || gdata->data.kd_r_frb > 0)
-      if (gdata->data.ctm - gdata->data.lkstm > 150) {
-        gdata->data.lkstm = gdata->data.ctm;
-        if (gdata->data.kd_r_frb > 0)
-          if (gdata->data.kd_l_frb > gdata->data.kd_r_frb) {
-            gdata->data.kd_l_frb -= gdata->data.kd_r_frb;
-            gdata->data.kd_r_frb = 0;
-          }
-        if (gdata->data.kd_l_frb > 0)
-          if (gdata->data.kd_r_frb > gdata->data.kd_l_frb) {
-            gdata->data.kd_r_frb -= gdata->data.kd_l_frb;
-            gdata->data.kd_l_frb = 0;
-          }
-        if (gdata->data.kd_l_frb > 0) {
-          int v = gdata->data.kd_l_frb;
-          if (v > 127) v = 127;
-          gdata->data.kd_l_frb -= v;
-          me->eang -= gdata->data.mamu * v * me->scang * me->spang;
-          mg_ws_send(connection, (uint8_t[]){252, (uint8_t)v}, 2,
-                     WEBSOCKET_OP_BINARY);
-        } else if (gdata->data.kd_r_frb > 0) {
-          int v = gdata->data.kd_r_frb;
-          if (v > 127) v = 127;
-          gdata->data.kd_r_frb -= v;
-          me->eang += gdata->data.mamu * v * me->scang * me->spang;
-          v += 128;
-          mg_ws_send(connection, (uint8_t[]){252, (uint8_t)v}, 2,
-                     WEBSOCKET_OP_BINARY);
-        }
-      }
-#endif
+    if (usrs->hotkeys[HOTKEY_BOT].active) {
+      xm = gdata->bot.output.xm;
+      ym = gdata->bot.output.ym;
+      gdata->data.wmd = gdata->bot.output.accel;
+    } else {
+      if (twindow_key_down(env->wnd, GLFW_KEY_LEFT))
+        gdata->data.kd_l_frb += gdata->data.vfrb;
+      if (twindow_key_down(env->wnd, GLFW_KEY_RIGHT))
+        gdata->data.kd_r_frb += gdata->data.vfrb;
 
-#if BOT
-    gdata->data.wmd = gdata->bot.output.accel;
-#else
-    gdata->data.wmd = twindow_button_down(env->wnd, GLFW_MOUSE_BUTTON_LEFT) ||
-                      twindow_key_down(env->wnd, GLFW_KEY_SPACE) ||
-                      twindow_key_down(env->wnd, GLFW_KEY_UP);
-#endif
+      if (gdata->data.kd_l_frb > 0 || gdata->data.kd_r_frb > 0)
+        if (gdata->data.ctm - gdata->data.lkstm > 150) {
+          gdata->data.lkstm = gdata->data.ctm;
+          if (gdata->data.kd_r_frb > 0)
+            if (gdata->data.kd_l_frb > gdata->data.kd_r_frb) {
+              gdata->data.kd_l_frb -= gdata->data.kd_r_frb;
+              gdata->data.kd_r_frb = 0;
+            }
+          if (gdata->data.kd_l_frb > 0)
+            if (gdata->data.kd_r_frb > gdata->data.kd_l_frb) {
+              gdata->data.kd_r_frb -= gdata->data.kd_l_frb;
+              gdata->data.kd_l_frb = 0;
+            }
+          if (gdata->data.kd_l_frb > 0) {
+            int v = gdata->data.kd_l_frb;
+            if (v > 127) v = 127;
+            gdata->data.kd_l_frb -= v;
+            me->eang -= gdata->data.mamu * v * me->scang * me->spang;
+            mg_ws_send(connection, (uint8_t[]){252, (uint8_t)v}, 2,
+                       WEBSOCKET_OP_BINARY);
+          } else if (gdata->data.kd_r_frb > 0) {
+            int v = gdata->data.kd_r_frb;
+            if (v > 127) v = 127;
+            gdata->data.kd_r_frb -= v;
+            me->eang += gdata->data.mamu * v * me->scang * me->spang;
+            v += 128;
+            mg_ws_send(connection, (uint8_t[]){252, (uint8_t)v}, 2,
+                       WEBSOCKET_OP_BINARY);
+          }
+        }
+
+      xm = (int)env->ms->pos[0] - ctx->size[0] / 2;
+      ym = (int)env->ms->pos[1] - ctx->size[1] / 2;
+      gdata->data.wmd = twindow_button_down(env->wnd, GLFW_MOUSE_BUTTON_LEFT) ||
+                        twindow_key_down(env->wnd, GLFW_KEY_SPACE) ||
+                        twindow_key_down(env->wnd, GLFW_KEY_UP);
+    }
+
     if (gdata->data.md != gdata->data.wmd &&
         gdata->data.ctm - gdata->data.last_accel_mtm > 150) {
       gdata->data.md = gdata->data.wmd;
@@ -76,13 +82,6 @@ void input(tenv* env) {
                  WEBSOCKET_OP_BINARY);
     }
 
-#if BOT
-    int xm = gdata->bot.output.xm;
-    int ym = gdata->bot.output.ym;
-#else
-    int xm = (int)env->ms->pos[0] - ctx->size[0] / 2;
-    int ym = (int)env->ms->pos[1] - ctx->size[1] / 2;
-#endif
     bool want_e = false;
     if (xm != gdata->data.lsxm || ym != gdata->data.lsym) want_e = true;
     me->eang = atan2f(ym, xm);

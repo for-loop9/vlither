@@ -434,4 +434,7 @@ void oef(tenv* env) {
       }
     }
   }
+
+  if (usrs->hotkeys[HOTKEY_BOT].active && gdata->data.follow_view)
+    sbot_go(env);
 }

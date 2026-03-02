@@ -40,6 +40,7 @@ You may also work on the project with VS Code by opening the `.code-workspace` f
 - Server selection
 - Zoom
 - Kill count
+- Bot ([Saya's implemenation](https://github.com/saya-0x0efe/Slither.io-bot))
 
 ## ![Image 0](./gallery/showcase.png)
 

@@ -53,10 +53,11 @@
 #define HOTKEY_SHOW_NAMES 1
 #define HOTKEY_BIG_FOOD 2
 #define HOTKEY_ASSIST 3
-#define HOTKEY_MENU 4
-#define HOTKEY_RESTART 5
-#define HOTKEY_QUIT 6
-#define NUM_HOTKEYS 7
+#define HOTKEY_BOT 4
+#define HOTKEY_MENU 5
+#define HOTKEY_RESTART 6
+#define HOTKEY_QUIT 7
+#define NUM_HOTKEYS 8
 
 typedef enum conn_status {
   DISCONNECTED = 0,
