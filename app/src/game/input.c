@@ -2,8 +2,6 @@
 
 #include "../user.h"
 
-#define BOT 1
-
 void input(tenv* env) {
   tuser_data* usr = env->usr;
   tcontext* ctx = env->ctx;
@@ -29,7 +27,6 @@ void input(tenv* env) {
     if (usrs->hotkeys[HOTKEY_BOT].active) {
       xm = gdata->bot.output.xm;
       ym = gdata->bot.output.ym;
-      gdata->data.wmd = gdata->bot.output.accel;
     } else {
       if (twindow_key_down(env->wnd, GLFW_KEY_LEFT))
         gdata->data.kd_l_frb += gdata->data.vfrb;
@@ -69,10 +66,11 @@ void input(tenv* env) {
 
       xm = (int)env->ms->pos[0] - ctx->size[0] / 2;
       ym = (int)env->ms->pos[1] - ctx->size[1] / 2;
-      gdata->data.wmd = twindow_button_down(env->wnd, GLFW_MOUSE_BUTTON_LEFT) ||
-                        twindow_key_down(env->wnd, GLFW_KEY_SPACE) ||
-                        twindow_key_down(env->wnd, GLFW_KEY_UP);
     }
+    gdata->data.wmd = twindow_button_down(env->wnd, GLFW_MOUSE_BUTTON_LEFT) ||
+                      twindow_key_down(env->wnd, GLFW_KEY_SPACE) ||
+                      twindow_key_down(env->wnd, GLFW_KEY_UP) ||
+                      gdata->bot.output.accel;
 
     if (gdata->data.md != gdata->data.wmd &&
         gdata->data.ctm - gdata->data.last_accel_mtm > 150) {
@@ -127,6 +125,18 @@ void input(tenv* env) {
       hk->active = twindow_key_down(env->wnd, hk->key);
     else
       hk->active ^= tkeyboard_key_pressed(env->kb, hk->key);
+  }
+
+  if (gdata->data.follow_view) {
+    snake* me = gdata->data.snakes + (tdarray_length(gdata->data.snakes) - 1);
+    int score = (int)floorf((gdata->data.fpsls[me->sct] +
+                             me->fam / gdata->data.fmlts[me->sct] - 1) *
+                                15 -
+                            5) /
+                1;
+    if (score >= 1000) {
+      usrs->hotkeys[HOTKEY_RESTART].active = false;
+    }
   }
 
   gameplay_mode* mode = usrs->modes + usrs->hotkeys[HOTKEY_ASSIST].active;

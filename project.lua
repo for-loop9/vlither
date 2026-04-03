@@ -111,7 +111,7 @@ workspace "vlither"
     libdirs { vk_path .. "/lib" }
     files { "app/src/**.c", "app/src/**.cpp" }
     defines {
-      "APP_VERSION=\"2.3\"",
+      "APP_VERSION=\"2.4\"",
       "SETTINGS_VERSION=\"1.1\""
     }
 
