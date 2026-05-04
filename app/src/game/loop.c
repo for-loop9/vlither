@@ -23,6 +23,7 @@ void game_loop(tenv* env) {
 
       if (glfwGetTime() > TIMEOUT) {
         gdata->connection->is_closing = true;
+        printf("Connection timed out.");
       }
 
       server_poll(env);

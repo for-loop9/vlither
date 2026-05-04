@@ -9,6 +9,8 @@ void user_settings_default(user_settings* usr_settings) {
   usr_settings->snake_names_font_size = FONT_SIZE_REGULAR;
   usr_settings->stats_font_size = FONT_SIZE_REGULAR;
 
+  strcpy(usr_settings->version, SETTINGS_VERSION);
+
   usr_settings->bd_color[0] = 1;
   usr_settings->bd_color[1] = 0.25f;
   usr_settings->bd_color[2] = 0.25f;

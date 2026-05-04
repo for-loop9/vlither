@@ -26,7 +26,6 @@ void tlaunch(tenv* env) {
   memset(usrs, 0, sizeof(user_settings));
   strcpy(usrs->ipv4, "15.204.212.200:444");
   strcpy(usrs->nickname, "");
-  strcpy(usrs->version, SETTINGS_VERSION);
 
   usrs->custom_skin = false;
   usrs->default_skin = rand() % 9;
