@@ -54,6 +54,8 @@ void ui_settings(tenv* env) {
       igAlignTextToFramePadding();
       igText("Minimap size");
       igAlignTextToFramePadding();
+      igText("Instant restart");
+      igAlignTextToFramePadding();
       igText("Restart with right click");
       igAlignTextToFramePadding();
       igText("Quit with middle click");
@@ -97,6 +99,7 @@ void ui_settings(tenv* env) {
       igSetNextItemWidth(-1);
       igSliderInt("##minimap size", &usrs->minimap_size, 128, 512, "%d px",
                   ImGuiSliderFlags_AlwaysClamp);
+      igCheckbox("##instant restart", &usrs->instant_restart);
       igCheckbox("##restart rc", &usrs->restart_rc);
       igCheckbox("##quit mc", &usrs->quit_mc);
       igSetNextItemWidth(-1);

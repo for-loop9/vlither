@@ -1,6 +1,7 @@
 #include "game_data.h"
 
 #include "../user.h"
+#include "../network/server.h"
 
 void show_hot_key(tuser_data* usr, int hotkey, vec3 color, const char* info,
                   float offset, font_size sz) {
@@ -513,6 +514,8 @@ void game_data_init(tenv* env) {
 
   gdata->data.fmlts = tdarray_create(float);
   gdata->data.fpsls = tdarray_create(float);
+  gdata->restart_req = false;
+  gdata->closed = false;
 
   for (int i = 0; i < GD_FLXC; i++) {
     float d = .5 * (1 - cosf(PI * i / (float)(GD_FLXC - 1)));
@@ -562,6 +565,8 @@ void game_data_init(tenv* env) {
   setup_accessories(gdata->accessories, usr);
   sbot_init(env);
   game_data_reset(env);
+
+  server_init(env);
 }
 
 void game_data_reset(tenv* env) {
@@ -638,6 +643,7 @@ void game_data_destroy(tenv* env) {
   tuser_data* usr = env->usr;
   game_data* gdata = &usr->gdata;
 
+  server_destroy(env);
   sbot_destroy(env);
   
   tdarray_destroy(gdata->data.fpsls);

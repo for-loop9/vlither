@@ -25,6 +25,7 @@ void user_settings_default(user_settings* usr_settings) {
   usr_settings->quit_mc = false;
   usr_settings->smooth_zoom = false;
   usr_settings->vsync = false;
+  usr_settings->instant_restart = false;
   usr_settings->bot_radius_mult = 20;
   usr_settings->bot_follow_circle_score = 2000;
 

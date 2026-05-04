@@ -54,6 +54,9 @@ typedef struct game_data {
   struct mg_mgr network_manager;
   struct mg_connection* connection;
 
+  bool restart_req;
+  bool closed;
+
   struct {
     float grd;
     float sector_size;

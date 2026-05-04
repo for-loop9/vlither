@@ -1,7 +1,7 @@
 # Vlither
 ## A Desktop Client for Slither.io
 
-Vlither is a client for [Slither.io](https://slither.io) which can run outside the browser. It is written in C and uses Vulkan for rendering all the graphics, resulting in faster rendering. This implementation is based on [protocol version 19](./game1107241958.js), which was the latest version on web in February 2026. It has been tested on Windows 11, Debian 13, Ubuntu 24.04, and LMDE7 (AMD and Intel).
+Vlither is a client for [Slither.io](https://slither.io) which can run outside the browser. It is written in C and uses Vulkan for rendering all the graphics, resulting in faster rendering. This implementation is based on [protocol version 19](./game1107241958.js), which was the latest version on web in May 2026. It has been tested on Windows 11, Debian 13, Ubuntu 24.04, and LMDE7 (AMD and Intel).
 
 ### Running Instructions
 No dependencies are required to run the program. If your GPU supports at least Vulkan 1.0, there should be no issues. Download the [latest release](https://github.com/for-loop9/vlither/releases/latest).
@@ -18,7 +18,7 @@ Prerequisites
 - Make
 - X11 dependencies (only for Linux, see [here](https://www.glfw.org/docs/latest/compile.html))
 
-For simplicity, _building_ is only supported on Linux.
+For simplicity, _building_ is only documented for Linux.
 
 Make sure the `VULKAN_SDK` environment variable is set (and acquire `vulkan-1.lib` and place it in `$VULKAN_SDK/lib` if targetting Windows).
 
@@ -49,4 +49,6 @@ This project is licensed under the GNU General Public License v3.0 - see the [LI
 
 ## Disclaimer & Copyright
 All game assets, artwork, trademarks, and game content are the property of [Slither.io](https://slither.io).  
-This project does **not** claim ownership over any game-related intellectual property. This application is provided for convenience and performance purposes only and is not affiliated with or endorsed by the original game developers.
+This project does **not** claim ownership over any game-related intellectual property. This application is provided for convenience and performance purposes only and is not affiliated with or endorsed by the original game developer.
+
+Permission to open source this project was granted by the original developer. This grant of permission does not transfer any intellectual property rights, and all original copyrights and trademarks remain with their respective owners.

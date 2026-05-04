@@ -62,6 +62,7 @@ typedef struct user_settings {
   bool vsync;
   bool smooth_zoom;
   bool snake_scores;
+  bool instant_restart;
   float zoom_step;
   int bot_radius_mult;
   int bot_follow_circle_score;

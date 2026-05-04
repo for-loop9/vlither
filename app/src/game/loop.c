@@ -22,7 +22,7 @@ void game_loop(tenv* env) {
       usr->r->global.minimap_opacity = 0;
 
       if (glfwGetTime() > TIMEOUT) {
-        gdata->conn = DISCONNECTED;
+        gdata->connection->is_closing = true;
       }
 
       server_poll(env);
@@ -36,6 +36,11 @@ void game_loop(tenv* env) {
       igProgressBar(-glfwGetTime(), (ImVec2){loading_bar[0], loading_bar[1]},
                     NULL);
       igPopStyleColor(1);
+
+      if (gdata->closed) {
+        gdata->conn = DISCONNECTED;
+        gdata->closed = false;
+      }
       break;
     }
     case CONNECTED:
@@ -47,15 +52,31 @@ void game_loop(tenv* env) {
       ui_overlay(env);
 
       // special hotkeys
-      if (usrs->hotkeys[HOTKEY_QUIT].active || (usrs->quit_mc && tmouse_button_pressed(env->ms, GLFW_MOUSE_BUTTON_MIDDLE))) {
-        gdata->conn = DISCONNECTED;
-      } else if (usrs->hotkeys[HOTKEY_RESTART].active || (usrs->restart_rc && tmouse_button_pressed(env->ms, GLFW_MOUSE_BUTTON_RIGHT))) {
-        game_data_reset(env);
-        server_disconnect(env);
-        usr->gdata.conn = CONNECTING;
-        glfwSetTime(0);
-        server_connect(env);
+      if (usrs->hotkeys[HOTKEY_QUIT].active ||
+          (usrs->quit_mc &&
+           tmouse_button_pressed(env->ms, GLFW_MOUSE_BUTTON_MIDDLE))) {
+        gdata->connection->is_closing = true;
+      } else if (usrs->hotkeys[HOTKEY_RESTART].active ||
+                 (usrs->restart_rc &&
+                  tmouse_button_pressed(env->ms, GLFW_MOUSE_BUTTON_RIGHT))) {
+        gdata->connection->is_closing = true;
+        gdata->restart_req = true;
       }
+
+      if (gdata->closed) {
+        game_data_reset(env);
+
+        if (gdata->restart_req) {
+          usr->gdata.conn = CONNECTING;
+          glfwSetTime(0);
+          server_connect(env);
+          gdata->restart_req = false;
+        } else {
+          usr->gdata.conn = DISCONNECTED;
+        }
+        gdata->closed = false;
+      }
+
       break;
     case DISCONNECTED:
       usr->r->global.bg_opacity = 0;
@@ -65,7 +86,7 @@ void game_loop(tenv* env) {
       gdata->curr_screen = TITLE_SCREEN;
 
       game_data_reset(env);
-      server_disconnect(env);
+      server_poll(env);
 
       break;
   }

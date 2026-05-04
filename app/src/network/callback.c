@@ -374,7 +374,7 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
         gdata->conn = CONNECTED;
         if (gdata->data.protocol_version != PROTOCOL_VERSION) {
           printf("Protocol version %d is not supported.\n", gdata->data.protocol_version);
-          gdata->conn = DISCONNECTED;
+          c->is_closing = true;
         }
         glfwSetTime(0);
       }
@@ -1268,6 +1268,11 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
     usrs->play_time = gdata->data.play_etm;
 
     save_user_settings(usrs);
+
+    if (usrs->instant_restart) {
+      gdata->restart_req = true;
+      c->is_closing = true;
+    }
   }
 }
 
@@ -1310,9 +1315,9 @@ void server_callback(struct mg_connection* c, int ev, void* ev_data) {
     }
   } else if (ev == MG_EV_ERROR) {
     printf("Connection error: %s, closing connection...\n", (char*)ev_data);
-    gdata->conn = DISCONNECTED;
+    c->is_closing = true;
   } else if (ev == MG_EV_CLOSE) {
     printf("Connection closed\n");
-    gdata->conn = DISCONNECTED;
+    gdata->closed = true;
   }
 }
