@@ -88,6 +88,9 @@ void redraw(tenv* env) {
   // draw foods and preys:
   int foods_len = tdarray_length(gdata->data.foods);
   int preys_len = tdarray_length(gdata->data.preys);
+  
+  float food_scale = mode->const_food_scale ? 1.0f : gdata->data.gsc;
+
   if (mode->uniform_food_color) {
     for (int i = foods_len - 1; i >= 0; i--) {
       food* fo = gdata->data.foods + i;
@@ -97,7 +100,7 @@ void redraw(tenv* env) {
       if (fo->rx >= gdata->data.fpx1 && fo->ry >= gdata->data.fpy1 &&
           fo->rx <= gdata->data.fpx2 && fo->ry <= gdata->data.fpy2) {
         float d =
-            gdata->fsz[fo->cv2] * gdata->data.gsc * fo->rad * mode->food_scale;
+            gdata->fsz[fo->cv2] * food_scale * fo->rad * mode->food_scale;
         vec3s c = {mode->food_color[0], mode->food_color[1],
                    mode->food_color[2]};
 
@@ -122,7 +125,7 @@ void redraw(tenv* env) {
       if (fo->rx >= gdata->data.fpx1 && fo->ry >= gdata->data.fpy1 &&
           fo->rx <= gdata->data.fpx2 && fo->ry <= gdata->data.fpy2) {
         float d =
-            gdata->fsz[fo->cv2] * gdata->data.gsc * fo->rad * mode->food_scale;
+            gdata->fsz[fo->cv2] * food_scale * fo->rad * mode->food_scale;
         vec3s c = gdata->cg_colors[fo->cv];
 
         float fx =

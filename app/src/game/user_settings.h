@@ -25,6 +25,7 @@ typedef struct gameplay_mode {
   bool show_accessories;
   bool death_effect;
   bool player_names_outline;
+  bool const_food_scale;
   int food_type;
   int boost_type;
   int render_mode;

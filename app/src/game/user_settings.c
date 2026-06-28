@@ -52,6 +52,7 @@ void user_settings_default(user_settings* usr_settings) {
   usr_settings->modes[0].death_effect = true;
   usr_settings->modes[0].player_names_outline = false;
   usr_settings->modes[0].render_mode = 0;
+  usr_settings->modes[0].const_food_scale = false;
 
   // assist mode
   usr_settings->modes[1].food_flicker = false;
@@ -74,6 +75,7 @@ void user_settings_default(user_settings* usr_settings) {
   usr_settings->modes[1].death_effect = false;
   usr_settings->modes[1].player_names_outline = true;
   usr_settings->modes[1].render_mode = 1;
+  usr_settings->modes[1].const_food_scale = false;
 
   usr_settings->hotkeys[HOTKEY_HUD] = (hotkey){GLFW_KEY_H, true, 0, "HUD"};
   usr_settings->hotkeys[HOTKEY_SHOW_NAMES] =

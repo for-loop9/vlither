@@ -162,6 +162,8 @@ void ui_settings(tenv* env) {
         igAlignTextToFramePadding();
         igText("Food flicker");
         igAlignTextToFramePadding();
+        igText("Constant food scale");
+        igAlignTextToFramePadding();
         igText("Uniform food color");
 
         igTableSetColumnIndex(1);
@@ -195,10 +197,11 @@ void ui_settings(tenv* env) {
         igCombo_Str_arr("##food type", &mode->food_type,
                         (const char*[]){"Solid", "Rings"}, 2, -1);
         igSetNextItemWidth(-1);
-        igSliderFloat("##food scale", &mode->food_scale, 0.25f, 3, "%.2f",
+        igSliderFloat("##food scale", &mode->food_scale, 0.25f, 3, "%.2fx",
                       ImGuiSliderFlags_AlwaysClamp);
         igCheckbox("##food float", &mode->food_float);
         igCheckbox("##food flicker", &mode->food_flicker);
+        igCheckbox("##food const scale", &mode->const_food_scale);
         igCheckbox("##uniform food color", &mode->uniform_food_color);
         igSameLine(0, -1);
         igBeginDisabled(!mode->uniform_food_color);
