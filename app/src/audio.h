@@ -8,6 +8,7 @@
 
 void audio_init(void);
 void audio_shutdown(void);
+void audio_set_boost_enabled(bool enabled);
 void audio_play_button_click(void);
 void audio_play_death_bloop_for_score(int score);
 void audio_play_food_eat(void);

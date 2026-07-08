@@ -13,6 +13,9 @@ typedef struct {
   ma_engine engine;
   ma_sound button_sound;
   bool button_sound_initialized;
+  ma_sound boost_sound;
+  bool boost_sound_initialized;
+  bool boost_sound_active;
   ma_sound bloop_sounds[16];
   bool bloop_sounds_initialized[16];
   ma_sound food_sounds[81];
@@ -41,12 +44,19 @@ void audio_init(void) {
 
   g_audio_state.initialized = true;
   g_audio_state.button_sound_initialized = false;
+  g_audio_state.boost_sound_initialized = false;
+  g_audio_state.boost_sound_active = false;
 }
 
 void audio_shutdown(void) {
   if (!g_audio_state.initialized) return;
 
   audio_shutdown_sound(&g_audio_state.button_sound);
+  if (g_audio_state.boost_sound_initialized) {
+    audio_shutdown_sound(&g_audio_state.boost_sound);
+    g_audio_state.boost_sound_initialized = false;
+  }
+  g_audio_state.boost_sound_active = false;
   for (int i = 0; i < 16; ++i) {
     if (g_audio_state.bloop_sounds_initialized[i]) {
       audio_shutdown_sound(&g_audio_state.bloop_sounds[i]);
@@ -61,6 +71,42 @@ void audio_shutdown(void) {
   }
   ma_engine_uninit(&g_audio_state.engine);
   memset(&g_audio_state, 0, sizeof(g_audio_state));
+}
+
+void audio_set_boost_enabled(bool enabled) {
+  if (!g_audio_state.initialized) {
+    audio_init();
+    if (!g_audio_state.initialized) return;
+  }
+
+  if (enabled) {
+    if (!g_audio_state.boost_sound_initialized) {
+      ma_result result = ma_sound_init_from_file(&g_audio_state.engine,
+                                                 "app/res/sounds/boost.wav",
+                                                 0,
+                                                 NULL,
+                                                 NULL,
+                                                 &g_audio_state.boost_sound);
+      if (result != MA_SUCCESS) {
+        return;
+      }
+
+      ma_sound_set_looping(&g_audio_state.boost_sound, true);
+      g_audio_state.boost_sound_initialized = true;
+    }
+
+    if (!g_audio_state.boost_sound_active) {
+      ma_sound_seek_to_pcm_frame(&g_audio_state.boost_sound, 0);
+      ma_sound_start(&g_audio_state.boost_sound);
+      g_audio_state.boost_sound_active = true;
+    }
+    return;
+  }
+
+  if (g_audio_state.boost_sound_initialized && g_audio_state.boost_sound_active) {
+    ma_sound_stop(&g_audio_state.boost_sound);
+    g_audio_state.boost_sound_active = false;
+  }
 }
 
 void audio_play_button_click(void) {

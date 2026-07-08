@@ -2,6 +2,7 @@ import subprocess
 import sys
 import os
 import shutil
+import glob
 
 
 def compile_shader(input_path, output_path, stage, entry):
@@ -109,6 +110,70 @@ def run_compiledb():
         sys.exit(1)
 
 
+def run_post_build():
+    print("> Running post-build steps...")
+    target_dir = os.path.join("build", "bin", "windows_x86_64_debug")
+    
+    if not os.path.exists(target_dir):
+        print(f"> Error: Target build directory '{target_dir}' does not exist.")
+        return
+
+    # 1. Copy 'app' folder (excluding 'src')
+    src_app = "app"
+    dst_app = os.path.join(target_dir, "app")
+    
+    if os.path.exists(src_app):
+        if os.path.exists(dst_app):
+            shutil.rmtree(dst_app)
+            
+        def ignore_patterns(path, names):
+            if os.path.normpath(path) == os.path.normpath(src_app):
+                return ["src"]
+            return []
+
+        try:
+            shutil.copytree(src_app, dst_app, ignore=ignore_patterns)
+            print("> 'app' folder copied successfully (excluding 'src').")
+        except Exception as e:
+            print(f"> Error copying 'app' folder: {e}")
+    else:
+        print(f"> Warning: Source folder '{src_app}' not found. Skipping copy.")
+
+    # 2. Delete .lib files in the target folder
+    lib_files = glob.glob(os.path.join(target_dir, "*.lib"))
+    for lib in lib_files:
+        try:
+            os.remove(lib)
+            print(f"> Deleted: {os.path.basename(lib)}")
+        except Exception as e:
+            print(f"> Error deleting {lib}: {e}")
+
+    # 3. Rename the built .exe to vlither.exe
+    exe_files = glob.glob(os.path.join(target_dir, "*.exe"))
+    # Filter out if vlither.exe already exists from a previous step to avoid renaming it to itself
+    exe_files = [f for f in exe_files if os.path.basename(f).lower() != "vlither.exe"]
+    
+    if len(exe_files) == 1:
+        old_exe = exe_files[0]
+        new_exe = os.path.join(target_dir, "vlither.exe")
+        try:
+            # If an old vlither.exe exists, remove it first so rename doesn't fail
+            if os.path.exists(new_exe):
+                os.remove(new_exe)
+            os.rename(old_exe, new_exe)
+            print(f"> Renamed executable: {os.path.basename(old_exe)} -> vlither.exe")
+        except Exception as e:
+            print(f"> Error renaming executable: {e}")
+    elif len(exe_files) > 1:
+        print(f"> Warning: Found multiple .exe files. Could not safely determine which one to rename to 'vlither.exe'.")
+    else:
+        # Check if vlither.exe is already there from a previous run
+        if os.path.exists(os.path.join(target_dir, "vlither.exe")):
+            print("> 'vlither.exe' already present.")
+        else:
+            print("> Warning: No executable found to rename.")
+
+
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Error: Please provide a command number.")
@@ -126,6 +191,7 @@ if __name__ == "__main__":
         run_premake()
         os.system("cls" if os.name == "nt" else "clear")
         run_compiledb()
+        run_post_build()  # Unified post-build processing hook
     elif cmd == 1:
         run_clean()
     elif cmd == 2:

@@ -1,5 +1,6 @@
 #include "input.h"
 
+#include "../audio.h"
 #include "../user.h"
 
 void input(tenv* env) {
@@ -138,6 +139,13 @@ void input(tenv* env) {
       usrs->hotkeys[HOTKEY_RESTART].active = false;
     }
   }
+
+  bool boost_available = false;
+  if (gdata->data.follow_view && tdarray_length(gdata->data.snakes) > 0) {
+    snake* me = gdata->data.snakes + (tdarray_length(gdata->data.snakes) - 1);
+    boost_available = gdata->data.md && !gdata->data.dead && me->tsp > me->fsp;
+  }
+  audio_set_boost_enabled(boost_available);
 
   gameplay_mode* mode = usrs->modes + usrs->hotkeys[HOTKEY_ASSIST].active;
   if (mode->show_crosshair) igSetMouseCursor(ImGuiMouseCursor_None);
