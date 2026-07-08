@@ -20,7 +20,7 @@ void ui_settings(tenv* env) {
   float child_window_height =
       ctx->size[1] - style->WindowPadding.y * 4 - frame_height;
 
-  if (igBeginTable("settings_table", 4, ImGuiTableFlags_None, (ImVec2){}, 0)) {
+  if (igBeginTable("settings_table", 5, ImGuiTableFlags_None, (ImVec2){}, 0)) {
     igTableNextRow(ImGuiTableRowFlags_None, 0);
     igTableSetColumnIndex(0);
 
@@ -218,6 +218,71 @@ void ui_settings(tenv* env) {
     }
 
     igTableSetColumnIndex(3);
+    igBeginChild_Str("sounds_child_window", (ImVec2){-1, child_window_height},
+                     ImGuiChildFlags_None, ImGuiWindowFlags_None);
+    igSeparatorText("Sounds");
+    if (igBeginTable("field:value", 2, ImGuiTableFlags_None, (ImVec2){}, 0)) {
+      igTableNextRow(ImGuiTableRowFlags_None, 0);
+      igTableSetColumnIndex(0);
+      igIndent(style->WindowPadding.x);
+      igAlignTextToFramePadding();
+      igText("Master sound");
+      igAlignTextToFramePadding();
+      igText("Eating");
+      igAlignTextToFramePadding();
+      igText("Bloops");
+      igAlignTextToFramePadding();
+      igText("Boosting");
+      igAlignTextToFramePadding();
+      igText("Menu buttons");
+
+      igTableSetColumnIndex(1);
+      if (igSliderInt("##master sound", &usrs->sound_master_volume, 0, 100,
+                      "%d%%", ImGuiSliderFlags_AlwaysClamp)) {
+        audio_apply_volume_settings(usrs->sound_master_volume,
+                                    usrs->sound_eating_volume,
+                                    usrs->sound_bloops_volume,
+                                    usrs->sound_boosting_volume,
+                                    usrs->sound_menu_volume);
+      }
+      if (igSliderInt("##eating sound", &usrs->sound_eating_volume, 0, 100,
+                      "%d%%", ImGuiSliderFlags_AlwaysClamp)) {
+        audio_apply_volume_settings(usrs->sound_master_volume,
+                                    usrs->sound_eating_volume,
+                                    usrs->sound_bloops_volume,
+                                    usrs->sound_boosting_volume,
+                                    usrs->sound_menu_volume);
+      }
+      if (igSliderInt("##bloops sound", &usrs->sound_bloops_volume, 0, 100,
+                      "%d%%", ImGuiSliderFlags_AlwaysClamp)) {
+        audio_apply_volume_settings(usrs->sound_master_volume,
+                                    usrs->sound_eating_volume,
+                                    usrs->sound_bloops_volume,
+                                    usrs->sound_boosting_volume,
+                                    usrs->sound_menu_volume);
+      }
+      if (igSliderInt("##boosting sound", &usrs->sound_boosting_volume, 0, 100,
+                      "%d%%", ImGuiSliderFlags_AlwaysClamp)) {
+        audio_apply_volume_settings(usrs->sound_master_volume,
+                                    usrs->sound_eating_volume,
+                                    usrs->sound_bloops_volume,
+                                    usrs->sound_boosting_volume,
+                                    usrs->sound_menu_volume);
+      }
+      if (igSliderInt("##menu button sound", &usrs->sound_menu_volume, 0, 100,
+                      "%d%%", ImGuiSliderFlags_AlwaysClamp)) {
+        audio_apply_volume_settings(usrs->sound_master_volume,
+                                    usrs->sound_eating_volume,
+                                    usrs->sound_bloops_volume,
+                                    usrs->sound_boosting_volume,
+                                    usrs->sound_menu_volume);
+      }
+      igIndent(-style->WindowPadding.x);
+      igEndTable();
+    }
+    igEndChild();
+
+    igTableSetColumnIndex(4);
     igBeginChild_Str("hotkey_child_window", (ImVec2){-1, child_window_height},
                      ImGuiChildFlags_None, ImGuiWindowFlags_None);
     igSeparatorText("Hotkeys");
@@ -302,11 +367,21 @@ void ui_settings(tenv* env) {
   igSetCursorPosY(ctx->size[1] - style->WindowPadding.y - frame_height);
   if (audio_button("Reset", (ImVec2){150, 0})) {
     user_settings_default(usrs);
+    audio_apply_volume_settings(usrs->sound_master_volume,
+                                usrs->sound_eating_volume,
+                                usrs->sound_bloops_volume,
+                                usrs->sound_boosting_volume,
+                                usrs->sound_menu_volume);
     env->config.vsync = usrs->vsync;
     twindow_request_refresh(env->wnd);
   }
   igSameLine(0, -1);
   if (audio_button("OK", (ImVec2){150, 0})) {
+    audio_apply_volume_settings(usrs->sound_master_volume,
+                                usrs->sound_eating_volume,
+                                usrs->sound_bloops_volume,
+                                usrs->sound_boosting_volume,
+                                usrs->sound_menu_volume);
     save_user_settings(usrs);
     gdata->curr_screen = TITLE_SCREEN;
   }

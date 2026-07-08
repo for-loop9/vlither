@@ -30,6 +30,11 @@ void user_settings_default(user_settings* usr_settings) {
   usr_settings->instant_restart = false;
   usr_settings->bot_radius_mult = 20;
   usr_settings->bot_follow_circle_score = 2000;
+  usr_settings->sound_master_volume = 100;
+  usr_settings->sound_eating_volume = 100;
+  usr_settings->sound_bloops_volume = 100;
+  usr_settings->sound_boosting_volume = 100;
+  usr_settings->sound_menu_volume = 100;
 
   // normal mode
   usr_settings->modes[0].food_flicker = true;

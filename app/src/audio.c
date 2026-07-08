@@ -16,6 +16,11 @@ typedef struct {
   ma_sound boost_sound;
   bool boost_sound_initialized;
   bool boost_sound_active;
+  float master_volume;
+  float eating_volume;
+  float bloops_volume;
+  float boosting_volume;
+  float menu_volume;
   ma_sound bloop_sounds[16];
   bool bloop_sounds_initialized[16];
   ma_sound food_sounds[81];
@@ -25,6 +30,40 @@ typedef struct {
 } audio_state_t;
 
 static audio_state_t g_audio_state = {0};
+
+static float audio_percent_to_volume(int percent) {
+  if (percent < 0) percent = 0;
+  if (percent > 100) percent = 100;
+  return percent == 0 ? 0.0f : (float)percent / 100.0f;
+}
+
+static void audio_set_sound_volume(ma_sound* sound, float volume) {
+  if (sound) {
+    ma_sound_set_volume(sound, volume);
+  }
+}
+
+static void audio_refresh_existing_sound_volumes(void) {
+  float master = g_audio_state.master_volume;
+  float eating = g_audio_state.eating_volume;
+  float bloops = g_audio_state.bloops_volume;
+  float boosting = g_audio_state.boosting_volume;
+  float menu = g_audio_state.menu_volume;
+
+  audio_set_sound_volume(&g_audio_state.button_sound, master * menu);
+  audio_set_sound_volume(&g_audio_state.boost_sound, master * boosting);
+
+  for (int i = 0; i < 16; ++i) {
+    if (g_audio_state.bloop_sounds_initialized[i]) {
+      audio_set_sound_volume(&g_audio_state.bloop_sounds[i], master * bloops);
+    }
+  }
+  for (int i = 1; i <= 80; ++i) {
+    if (g_audio_state.food_sounds_initialized[i]) {
+      audio_set_sound_volume(&g_audio_state.food_sounds[i], master * eating);
+    }
+  }
+}
 
 static void audio_shutdown_sound(ma_sound* sound) {
   if (!sound) return;
@@ -46,6 +85,11 @@ void audio_init(void) {
   g_audio_state.button_sound_initialized = false;
   g_audio_state.boost_sound_initialized = false;
   g_audio_state.boost_sound_active = false;
+  g_audio_state.master_volume = 1.0f;
+  g_audio_state.eating_volume = 1.0f;
+  g_audio_state.bloops_volume = 1.0f;
+  g_audio_state.boosting_volume = 1.0f;
+  g_audio_state.menu_volume = 1.0f;
 }
 
 void audio_shutdown(void) {
@@ -73,6 +117,22 @@ void audio_shutdown(void) {
   memset(&g_audio_state, 0, sizeof(g_audio_state));
 }
 
+void audio_apply_volume_settings(int master_percent, int eating_percent,
+                                 int bloops_percent, int boosting_percent,
+                                 int menu_percent) {
+  if (!g_audio_state.initialized) {
+    audio_init();
+    if (!g_audio_state.initialized) return;
+  }
+
+  g_audio_state.master_volume = audio_percent_to_volume(master_percent);
+  g_audio_state.eating_volume = audio_percent_to_volume(eating_percent);
+  g_audio_state.bloops_volume = audio_percent_to_volume(bloops_percent);
+  g_audio_state.boosting_volume = audio_percent_to_volume(boosting_percent);
+  g_audio_state.menu_volume = audio_percent_to_volume(menu_percent);
+  audio_refresh_existing_sound_volumes();
+}
+
 void audio_set_boost_enabled(bool enabled) {
   if (!g_audio_state.initialized) {
     audio_init();
@@ -80,6 +140,10 @@ void audio_set_boost_enabled(bool enabled) {
   }
 
   if (enabled) {
+    if (g_audio_state.master_volume <= 0.0f ||
+        g_audio_state.boosting_volume <= 0.0f) {
+      return;
+    }
     if (!g_audio_state.boost_sound_initialized) {
       ma_result result = ma_sound_init_from_file(&g_audio_state.engine,
                                                  "app/res/sounds/boost.wav",
@@ -92,6 +156,9 @@ void audio_set_boost_enabled(bool enabled) {
       }
 
       ma_sound_set_looping(&g_audio_state.boost_sound, true);
+      audio_set_sound_volume(&g_audio_state.boost_sound,
+                             g_audio_state.master_volume *
+                                 g_audio_state.boosting_volume);
       g_audio_state.boost_sound_initialized = true;
     }
 
@@ -129,6 +196,14 @@ void audio_play_button_click(void) {
     g_audio_state.button_sound_initialized = true;
   }
 
+  if (g_audio_state.master_volume <= 0.0f ||
+      g_audio_state.menu_volume <= 0.0f) {
+    return;
+  }
+
+  audio_set_sound_volume(&g_audio_state.button_sound,
+                         g_audio_state.master_volume *
+                             g_audio_state.menu_volume);
   ma_sound_seek_to_pcm_frame(&g_audio_state.button_sound, 0);
   ma_sound_start(&g_audio_state.button_sound);
 }
@@ -160,6 +235,14 @@ void audio_play_death_bloop_for_score(int score) {
     g_audio_state.bloop_sounds_initialized[bloop_index] = true;
   }
 
+  if (g_audio_state.master_volume <= 0.0f ||
+      g_audio_state.bloops_volume <= 0.0f) {
+    return;
+  }
+
+  audio_set_sound_volume(&g_audio_state.bloop_sounds[bloop_index],
+                         g_audio_state.master_volume *
+                             g_audio_state.bloops_volume);
   ma_sound_seek_to_pcm_frame(&g_audio_state.bloop_sounds[bloop_index], 0);
   ma_sound_start(&g_audio_state.bloop_sounds[bloop_index]);
 }
@@ -196,6 +279,14 @@ void audio_play_food_eat(void) {
     g_audio_state.food_sounds_initialized[food_index] = true;
   }
 
+  if (g_audio_state.master_volume <= 0.0f ||
+      g_audio_state.eating_volume <= 0.0f) {
+    return;
+  }
+
+  audio_set_sound_volume(&g_audio_state.food_sounds[food_index],
+                         g_audio_state.master_volume *
+                             g_audio_state.eating_volume);
   ma_sound_seek_to_pcm_frame(&g_audio_state.food_sounds[food_index], 0);
   ma_sound_start(&g_audio_state.food_sounds[food_index]);
 }

@@ -67,6 +67,11 @@ typedef struct user_settings {
   float zoom_step;
   int bot_radius_mult;
   int bot_follow_circle_score;
+  int sound_master_volume;
+  int sound_eating_volume;
+  int sound_bloops_volume;
+  int sound_boosting_volume;
+  int sound_menu_volume;
 
   gameplay_mode modes[2];
 

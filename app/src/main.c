@@ -33,6 +33,11 @@ void tlaunch(tenv* env) {
   usrs->accessory = NO_ACCESSORY;
 
   read_user_settings(usrs);
+  audio_apply_volume_settings(usrs->sound_master_volume,
+                              usrs->sound_eating_volume,
+                              usrs->sound_bloops_volume,
+                              usrs->sound_boosting_volume,
+                              usrs->sound_menu_volume);
 
   env->config.vsync = usrs->vsync;
   env->config.fullscreen = false;
