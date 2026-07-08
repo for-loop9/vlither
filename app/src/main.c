@@ -38,6 +38,7 @@ void tlaunch(tenv* env) {
                               usrs->sound_bloops_volume,
                               usrs->sound_boosting_volume,
                               usrs->sound_menu_volume);
+  audio_apply_music_settings(usrs->new_songs, usrs->music_volume);
 
   env->config.vsync = usrs->vsync;
   env->config.fullscreen = false;
@@ -55,6 +56,7 @@ void tinit(tenv* env) {
   ui_skin_editor_init(env);
   ui_settings_init(env);
   game_data_init(env);
+  audio_update_music_for_screen(usr->gdata.curr_screen);
 }
 
 void tdestroy(tenv* env) {
@@ -73,6 +75,7 @@ void trender(tenv* env) {
   tcontext* ctx = env->ctx;
   game_data* gdata = &usr->gdata;
 
+  audio_update();
   imgui_prerender();
   // render begin
   ImGuiStyle* style = igGetStyle();

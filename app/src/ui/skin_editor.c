@@ -239,6 +239,7 @@ void ui_skin_editor(tenv* env) {
   if (audio_button("OK", (ImVec2){tot_size[0]})) {
     if (usrs->skin_code[0] == 0) usrs->custom_skin = false;
     gdata->curr_screen = TITLE_SCREEN;
+    audio_update_music_for_screen(gdata->curr_screen);
     save_user_settings(usrs);
   }
 

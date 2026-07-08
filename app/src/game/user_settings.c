@@ -35,6 +35,8 @@ void user_settings_default(user_settings* usr_settings) {
   usr_settings->sound_bloops_volume = 100;
   usr_settings->sound_boosting_volume = 100;
   usr_settings->sound_menu_volume = 100;
+  usr_settings->new_songs = true;
+  usr_settings->music_volume = 100;
 
   // normal mode
   usr_settings->modes[0].food_flicker = true;

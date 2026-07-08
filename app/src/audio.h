@@ -11,6 +11,9 @@ void audio_shutdown(void);
 void audio_apply_volume_settings(int master_percent, int eating_percent,
                                  int bloops_percent, int boosting_percent,
                                  int menu_percent);
+void audio_apply_music_settings(bool new_songs_enabled, int volume_percent);
+void audio_update(void);
+void audio_update_music_for_screen(int screen);
 void audio_set_boost_enabled(bool enabled);
 void audio_play_button_click(void);
 void audio_play_death_bloop_for_score(int score);

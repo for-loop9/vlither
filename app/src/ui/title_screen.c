@@ -85,6 +85,7 @@ void ui_title_screen(tenv* env) {
   if (audio_button("\uea1c Play", (ImVec2){logo_size})) {
     usr->gdata.conn = CONNECTING;
     usr->gdata.curr_screen = PLAYING;
+    audio_update_music_for_screen(usr->gdata.curr_screen);
     glfwSetTime(0);
     server_connect(env);
   }
@@ -92,12 +93,15 @@ void ui_title_screen(tenv* env) {
   igSetCursorPosY(ctx->size[1] / 2.0f + style->ItemSpacing.y * 4 +
                   frame_height * 3);
   if (audio_button("\ue90c Skin editor",
-               (ImVec2){logo_size / 2 - style->ItemSpacing.x / 2}))
+               (ImVec2){logo_size / 2 - style->ItemSpacing.x / 2})) {
     usr->gdata.curr_screen = SKIN_EDITOR;
+    audio_update_music_for_screen(usr->gdata.curr_screen);
+  }
   igSameLine(0, -1);
   if (audio_button("\ue991 Settings",
                (ImVec2){logo_size / 2 - style->ItemSpacing.x / 2})) {
     usr->gdata.curr_screen = SETTINGS;
+    audio_update_music_for_screen(usr->gdata.curr_screen);
   }
   igSetCursorPosX(ctx->size[0] / 2.0f - logo_size / 2);
   igSetCursorPosY(ctx->size[1] / 2.0f + style->ItemSpacing.y * 5 +

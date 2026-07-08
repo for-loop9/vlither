@@ -1,5 +1,6 @@
 #include "loop.h"
 
+#include "../audio.h"
 #include "../network/server.h"
 #include "../user.h"
 #include "input.h"
@@ -85,6 +86,7 @@ void game_loop(tenv* env) {
       usr->r->global.minimap_opacity = 0;
 
       gdata->curr_screen = TITLE_SCREEN;
+      audio_update_music_for_screen(gdata->curr_screen);
 
       game_data_reset(env);
       server_poll(env);

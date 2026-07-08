@@ -226,18 +226,22 @@ void ui_settings(tenv* env) {
       igTableSetColumnIndex(0);
       igIndent(style->WindowPadding.x);
       igAlignTextToFramePadding();
-      igText("Master sound");
+      igText("Master volume");
       igAlignTextToFramePadding();
-      igText("Eating");
+      igText("Music volume");
       igAlignTextToFramePadding();
-      igText("Bloops");
+      igText("Eating volume");
       igAlignTextToFramePadding();
-      igText("Boosting");
+      igText("Bloops volume");
       igAlignTextToFramePadding();
-      igText("Menu buttons");
+      igText("Boosting volume");
+      igAlignTextToFramePadding();
+      igText("Button volume");
+      igAlignTextToFramePadding();
+      igText("New songs");
 
       igTableSetColumnIndex(1);
-      if (igSliderInt("##master sound", &usrs->sound_master_volume, 0, 100,
+      if (igSliderInt("##master volume", &usrs->sound_master_volume, 0, 100,
                       "%d%%", ImGuiSliderFlags_AlwaysClamp)) {
         audio_apply_volume_settings(usrs->sound_master_volume,
                                     usrs->sound_eating_volume,
@@ -245,7 +249,11 @@ void ui_settings(tenv* env) {
                                     usrs->sound_boosting_volume,
                                     usrs->sound_menu_volume);
       }
-      if (igSliderInt("##eating sound", &usrs->sound_eating_volume, 0, 100,
+      if (igSliderInt("##music volume", &usrs->music_volume, 0, 100,
+                      "%d%%", ImGuiSliderFlags_AlwaysClamp)) {
+        audio_apply_music_settings(usrs->new_songs, usrs->music_volume);
+      }
+      if (igSliderInt("##eating volume", &usrs->sound_eating_volume, 0, 100,
                       "%d%%", ImGuiSliderFlags_AlwaysClamp)) {
         audio_apply_volume_settings(usrs->sound_master_volume,
                                     usrs->sound_eating_volume,
@@ -253,7 +261,7 @@ void ui_settings(tenv* env) {
                                     usrs->sound_boosting_volume,
                                     usrs->sound_menu_volume);
       }
-      if (igSliderInt("##bloops sound", &usrs->sound_bloops_volume, 0, 100,
+      if (igSliderInt("##bloops volume", &usrs->sound_bloops_volume, 0, 100,
                       "%d%%", ImGuiSliderFlags_AlwaysClamp)) {
         audio_apply_volume_settings(usrs->sound_master_volume,
                                     usrs->sound_eating_volume,
@@ -261,7 +269,7 @@ void ui_settings(tenv* env) {
                                     usrs->sound_boosting_volume,
                                     usrs->sound_menu_volume);
       }
-      if (igSliderInt("##boosting sound", &usrs->sound_boosting_volume, 0, 100,
+      if (igSliderInt("##boosting volume", &usrs->sound_boosting_volume, 0, 100,
                       "%d%%", ImGuiSliderFlags_AlwaysClamp)) {
         audio_apply_volume_settings(usrs->sound_master_volume,
                                     usrs->sound_eating_volume,
@@ -269,13 +277,16 @@ void ui_settings(tenv* env) {
                                     usrs->sound_boosting_volume,
                                     usrs->sound_menu_volume);
       }
-      if (igSliderInt("##menu button sound", &usrs->sound_menu_volume, 0, 100,
+      if (igSliderInt("##button volume", &usrs->sound_menu_volume, 0, 100,
                       "%d%%", ImGuiSliderFlags_AlwaysClamp)) {
         audio_apply_volume_settings(usrs->sound_master_volume,
                                     usrs->sound_eating_volume,
                                     usrs->sound_bloops_volume,
                                     usrs->sound_boosting_volume,
                                     usrs->sound_menu_volume);
+      }
+      if (igCheckbox("##new songs", &usrs->new_songs)) {
+        audio_apply_music_settings(usrs->new_songs, usrs->music_volume);
       }
       igIndent(-style->WindowPadding.x);
       igEndTable();
@@ -382,6 +393,7 @@ void ui_settings(tenv* env) {
                                 usrs->sound_bloops_volume,
                                 usrs->sound_boosting_volume,
                                 usrs->sound_menu_volume);
+    audio_apply_music_settings(usrs->new_songs, usrs->music_volume);
     save_user_settings(usrs);
     gdata->curr_screen = TITLE_SCREEN;
   }

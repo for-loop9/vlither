@@ -72,6 +72,8 @@ typedef struct user_settings {
   int sound_bloops_volume;
   int sound_boosting_volume;
   int sound_menu_volume;
+  bool new_songs;
+  int music_volume;
 
   gameplay_mode modes[2];
 
