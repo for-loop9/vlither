@@ -970,6 +970,9 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
         if (ebid >= 0) {
           fo->ebid = ebid;
           fo->eaten_fr = 0;
+          if (gdata->data.snake_id >= 0 && ebid == gdata->data.snake_id) {
+            audio_play_food_eat();
+          }
         } else {
           if (i != cm1) {
             gdata->data.foods[i] = gdata->data.foods[cm1];
