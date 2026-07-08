@@ -4,6 +4,7 @@
 #include "ui/settings.h"
 #include "ui/viewport.h"
 #include "user.h"
+#include "audio.h"
 
 void tinput(tenv* env) {
   tuser_data* usr = env->usr;
@@ -42,6 +43,7 @@ void tinit(tenv* env) {
   tuser_data* usr = env->usr;
 
   imgui_init(env);
+  audio_init();
   env->usr->r = renderer_create(env);
   ui_viewport_init(env);
   ui_title_screen_init(env);
@@ -57,6 +59,7 @@ void tdestroy(tenv* env) {
   ui_title_screen_destroy(env);
   ui_viewport_destroy(env);
   renderer_destroy(env->usr->r, env->ctx);
+  audio_shutdown();
   imgui_destroy();
 }
 

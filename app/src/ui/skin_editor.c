@@ -2,6 +2,7 @@
 
 #include <string.h>
 
+#include "../audio.h"
 #include "../user.h"
 
 int skin_code_filter(ImGuiInputTextCallbackData* data) {
@@ -206,36 +207,36 @@ void ui_skin_editor(tenv* env) {
     igSameLine(0, -1);
     igPushStyleVarX(ImGuiStyleVar_FramePadding, 0);
     int skin_code_len = strlen(usrs->skin_code);
-    if (igButton("C", (ImVec2){frame_height, frame_height}) &&
+    if (audio_button("C", (ImVec2){frame_height, frame_height}) &&
         skin_code_len > 0) {
       usrs->skin_code[strlen(usrs->skin_code) - 1] = 0;
     }
     igSameLine(0, -1);
-    if (igButton("\ue9ac", (ImVec2){frame_height, frame_height})) {
+    if (audio_button("\ue9ac", (ImVec2){frame_height, frame_height})) {
       usrs->skin_code[0] = 0;
     }
     igPopStyleVar(1);
   } else {
-    if (igButton("\uea38",
+    if (audio_button("\uea38",
                  (ImVec2){tot_size[0] / 2 - style->ItemSpacing.x / 2, 0}))
       usrs->default_skin =
           (usrs->default_skin + (NUM_DEFAULT_SKINS - 1)) % NUM_DEFAULT_SKINS;
     igSameLine(0, -1);
-    if (igButton("\uea34",
+    if (audio_button("\uea34",
                  (ImVec2){tot_size[0] / 2 - style->ItemSpacing.x / 2, 0}))
       usrs->default_skin = (usrs->default_skin + 1) % NUM_DEFAULT_SKINS;
   }
   igSetCursorPosX(ctx->size[0] * 0.5 - tot_size[0] * 0.5f);
   igSetCursorPosY((ctx->size[1] * 0.5 - tot_size[1] * 0.5f) -
                   ((style->ItemSpacing.y + frame_height) * 2));
-  if (igButton(usrs->custom_skin ? "\uea40 Default" : "\ue905 Custom",
+  if (audio_button(usrs->custom_skin ? "\uea40 Default" : "\ue905 Custom",
                (ImVec2){tot_size[0]}))
     usrs->custom_skin = !usrs->custom_skin;
 
   igSetCursorPosX(ctx->size[0] * 0.5 - tot_size[0] * 0.5f);
   igSetCursorPosY((ctx->size[1] * 0.5 - tot_size[1] * 0.5f) -
                   ((style->ItemSpacing.y + frame_height) * 1));
-  if (igButton("OK", (ImVec2){tot_size[0]})) {
+  if (audio_button("OK", (ImVec2){tot_size[0]})) {
     if (usrs->skin_code[0] == 0) usrs->custom_skin = false;
     gdata->curr_screen = TITLE_SCREEN;
     save_user_settings(usrs);
@@ -293,7 +294,7 @@ void ui_skin_editor(tenv* env) {
         igPushStyleColor_Vec4(ImGuiCol_ButtonHovered, (ImVec4){0, 0, 0, 0});
         igPushStyleColor_Vec4(ImGuiCol_ButtonActive, (ImVec4){0, 0, 0, 0});
         igPushID_Int(cg_id);
-        bool pressed = igButton(label, (ImVec2){scale, scale});
+        bool pressed = audio_button(label, (ImVec2){scale, scale});
         igPopID();
         igPopStyleVar(1);
         igPopStyleColor(6);
@@ -343,7 +344,7 @@ void ui_skin_editor(tenv* env) {
           igPushStyleColor_Vec4(ImGuiCol_ButtonActive, (ImVec4){0, 0, 0, 0});
         }
         igPushID_Str(label);
-        bool pressed = igButton(is_no_accessory ? "\uea0f" : "", (ImVec2){scale, scale});
+        bool pressed = audio_button(is_no_accessory ? "\uea0f" : "", (ImVec2){scale, scale});
         igPopID();
         if (!is_no_accessory) igPopStyleVar(1);
         igPopStyleColor(is_no_accessory ? 1 : 6);

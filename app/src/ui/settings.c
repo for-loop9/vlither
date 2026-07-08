@@ -1,5 +1,6 @@
 #include "settings.h"
 
+#include "../audio.h"
 #include "../user.h"
 
 void ui_settings_init(tenv* env) {}
@@ -299,13 +300,13 @@ void ui_settings(tenv* env) {
   igSetCursorPosX(ctx->size[0] - style->WindowPadding.x - 150 -
                   style->ItemSpacing.x - 150);
   igSetCursorPosY(ctx->size[1] - style->WindowPadding.y - frame_height);
-  if (igButton("Reset", (ImVec2){150, 0})) {
+  if (audio_button("Reset", (ImVec2){150, 0})) {
     user_settings_default(usrs);
     env->config.vsync = usrs->vsync;
     twindow_request_refresh(env->wnd);
   }
   igSameLine(0, -1);
-  if (igButton("OK", (ImVec2){150, 0})) {
+  if (audio_button("OK", (ImVec2){150, 0})) {
     save_user_settings(usrs);
     gdata->curr_screen = TITLE_SCREEN;
   }
