@@ -1,5 +1,6 @@
 #include "callback.h"
 
+#include "../audio.h"
 #include "../game/food.h"
 #include "../game/snake.h"
 #include "../user.h"
@@ -425,6 +426,13 @@ void got_packet(tenv* env, uint8_t* a, int a_len) {
             o->dead = true;
             o->dead_amt = 0;
             o->edir = 0;
+
+            int sct = o->sct + o->rsc;
+            int score = (int)floorf((gdata->data.fpsls[sct] +
+                                     o->fam / gdata->data.fmlts[sct] - 1) *
+                                        15 -
+                                    5);
+            audio_play_death_bloop_for_score(score);
           } else {
             tdarray_push(&gdata->data.pts_dp, &o->pts);
             tdarray_push(&gdata->data.gptz_dp, &o->gptz);
